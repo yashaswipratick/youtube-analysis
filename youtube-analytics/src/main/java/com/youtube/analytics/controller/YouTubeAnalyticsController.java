@@ -2,6 +2,7 @@ package com.youtube.analytics.controller;
 
 import com.youtube.analytics.model.AnalyticsRequest;
 import com.youtube.analytics.model.ApiResponse;
+import com.youtube.analytics.model.ChannelAnalyticsResult;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.service.AnalyticsRequestValidator;
@@ -32,6 +33,26 @@ public class YouTubeAnalyticsController {
 
     private final YouTubeAnalyticsService analyticsService;
 
+    @GetMapping("/channel")
+    public ResponseEntity<ApiResponse<ChannelAnalyticsResult>> getChannelAnalytics(
+            @RequestParam(required = false)
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
+            @RequestParam(required = false)
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
+            @RequestParam(required = false) List<String> metrics) {
+
+        AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
+        log.info("GET /channel | {} → {}", startDate, endDate);
+
+        ChannelAnalyticsResult result = analyticsService.getChannelAnalytics(
+                startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
     @GetMapping("/video/{videoId}")
     public ResponseEntity<ApiResponse<VideoAnalyticsResult>> getSingleVideoAnalytics(
             @PathVariable String videoId,
@@ -54,10 +75,6 @@ public class YouTubeAnalyticsController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
-    /**
-     * Returns one analytics row per reporting day for a single video.
-     * The existing aggregate video endpoint remains unchanged.
-     */
     @GetMapping("/video/{videoId}/daily")
     public ResponseEntity<ApiResponse<DailyVideoAnalyticsResult>> getDailyVideoAnalytics(
             @PathVariable String videoId,
