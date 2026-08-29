@@ -5,10 +5,13 @@ import com.youtube.analytics.model.VideoMeta;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,19 +63,21 @@ public class YouTubeAnalyticsService {
         log.info("Fetching single video analytics: {} | {} → {} | metrics: {}",
                 videoId, resolvedStart, resolvedEnd, resolvedMetrics);
 
-        String url = UriComponentsBuilder.fromHttpUrl(YT_ANALYTICS_BASE)
+        URI uri = UriComponentsBuilder.fromHttpUrl(YT_ANALYTICS_BASE)
                 .queryParam("ids", CHANNEL_IDS)
                 .queryParam("startDate", resolvedStart)
                 .queryParam("endDate", resolvedEnd)
                 .queryParam("metrics", resolvedMetrics)
                 .queryParam("filters", "video==" + videoId)
-                .toUriString();
+                .build()
+                .toUri();
 
         Map<?, ?> response = youTubeWebClient.get()
-                .uri(url)
+                .uri(uri)
                 .retrieve()
                 .bodyToMono(Map.class)
                 .block();
+        log.info("Response from YouTube API is {}", response);
 
         Map<String, Object> metricsMap = parseSingleRowResponse(response);
 
@@ -116,18 +121,31 @@ public class YouTubeAnalyticsService {
 
             String filter = "video==" + String.join(",", batch);
 
-            String url = UriComponentsBuilder.fromHttpUrl(YT_ANALYTICS_BASE)
+            URI uri = UriComponentsBuilder.fromHttpUrl(YT_ANALYTICS_BASE)
                     .queryParam("ids", CHANNEL_IDS)
                     .queryParam("startDate", resolvedStart)
                     .queryParam("endDate", resolvedEnd)
                     .queryParam("metrics", resolvedMetrics)
                     .queryParam("filters", filter)
                     .queryParam("dimensions", "video")
-                    .toUriString();
+                    .build()
+                    .toUri();
 
             Map<?, ?> response = youTubeWebClient.get()
-                    .uri(url)
+                    .uri(uri)
                     .retrieve()
+                    .onStatus(
+                            HttpStatusCode::isError,
+                            responseData -> responseData.bodyToMono(String.class)
+                                    .flatMap(body -> {
+                                        log.error("YouTube API error response: {}", body);
+                                        return Mono.error(
+                                                new RuntimeException(
+                                                        "YouTube API returned " + responseData.statusCode() + ": " + body
+                                                )
+                                        );
+                                    })
+                    )
                     .bodyToMono(Map.class)
                     .block();
 

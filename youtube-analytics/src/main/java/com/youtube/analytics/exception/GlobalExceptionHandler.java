@@ -17,11 +17,22 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(WebClientResponseException.class)
-    public ResponseEntity<ApiResponse<Void>> handleWebClientError(WebClientResponseException ex) {
-        log.error("YouTube API call failed: {} {}", ex.getStatusCode(), ex.getMessage());
+    public ResponseEntity<ApiResponse<Void>> handleWebClientError(
+            WebClientResponseException ex) {
+
+        log.error(
+                "YouTube API call failed | status={} | responseBody={}",
+                ex.getStatusCode(),
+                ex.getResponseBodyAsString()
+        );
+
         return ResponseEntity
                 .status(HttpStatus.BAD_GATEWAY)
-                .body(ApiResponse.error("YouTube API error: " + ex.getStatusCode() + " — " + ex.getMessage()));
+                .body(ApiResponse.error(
+                        "YouTube API error: "
+                                + ex.getStatusCode()
+                                + " — "
+                                + ex.getResponseBodyAsString()));
     }
 
     @ExceptionHandler(IllegalStateException.class)
