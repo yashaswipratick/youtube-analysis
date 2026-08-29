@@ -1,0 +1,12 @@
+target/
+*.class
+*.jar
+*.war
+
+# Local secrets - NEVER commit
+src/main/resources/application-local.yml
+
+# IDE
+.idea/
+*.iml
+.DS_Store
