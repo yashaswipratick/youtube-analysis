@@ -22,7 +22,7 @@ class ChannelAnalyticsServiceTest {
     @Test
     void parsesChannelAnalyticsAndBuildsChannelQuery() {
         YouTubeAnalyticsService service = serviceResponding(
-                "{\"columnHeaders":[{\"name\":\"views\"},{\"name\":\"likes\"},{\"name\":\"subscribersGained\"}],\"rows\":[[57,3,2]]}");
+                "{\"columnHeaders\":[{\"name\":\"views\"},{\"name\":\"likes\"},{\"name\":\"subscribersGained\"}],\"rows\":[[57,3,2]]}");
 
         ChannelAnalyticsResult result = service.getChannelAnalytics(
                 "2026-07-27", "2026-08-29", List.of("views", "likes", "subscribersGained"));
@@ -34,7 +34,7 @@ class ChannelAnalyticsServiceTest {
                 .containsEntry("likes", 3)
                 .containsEntry("subscribersGained", 2);
         assertThat(requestUri.get())
-                .contains("ids=channel%3D%3DMINE")
+                .contains("ids=channel==MINE")
                 .contains("metrics=views,likes,subscribersGained")
                 .doesNotContain("filters=")
                 .doesNotContain("dimensions=");
