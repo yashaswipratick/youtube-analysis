@@ -66,8 +66,10 @@ public class YouTubeAnalyticsController {
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /channel | {} → {}", startDate, endDate);
+
         return ResponseEntity.ok(ApiResponse.success(
                 analyticsService.getChannelAnalytics(startDate, endDate, metrics)));
     }
@@ -81,8 +83,10 @@ public class YouTubeAnalyticsController {
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /channel/geography | {} → {}", startDate, endDate);
+
         return ResponseEntity.ok(ApiResponse.success(
                 channelGeographyAnalyticsService.getChannelGeographyAnalytics(startDate, endDate, metrics)));
     }
@@ -97,9 +101,11 @@ public class YouTubeAnalyticsController {
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /video/{} | {} → {}", videoId, startDate, endDate);
+
         return ResponseEntity.ok(ApiResponse.success(
                 analyticsService.getSingleVideoAnalytics(videoId, startDate, endDate, metrics)));
     }
@@ -113,9 +119,11 @@ public class YouTubeAnalyticsController {
             @RequestParam(required = false)
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /video/{}/retention | {} → {}", videoId, startDate, endDate);
+
         return ResponseEntity.ok(ApiResponse.success(
                 analyticsService.getVideoRetentionAnalytics(videoId, startDate, endDate)));
     }
@@ -130,9 +138,11 @@ public class YouTubeAnalyticsController {
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /video/{}/daily | {} → {}", videoId, startDate, endDate);
+
         return ResponseEntity.ok(ApiResponse.success(
                 analyticsService.getDailyVideoAnalytics(videoId, startDate, endDate, metrics)));
     }
@@ -147,9 +157,11 @@ public class YouTubeAnalyticsController {
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /video/{}/traffic-sources | {} → {}", videoId, startDate, endDate);
+
         return ResponseEntity.ok(ApiResponse.success(
                 trafficSourceAnalyticsService.getVideoTrafficSources(videoId, startDate, endDate, metrics)));
     }
@@ -164,9 +176,11 @@ public class YouTubeAnalyticsController {
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /video/{}/geography | {} → {}", videoId, startDate, endDate);
+
         return ResponseEntity.ok(ApiResponse.success(
                 geographyAnalyticsService.getVideoGeography(videoId, startDate, endDate, metrics)));
     }
@@ -174,10 +188,13 @@ public class YouTubeAnalyticsController {
     @PostMapping("/videos")
     public ResponseEntity<ApiResponse<List<VideoAnalyticsResult>>> getMultipleVideoAnalytics(
             @Valid @RequestBody AnalyticsRequest request) {
+
         request.getVideoIds().forEach(AnalyticsRequestValidator::validateVideoId);
         AnalyticsRequestValidator.validateProvidedDates(request.getStartDate(), request.getEndDate());
+
         log.info("POST /videos | count={} | {} → {}",
                 request.getVideoIds().size(), request.getStartDate(), request.getEndDate());
+
         return ResponseEntity.ok(ApiResponse.success(analyticsService.getMultipleVideoAnalytics(
                 request.getVideoIds(), request.getStartDate(), request.getEndDate(), request.getMetrics())));
     }
@@ -191,8 +208,10 @@ public class YouTubeAnalyticsController {
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /videos/all | {} → {}", startDate, endDate);
+
         return ResponseEntity.ok(ApiResponse.success(
                 analyticsService.getAllVideosAnalytics(startDate, endDate, metrics)));
     }
