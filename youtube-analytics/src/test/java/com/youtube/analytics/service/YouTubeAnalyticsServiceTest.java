@@ -1,6 +1,7 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
+import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
 import org.junit.jupiter.api.Test;
@@ -63,6 +64,30 @@ class YouTubeAnalyticsServiceTest {
     }
 
     @Test
+    void parsesDailyVideoAnalyticsUsingDayDimension() {
+        stubMetadata();
+        YouTubeAnalyticsService service = serviceResponding(HttpStatus.OK, dailyResponse());
+
+        DailyVideoAnalyticsResult result = service.getDailyVideoAnalytics(
+                "laQbWAoa3NI", "2026-07-27", "2026-07-29", List.of("views", "likes"));
+
+        assertThat(result.getVideoId()).isEqualTo("laQbWAoa3NI");
+        assertThat(result.getDays()).hasSize(2);
+        assertThat(result.getDays().get(0).getDate()).isEqualTo("2026-07-27");
+        assertThat(result.getDays().get(0).getMetrics())
+                .containsEntry("views", 12)
+                .containsEntry("likes", 1);
+        assertThat(result.getDays().get(1).getDate()).isEqualTo("2026-07-28");
+        assertThat(result.getDays().get(1).getMetrics())
+                .containsEntry("views", 7)
+                .containsEntry("likes", 0);
+        assertThat(requestUri.get())
+                .contains("dimensions=day")
+                .contains("filters=video==laQbWAoa3NI")
+                .contains("metrics=views,likes");
+    }
+
+    @Test
     void handlesEmptyAnalyticsRowsGracefully() {
         stubMetadata();
         YouTubeAnalyticsService service = serviceResponding(HttpStatus.OK, "{\"columnHeaders\":[{\"name\":\"views\"}]}" );
@@ -117,6 +142,19 @@ class YouTubeAnalyticsServiceTest {
                   {"name":"likes","columnType":"METRIC","dataType":"INTEGER"},
                   {"name":"comments","columnType":"METRIC","dataType":"INTEGER"}
                 ],"rows":[[57,3,1]]}
+                """;
+    }
+
+    private String dailyResponse() {
+        return """
+                {"columnHeaders":[
+                  {"name":"day","columnType":"DIMENSION","dataType":"STRING"},
+                  {"name":"views","columnType":"METRIC","dataType":"INTEGER"},
+                  {"name":"likes","columnType":"METRIC","dataType":"INTEGER"}
+                ],"rows":[
+                  ["2026-07-27",12,1],
+                  ["2026-07-28",7,0]
+                ]}
                 """;
     }
 }
