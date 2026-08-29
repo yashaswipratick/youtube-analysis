@@ -1,6 +1,7 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
+import com.youtube.analytics.model.ChannelAnalyticsResult;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
@@ -24,7 +25,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
- * Calls the YouTube Analytics API v2 to fetch video-level metrics.
+ * Calls the YouTube Analytics API v2 to fetch channel and video-level metrics.
  */
 @Slf4j
 @Service
@@ -40,6 +41,37 @@ public class YouTubeAnalyticsService {
 
     private final WebClient youTubeWebClient;
     private final YouTubeDataService youTubeDataService;
+
+    public ChannelAnalyticsResult getChannelAnalytics(
+            String startDate,
+            String endDate,
+            List<String> metrics) {
+
+        String resolvedStart = resolveStartDate(startDate);
+        String resolvedEnd = resolveEndDate(endDate);
+        AnalyticsRequestValidator.validateProvidedDates(resolvedStart, resolvedEnd);
+        List<String> resolvedMetrics = resolveMetrics(metrics);
+
+        log.info("Fetching channel analytics | {} → {} | metrics: {}",
+                resolvedStart, resolvedEnd, resolvedMetrics);
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(YT_ANALYTICS_BASE)
+                .queryParam("ids", CHANNEL_IDS)
+                .queryParam("startDate", resolvedStart)
+                .queryParam("endDate", resolvedEnd)
+                .queryParam("metrics", String.join(",", resolvedMetrics))
+                .build()
+                .toUri();
+
+        YouTubeAnalyticsApiResponse response = fetchAnalyticsResponse(uri);
+        Map<String, Object> metricsMap = parseSingleRowResponse(response);
+
+        return ChannelAnalyticsResult.builder()
+                .startDate(resolvedStart)
+                .endDate(resolvedEnd)
+                .metrics(metricsMap)
+                .build();
+    }
 
     public VideoAnalyticsResult getSingleVideoAnalytics(
             String videoId,
@@ -81,10 +113,6 @@ public class YouTubeAnalyticsService {
                 .build();
     }
 
-    /**
-     * Fetches daily analytics for one video. The YouTube Analytics API uses the
-     * core `day` dimension, so each returned row represents one reporting day.
-     */
     public DailyVideoAnalyticsResult getDailyVideoAnalytics(
             String videoId,
             String startDate,
