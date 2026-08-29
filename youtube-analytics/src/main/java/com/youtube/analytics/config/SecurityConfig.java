@@ -14,7 +14,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/oauth/**", "/login/**", "/error").permitAll()
+                .requestMatchers(
+                        "/oauth/**",
+                        "/login/**",
+                        "/error",
+                        "/api/youtube/analytics/ai/analyze"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
