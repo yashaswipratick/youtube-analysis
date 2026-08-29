@@ -3,12 +3,14 @@ package com.youtube.analytics.controller;
 import com.youtube.analytics.model.AnalyticsRequest;
 import com.youtube.analytics.model.ApiResponse;
 import com.youtube.analytics.model.ChannelAnalyticsResult;
+import com.youtube.analytics.model.ChannelGeographyAnalyticsResult;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.GeographyAnalyticsResult;
 import com.youtube.analytics.model.TrafficSourceAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.service.AnalyticsRequestValidator;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
+import com.youtube.analytics.service.YouTubeChannelGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeTrafficSourceAnalyticsService;
 import jakarta.validation.Valid;
@@ -38,94 +40,180 @@ public class YouTubeAnalyticsController {
     private final YouTubeAnalyticsService analyticsService;
     private final YouTubeTrafficSourceAnalyticsService trafficSourceAnalyticsService;
     private final YouTubeGeographyAnalyticsService geographyAnalyticsService;
+    private final YouTubeChannelGeographyAnalyticsService channelGeographyAnalyticsService;
 
     @GetMapping("/channel")
     public ResponseEntity<ApiResponse<ChannelAnalyticsResult>> getChannelAnalytics(
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd") String startDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd") String endDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
         log.info("GET /channel | {} → {}", startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(analyticsService.getChannelAnalytics(startDate, endDate, metrics)));
+
+        ChannelAnalyticsResult result = analyticsService.getChannelAnalytics(
+                startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
+    @GetMapping("/channel/geography")
+    public ResponseEntity<ApiResponse<ChannelGeographyAnalyticsResult>> getChannelGeographyAnalytics(
+            @RequestParam(required = false)
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
+            @RequestParam(required = false)
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
+            @RequestParam(required = false) List<String> metrics) {
+
+        AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
+        log.info("GET /channel/geography | {} → {}", startDate, endDate);
+
+        ChannelGeographyAnalyticsResult result =
+                channelGeographyAnalyticsService.getChannelGeographyAnalytics(
+                        startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @GetMapping("/video/{videoId}")
     public ResponseEntity<ApiResponse<VideoAnalyticsResult>> getSingleVideoAnalytics(
             @PathVariable String videoId,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd") String startDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd") String endDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
         log.info("GET /video/{} | {} → {}", videoId, startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(analyticsService.getSingleVideoAnalytics(videoId, startDate, endDate, metrics)));
+
+        VideoAnalyticsResult result = analyticsService.getSingleVideoAnalytics(
+                videoId, startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @GetMapping("/video/{videoId}/daily")
     public ResponseEntity<ApiResponse<DailyVideoAnalyticsResult>> getDailyVideoAnalytics(
             @PathVariable String videoId,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd") String startDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd") String endDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
         log.info("GET /video/{}/daily | {} → {}", videoId, startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(analyticsService.getDailyVideoAnalytics(videoId, startDate, endDate, metrics)));
+
+        DailyVideoAnalyticsResult result = analyticsService.getDailyVideoAnalytics(
+                videoId, startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @GetMapping("/video/{videoId}/traffic-sources")
     public ResponseEntity<ApiResponse<TrafficSourceAnalyticsResult>> getVideoTrafficSources(
             @PathVariable String videoId,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd") String startDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd") String endDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
         log.info("GET /video/{}/traffic-sources | {} → {}", videoId, startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(trafficSourceAnalyticsService.getVideoTrafficSources(videoId, startDate, endDate, metrics)));
+
+        TrafficSourceAnalyticsResult result =
+                trafficSourceAnalyticsService.getVideoTrafficSources(
+                        videoId, startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @GetMapping("/video/{videoId}/geography")
     public ResponseEntity<ApiResponse<GeographyAnalyticsResult>> getVideoGeography(
             @PathVariable String videoId,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd") String startDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd") String endDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
         log.info("GET /video/{}/geography | {} → {}", videoId, startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(geographyAnalyticsService.getVideoGeography(videoId, startDate, endDate, metrics)));
+
+        GeographyAnalyticsResult result =
+                geographyAnalyticsService.getVideoGeography(
+                        videoId, startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @PostMapping("/videos")
     public ResponseEntity<ApiResponse<List<VideoAnalyticsResult>>> getMultipleVideoAnalytics(
             @Valid @RequestBody AnalyticsRequest request) {
+
         request.getVideoIds().forEach(AnalyticsRequestValidator::validateVideoId);
-        AnalyticsRequestValidator.validateProvidedDates(request.getStartDate(), request.getEndDate());
-        log.info("POST /videos | count={} | {} → {}", request.getVideoIds().size(), request.getStartDate(), request.getEndDate());
-        return ResponseEntity.ok(ApiResponse.success(analyticsService.getMultipleVideoAnalytics(
-                request.getVideoIds(), request.getStartDate(), request.getEndDate(), request.getMetrics())));
+        AnalyticsRequestValidator.validateProvidedDates(
+                request.getStartDate(), request.getEndDate());
+
+        log.info("POST /videos | count={} | {} → {}",
+                request.getVideoIds().size(),
+                request.getStartDate(),
+                request.getEndDate());
+
+        List<VideoAnalyticsResult> results =
+                analyticsService.getMultipleVideoAnalytics(
+                        request.getVideoIds(),
+                        request.getStartDate(),
+                        request.getEndDate(),
+                        request.getMetrics());
+
+        return ResponseEntity.ok(ApiResponse.success(results));
     }
 
     @GetMapping("/videos/all")
     public ResponseEntity<ApiResponse<List<VideoAnalyticsResult>>> getAllVideosAnalytics(
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd") String startDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
             @RequestParam(required = false)
-            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd") String endDate,
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
         log.info("GET /videos/all | {} → {}", startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(analyticsService.getAllVideosAnalytics(startDate, endDate, metrics)));
+
+        List<VideoAnalyticsResult> results =
+                analyticsService.getAllVideosAnalytics(
+                        startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(results));
     }
 }
