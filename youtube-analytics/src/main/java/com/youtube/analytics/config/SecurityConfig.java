@@ -18,7 +18,8 @@ public class SecurityConfig {
                         "/oauth/**",
                         "/login/**",
                         "/error",
-                        "/api/youtube/analytics/ai/analyze"
+                        "/api/youtube/analytics/ai/analyze",
+                        "/api/youtube/analytics/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
