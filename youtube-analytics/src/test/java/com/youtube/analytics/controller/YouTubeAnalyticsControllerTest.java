@@ -3,6 +3,9 @@ package com.youtube.analytics.controller;
 import com.youtube.analytics.exception.GlobalExceptionHandler;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
+import com.youtube.analytics.service.YouTubeChannelGeographyAnalyticsService;
+import com.youtube.analytics.service.YouTubeGeographyAnalyticsService;
+import com.youtube.analytics.service.YouTubeTrafficSourceAnalyticsService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -25,6 +28,10 @@ class YouTubeAnalyticsControllerTest {
     @BeforeEach
     void setUp() {
         YouTubeAnalyticsService service = mock(YouTubeAnalyticsService.class);
+        YouTubeTrafficSourceAnalyticsService trafficSourceService = mock(YouTubeTrafficSourceAnalyticsService.class);
+        YouTubeGeographyAnalyticsService geographyService = mock(YouTubeGeographyAnalyticsService.class);
+        YouTubeChannelGeographyAnalyticsService channelGeographyService = mock(YouTubeChannelGeographyAnalyticsService.class);
+
         when(service.getSingleVideoAnalytics(any(), any(), any(), any())).thenReturn(VideoAnalyticsResult.builder()
                 .videoId("laQbWAoa3NI")
                 .title("Weekend Trip")
@@ -32,7 +39,12 @@ class YouTubeAnalyticsControllerTest {
                 .endDate("2026-08-29")
                 .metrics(Map.of("views", 57))
                 .build());
-        mockMvc = MockMvcBuilders.standaloneSetup(new YouTubeAnalyticsController(service))
+
+        mockMvc = MockMvcBuilders.standaloneSetup(new YouTubeAnalyticsController(
+                        service,
+                        trafficSourceService,
+                        geographyService,
+                        channelGeographyService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

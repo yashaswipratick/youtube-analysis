@@ -34,7 +34,9 @@ public class YouTubeAnalyticsService {
 
     private static final String YT_ANALYTICS_BASE = "https://youtubeanalytics.googleapis.com/v2/reports";
     private static final String CHANNEL_IDS = "channel==MINE";
-    private static final int ANALYTICS_BATCH_SIZE = 200;
+
+    /** YouTube Analytics supports up to 500 video IDs in a video filter. */
+    private static final int ANALYTICS_BATCH_SIZE = 500;
 
     @Value("${youtube.analytics.default-metrics:views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,comments,shares,subscribersGained,subscribersLost}")
     private String defaultMetrics;
@@ -184,6 +186,7 @@ public class YouTubeAnalyticsService {
                     .queryParam("metrics", String.join(",", resolvedMetrics))
                     .queryParam("filters", "video==" + String.join(",", batch))
                     .queryParam("dimensions", "video")
+                    .queryParam("sort", "-views")
                     .build()
                     .toUri();
 
@@ -194,6 +197,13 @@ public class YouTubeAnalyticsService {
         return results;
     }
 
+    /**
+     * Returns analytics for every video currently present in the authenticated
+     * channel's uploads playlist. Analytics requests are batched at the API's
+     * supported 500-video filter limit. Videos with no Analytics row for the
+     * requested date range are retained with an empty metrics map so this
+     * endpoint truly represents the complete channel video inventory.
+     */
     public List<VideoAnalyticsResult> getAllVideosAnalytics(
             String startDate,
             String endDate,
@@ -207,8 +217,41 @@ public class YouTubeAnalyticsService {
             return Collections.emptyList();
         }
 
-        log.info("Found {} total videos — fetching analytics...", allVideoIds.size());
-        return getMultipleVideoAnalytics(allVideoIds, startDate, endDate, metrics);
+        log.info("Found {} total videos — fetching analytics in batches of up to {}...",
+                allVideoIds.size(), ANALYTICS_BATCH_SIZE);
+
+        List<VideoAnalyticsResult> analyticsResults =
+                getMultipleVideoAnalytics(allVideoIds, startDate, endDate, metrics);
+
+        Map<String, VideoAnalyticsResult> byVideoId = new LinkedHashMap<>();
+        analyticsResults.forEach(result -> byVideoId.put(result.getVideoId(), result));
+
+        String resolvedStart = resolveStartDate(startDate);
+        String resolvedEnd = resolveEndDate(endDate);
+        Map<String, VideoMeta> allMeta = youTubeDataService.getVideoMeta(allVideoIds);
+
+        List<VideoAnalyticsResult> completeResults = new ArrayList<>(allVideoIds.size());
+        for (String videoId : allVideoIds) {
+            VideoAnalyticsResult result = byVideoId.get(videoId);
+            if (result != null) {
+                completeResults.add(result);
+                continue;
+            }
+
+            VideoMeta meta = allMeta.getOrDefault(
+                    videoId, new VideoMeta(videoId, videoId, null));
+
+            completeResults.add(VideoAnalyticsResult.builder()
+                    .videoId(videoId)
+                    .title(meta.getTitle())
+                    .publishedAt(meta.getPublishedAt())
+                    .startDate(resolvedStart)
+                    .endDate(resolvedEnd)
+                    .metrics(new LinkedHashMap<>())
+                    .build());
+        }
+
+        return completeResults;
     }
 
     private Map<String, Object> parseSingleRowResponse(YouTubeAnalyticsApiResponse response) {
