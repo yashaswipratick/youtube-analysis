@@ -57,10 +57,10 @@ class OpenAiAnalysisServiceTest {
         assertThat(result.strengths()).containsExactly("Good engagement");
         assertThat(result.weaknesses()).containsExactly("Low reach");
         assertThat(result.recommendations()).hasSize(1);
-        assertThat(result.recommendations().getFirst().recommendation()).isEqualTo("Improve packaging");
-        assertThat(result.recommendations().getFirst().type())
+        assertThat(result.recommendations().get(0).recommendation()).isEqualTo("Improve packaging");
+        assertThat(result.recommendations().get(0).type())
                 .isEqualTo(AiAnalysisResult.RecommendationType.EVIDENCE_BASED);
-        assertThat(result.recommendations().getFirst().reason())
+        assertThat(result.recommendations().get(0).reason())
                 .isEqualTo("Search and related traffic exist.");
         assertThat(result.missingData()).containsExactly("retention");
     }
