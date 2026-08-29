@@ -15,7 +15,7 @@ import java.util.function.ToDoubleFunction;
  * Calculates a deterministic channel-relative performance score.
  *
  * Each component is percentile-ranked against the supplied comparison set.
- * The final score is the equally weighted average of available components.
+ * The final score is the weighted average of available components.
  */
 @Service
 @RequiredArgsConstructor
@@ -131,9 +131,9 @@ public class VideoPerformanceScoringService {
     private VideoPerformanceScore.PerformanceBand band(double score) {
         if (!Double.isFinite(score)) return VideoPerformanceScore.PerformanceBand.INSUFFICIENT_DATA;
         if (score >= 90) return VideoPerformanceScore.PerformanceBand.TOP_PERFORMER;
-        if (score >= 70) return VideoPerformanceScore.PerformanceBand.ABOVE_AVERAGE;
-        if (score >= 50) return VideoPerformanceScore.PerformanceBand.AVERAGE;
-        if (score >= 25) return VideoPerformanceScore.PerformanceBand.BELOW_AVERAGE;
+        if (score >= 60) return VideoPerformanceScore.PerformanceBand.ABOVE_AVERAGE;
+        if (score >= 40) return VideoPerformanceScore.PerformanceBand.AVERAGE;
+        if (score >= 20) return VideoPerformanceScore.PerformanceBand.BELOW_AVERAGE;
         return VideoPerformanceScore.PerformanceBand.LOW_PERFORMER;
     }
 
