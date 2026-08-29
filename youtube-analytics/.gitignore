@@ -2,9 +2,11 @@ target/
 *.class
 *.jar
 *.war
+*.yml
 
 # Local secrets - NEVER commit
 src/main/resources/application-local.yml
+src/main/resources/application-local/application.yml
 
 # IDE
 .idea/
