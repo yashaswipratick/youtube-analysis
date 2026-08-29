@@ -8,6 +8,7 @@ import com.youtube.analytics.model.AiAnalysisResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,15 +28,7 @@ class OpenAiAnalysisServiceTest {
             requestUrl.set(request.url().toString());
             return Mono.just(ClientResponse.create(HttpStatus.OK)
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .body("{\"model\":\"gpt-5.6-luna\",\"output_text\":\"{"
-                            + "\\\"summary\\\":\\\"Views are strong.\\\","
-                            + "\\\"observations\\\":[\\\"57 views\\\"],"
-                            + "\\\"strengths\\\":[\\\"Good engagement\\\"],"
-                            + "\\\"weaknesses\\\":[\\\"Low reach\\\"],"
-                            + "\\\"recommendations\\\":[\\\"Improve packaging\\\"],"
-                            + "\\\"missingData\\\":[\\\"retention\\\"]"
-                            + "}" .replace("\\\"", "\\\"")
-                            + "}")
+                    .body("{\"model\":\"gpt-5.6-luna\",\"output_text\":\"{\\\"summary\\\":\\\"Views are strong.\\\",\\\"observations\\\":[\\\"57 views\\\"],\\\"strengths\\\":[\\\"Good engagement\\\"],\\\"weaknesses\\\":[\\\"Low reach\\\"],\\\"recommendations\\\":[\\\"Improve packaging\\\"],\\\"missingData\\\":[\\\"retention\\\"]}\"}")
                     .build());
         };
 
