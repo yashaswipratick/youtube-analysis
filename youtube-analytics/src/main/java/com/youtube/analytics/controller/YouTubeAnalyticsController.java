@@ -1,5 +1,7 @@
 package com.youtube.analytics.controller;
 
+import com.youtube.analytics.model.AiAnalysisRequest;
+import com.youtube.analytics.model.AiAnalysisResult;
 import com.youtube.analytics.model.AnalyticsRequest;
 import com.youtube.analytics.model.ApiResponse;
 import com.youtube.analytics.model.ChannelAnalyticsResult;
@@ -10,6 +12,7 @@ import com.youtube.analytics.model.TrafficSourceAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.model.VideoRetentionAnalyticsResult;
 import com.youtube.analytics.service.AnalyticsRequestValidator;
+import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
 import com.youtube.analytics.service.YouTubeChannelGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeGeographyAnalyticsService;
@@ -42,6 +45,17 @@ public class YouTubeAnalyticsController {
     private final YouTubeTrafficSourceAnalyticsService trafficSourceAnalyticsService;
     private final YouTubeGeographyAnalyticsService geographyAnalyticsService;
     private final YouTubeChannelGeographyAnalyticsService channelGeographyAnalyticsService;
+    private final OpenAiAnalysisService openAiAnalysisService;
+
+    @PostMapping("/ai/analyze")
+    public ResponseEntity<ApiResponse<AiAnalysisResult>> analyzeWithAi(
+            @Valid @RequestBody AiAnalysisRequest request) {
+
+        log.info("POST /ai/analyze | contextPresent={}",
+                request.context() != null && !request.context().isEmpty());
+
+        return ResponseEntity.ok(ApiResponse.success(openAiAnalysisService.analyze(request)));
+    }
 
     @GetMapping("/channel")
     public ResponseEntity<ApiResponse<ChannelAnalyticsResult>> getChannelAnalytics(
