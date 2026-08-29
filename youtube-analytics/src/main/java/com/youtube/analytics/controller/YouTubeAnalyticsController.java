@@ -10,6 +10,7 @@ import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.GeographyAnalyticsResult;
 import com.youtube.analytics.model.TrafficSourceAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
+import com.youtube.analytics.model.VideoRetentionAnalyticsResult;
 import com.youtube.analytics.service.AnalyticsRequestValidator;
 import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
@@ -107,6 +108,24 @@ public class YouTubeAnalyticsController {
 
         return ResponseEntity.ok(ApiResponse.success(
                 analyticsService.getSingleVideoAnalytics(videoId, startDate, endDate, metrics)));
+    }
+
+    @GetMapping("/video/{videoId}/retention")
+    public ResponseEntity<ApiResponse<VideoRetentionAnalyticsResult>> getVideoRetentionAnalytics(
+            @PathVariable String videoId,
+            @RequestParam(required = false)
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
+            @RequestParam(required = false)
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate) {
+
+        AnalyticsRequestValidator.validateVideoId(videoId);
+        AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+        log.info("GET /video/{}/retention | {} → {}", videoId, startDate, endDate);
+
+        return ResponseEntity.ok(ApiResponse.success(
+                analyticsService.getVideoRetentionAnalytics(videoId, startDate, endDate)));
     }
 
     @GetMapping("/video/{videoId}/daily")
