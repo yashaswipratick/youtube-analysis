@@ -2,6 +2,7 @@ package com.youtube.analytics.controller;
 
 import com.youtube.analytics.exception.GlobalExceptionHandler;
 import com.youtube.analytics.model.VideoAnalyticsResult;
+import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
 import com.youtube.analytics.service.YouTubeChannelGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeGeographyAnalyticsService;
@@ -12,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -31,6 +31,7 @@ class YouTubeAnalyticsControllerTest {
         YouTubeTrafficSourceAnalyticsService trafficSourceService = mock(YouTubeTrafficSourceAnalyticsService.class);
         YouTubeGeographyAnalyticsService geographyService = mock(YouTubeGeographyAnalyticsService.class);
         YouTubeChannelGeographyAnalyticsService channelGeographyService = mock(YouTubeChannelGeographyAnalyticsService.class);
+        OpenAiAnalysisService openAiAnalysisService = mock(OpenAiAnalysisService.class);
 
         when(service.getSingleVideoAnalytics(any(), any(), any(), any())).thenReturn(VideoAnalyticsResult.builder()
                 .videoId("laQbWAoa3NI")
@@ -44,7 +45,8 @@ class YouTubeAnalyticsControllerTest {
                         service,
                         trafficSourceService,
                         geographyService,
-                        channelGeographyService))
+                        channelGeographyService,
+                        openAiAnalysisService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
