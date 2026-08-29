@@ -46,7 +46,9 @@ public class ContentClassificationService {
 
     private static final List<TopicRule> TOPIC_RULES = List.of(
             new TopicRule("BANGALORE", "bangalore", "bengaluru"),
-            new TopicRule("TRAVEL", "travel", "trip", "getaway", "explore", "road trip", "roadtrip"),
+            new TopicRule("TRAVEL", "travel", "trip", "getaway", "explore", "road trip", "roadtrip",
+                    "hill", "hills", "mountain", "mountains", "beach", "trek", "trekking", "tour",
+                    "nilgiris", "toy train", "train"),
             new TopicRule("CORPORATE_LIFE", "corporate", "office", "software engineer", "developer",
                     "work life", "worklife", "9 to 5", "9-5", "career"),
             new TopicRule("FOOD", "food", "cooking", "recipe", "biryani", "biriyani", "restaurant", "cafe", "meal"),
