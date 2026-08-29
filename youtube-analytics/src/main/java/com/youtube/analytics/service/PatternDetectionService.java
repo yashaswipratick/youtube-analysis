@@ -3,6 +3,7 @@ package com.youtube.analytics.service;
 import com.youtube.analytics.model.ContentClassification;
 import com.youtube.analytics.model.NormalizedVideoAnalytics;
 import com.youtube.analytics.model.PatternDetectionResult;
+import com.youtube.analytics.model.VideoMeta;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,7 +12,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -37,11 +37,12 @@ public class PatternDetectionService {
                 .toList();
 
         Map<ContentClassification.Category, List<NormalizedVideoAnalytics>> categories = withAnalytics.stream()
-                .collect(Collectors.groupingBy(this::category));
+                .collect(Collectors.groupingBy(this::category, LinkedHashMap::new, Collectors.toList()));
         Map<String, List<NormalizedVideoAnalytics>> topics = withAnalytics.stream()
                 .flatMap(v -> classificationService.classify(toVideoMeta(v)).getTopics().stream()
                         .map(topic -> Map.entry(topic, v)))
                 .collect(Collectors.groupingBy(Map.Entry::getKey,
+                        LinkedHashMap::new,
                         Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
 
         Group bestCategory = bestGroup(categories.entrySet().stream()
@@ -54,12 +55,16 @@ public class PatternDetectionService {
 
         PatternDetectionResult.Finding typeFinding = typeFinding(shortAverage, longAverage);
         List<PatternDetectionResult.Finding> findings = new ArrayList<>();
-        if (bestCategory != null) findings.add(finding("TOP_CATEGORY", bestCategory.name,
-                "This category has the highest average views among categories with analytics.",
-                Map.of("averageViews", bestCategory.averageViews)));
-        if (bestTopic != null) findings.add(finding("TOP_TOPIC", bestTopic.name,
-                "This topic has the highest average views among detected topics.",
-                Map.of("averageViews", bestTopic.averageViews)));
+        if (bestCategory != null) {
+            findings.add(finding("TOP_CATEGORY", bestCategory.name,
+                    "This category has the highest average views among categories with analytics.",
+                    Map.of("averageViews", bestCategory.averageViews)));
+        }
+        if (bestTopic != null) {
+            findings.add(finding("TOP_TOPIC", bestTopic.name,
+                    "This topic has the highest average views among detected topics.",
+                    Map.of("averageViews", bestTopic.averageViews)));
+        }
         if (typeFinding != null) findings.add(typeFinding);
 
         return PatternDetectionResult.builder()
@@ -94,9 +99,8 @@ public class PatternDetectionService {
         return classificationService.classify(toVideoMeta(video)).getCategory();
     }
 
-    private com.youtube.analytics.model.VideoMeta toVideoMeta(NormalizedVideoAnalytics video) {
-        return com.youtube.analytics.model.VideoMeta.builder()
-                .videoId(video.getVideoId()).title(video.getTitle()).publishedAt(video.getPublishedAt()).build();
+    private VideoMeta toVideoMeta(NormalizedVideoAnalytics video) {
+        return new VideoMeta(video.getVideoId(), video.getTitle(), video.getPublishedAt());
     }
 
     private double averageViewsByType(List<NormalizedVideoAnalytics> videos, ContentClassification.ContentType type) {
