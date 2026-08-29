@@ -22,16 +22,17 @@ class OpenAiAnalysisServiceTest {
 
     @Test
     void sendsAnalysisRequestToResponsesApiAndExtractsOutputText() {
-        AtomicReference<String> requestBody = new AtomicReference<>();
+        AtomicReference<String> requestUrl = new AtomicReference<>();
         ExchangeFunction exchange = request -> {
-            requestBody.set(request.body() == null ? null : request.url().toString());
+            requestUrl.set(request.url().toString());
             return Mono.just(ClientResponse.create(HttpStatus.OK)
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
                     .body("{\"model\":\"gpt-5.6-luna\",\"output_text\":\"Views increased 25%.\"}")
                     .build());
         };
 
-        OpenAiConfig config = new OpenAiConfig("/tmp/openai-key", "https://api.openai.com/v1", "gpt-5.6-luna");
+        OpenAiConfig config = new OpenAiConfig(
+                "/tmp/openai-key", "https://api.openai.com/v1", "gpt-5.6-luna");
         OpenAiApiKeyProvider keyProvider = new OpenAiApiKeyProvider(config) {
             @Override
             public String getApiKey() {
@@ -40,7 +41,7 @@ class OpenAiAnalysisServiceTest {
         };
 
         OpenAiAnalysisService service = new OpenAiAnalysisService(
-                () -> WebClient.builder().exchangeFunction(exchange),
+                WebClient.builder().exchangeFunction(exchange),
                 config,
                 keyProvider,
                 new ObjectMapper());
@@ -49,7 +50,7 @@ class OpenAiAnalysisServiceTest {
                 "Analyze the trend",
                 Map.of("views", 3681)));
 
-        assertThat(requestBody.get()).isEqualTo("https://api.openai.com/v1/responses");
+        assertThat(requestUrl.get()).isEqualTo("https://api.openai.com/v1/responses");
         assertThat(result.model()).isEqualTo("gpt-5.6-luna");
         assertThat(result.analysis()).isEqualTo("Views increased 25%.");
     }
