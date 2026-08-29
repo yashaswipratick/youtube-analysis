@@ -56,7 +56,8 @@ class YouTubeTrafficSourceAnalyticsServiceTest {
         when(dataService.getVideoMeta(List.of("laQbWAoa3NI"))).thenReturn(Map.of(
                 "laQbWAoa3NI", new VideoMeta("laQbWAoa3NI", "Weekend Trip", "2026-07-27T13:00:17Z")));
 
-        YouTubeTrafficSourceAnalyticsService service = serviceResponding("{\"columnHeaders":[{\"name\":\"insightTrafficSourceType\"},{\"name\":\"views\"}],\"rows\":[]}");
+        YouTubeTrafficSourceAnalyticsService service = serviceResponding(
+                "{\"columnHeaders\":[{\"name\":\"insightTrafficSourceType\"},{\"name\":\"views\"}],\"rows\":[]}");
 
         TrafficSourceAnalyticsResult result = service.getVideoTrafficSources(
                 "laQbWAoa3NI", "2026-07-27", "2026-08-29", List.of("views"));
@@ -65,17 +66,16 @@ class YouTubeTrafficSourceAnalyticsServiceTest {
     }
 
     private YouTubeTrafficSourceAnalyticsService serviceResponding() {
-        return serviceResponding("""
-                {"columnHeaders":[
-                  {"name":"insightTrafficSourceType","columnType":"DIMENSION","dataType":"STRING"},
-                  {"name":"views","columnType":"METRIC","dataType":"INTEGER"},
-                  {"name":"estimatedMinutesWatched","columnType":"METRIC","dataType":"INTEGER"}
-                ],"rows":[
-                  ["YT_SEARCH",20,100],
-                  ["SHORTS",15,80],
-                  ["EXT_URL",5,20]
-                ]}
-                """);
+        return serviceResponding(
+                "{\"columnHeaders\":["
+                        + "{\"name\":\"insightTrafficSourceType\",\"columnType\":\"DIMENSION\",\"dataType\":\"STRING\"},"
+                        + "{\"name\":\"views\",\"columnType\":\"METRIC\",\"dataType\":\"INTEGER\"},"
+                        + "{\"name\":\"estimatedMinutesWatched\",\"columnType\":\"METRIC\",\"dataType\":\"INTEGER\"}"
+                        + "],\"rows\":["
+                        + "[\"YT_SEARCH\",20,100],"
+                        + "[\"SHORTS\",15,80],"
+                        + "[\"EXT_URL\",5,20]"
+                        + "]}");
     }
 
     private YouTubeTrafficSourceAnalyticsService serviceResponding(String body) {
