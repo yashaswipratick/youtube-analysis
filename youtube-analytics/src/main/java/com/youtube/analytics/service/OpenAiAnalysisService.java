@@ -51,7 +51,7 @@ public class OpenAiAnalysisService {
                     .block();
 
             String analysis = extractOutputText(response);
-            return new AiAnalysisResult(config.resolvedModel(), analysis);
+            return new AiAnalysisResult(config.resolvedModel(), request.context(), analysis);
         } catch (Exception e) {
             log.error("OpenAI analytics analysis failed", e);
             throw new IllegalStateException("OpenAI analytics analysis failed: " + e.getMessage(), e);
