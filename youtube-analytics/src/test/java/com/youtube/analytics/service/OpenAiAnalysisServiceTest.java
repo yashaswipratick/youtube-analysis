@@ -21,13 +21,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OpenAiAnalysisServiceTest {
 
     @Test
-    void sendsAnalysisRequestToResponsesApiAndExtractsOutputText() {
+    void sendsAnalysisRequestToResponsesApiAndParsesStructuredOutput() {
         AtomicReference<String> requestUrl = new AtomicReference<>();
         ExchangeFunction exchange = request -> {
             requestUrl.set(request.url().toString());
             return Mono.just(ClientResponse.create(HttpStatus.OK)
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .body("{\"model\":\"gpt-5.6-luna\",\"output_text\":\"Views increased 25%.\"}")
+                    .body("{\"model\":\"gpt-5.6-luna\",\"output_text\":\"{"
+                            + "\\\"summary\\\":\\\"Views are strong.\\\","
+                            + "\\\"observations\\\":[\\\"57 views\\\"],"
+                            + "\\\"strengths\\\":[\\\"Good engagement\\\"],"
+                            + "\\\"weaknesses\\\":[\\\"Low reach\\\"],"
+                            + "\\\"recommendations\\\":[\\\"Improve packaging\\\"],"
+                            + "\\\"missingData\\\":[\\\"retention\\\"]"
+                            + "}" .replace("\\\"", "\\\"")
+                            + "}")
                     .build());
         };
 
@@ -52,6 +60,11 @@ class OpenAiAnalysisServiceTest {
 
         assertThat(requestUrl.get()).isEqualTo("https://api.openai.com/v1/responses");
         assertThat(result.model()).isEqualTo("gpt-5.6-luna");
-        assertThat(result.analysis()).isEqualTo("Views increased 25%.");
+        assertThat(result.summary()).isEqualTo("Views are strong.");
+        assertThat(result.observations()).containsExactly("57 views");
+        assertThat(result.strengths()).containsExactly("Good engagement");
+        assertThat(result.weaknesses()).containsExactly("Low reach");
+        assertThat(result.recommendations()).containsExactly("Improve packaging");
+        assertThat(result.missingData()).containsExactly("retention");
     }
 }
