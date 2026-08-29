@@ -8,7 +8,6 @@ import com.youtube.analytics.model.AiAnalysisResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -28,7 +27,7 @@ class OpenAiAnalysisServiceTest {
             requestUrl.set(request.url().toString());
             return Mono.just(ClientResponse.create(HttpStatus.OK)
                     .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
-                    .body("{\"model\":\"gpt-5.6-luna\",\"output_text\":\"{\\\"summary\\\":\\\"Views are strong.\\\",\\\"observations\\\":[\\\"57 views\\\"],\\\"strengths\\\":[\\\"Good engagement\\\"],\\\"weaknesses\\\":[\\\"Low reach\\\"],\\\"recommendations\\\":[\\\"Improve packaging\\\"],\\\"missingData\\\":[\\\"retention\\\"]}\"}")
+                    .body("{\"model\":\"gpt-5.6-luna\",\"output_text\":\"{\\\"summary\\\":\\\"Views are strong.\\\",\\\"observations\\\":[\\\"57 views\\\"],\\\"strengths\\\":[\\\"Good engagement\\\"],\\\"weaknesses\\\":[\\\"Low reach\\\"],\\\"recommendations\\\":[{\\\"recommendation\\\":\\\"Improve packaging\\\",\\\"type\\\":\\\"EVIDENCE_BASED\\\",\\\"reason\\\":\\\"Search and related traffic exist.\\\"}],\\\"missingData\\\":[\\\"retention\\\"]}\"}")
                     .build());
         };
 
@@ -57,7 +56,12 @@ class OpenAiAnalysisServiceTest {
         assertThat(result.observations()).containsExactly("57 views");
         assertThat(result.strengths()).containsExactly("Good engagement");
         assertThat(result.weaknesses()).containsExactly("Low reach");
-        assertThat(result.recommendations()).containsExactly("Improve packaging");
+        assertThat(result.recommendations()).hasSize(1);
+        assertThat(result.recommendations().getFirst().recommendation()).isEqualTo("Improve packaging");
+        assertThat(result.recommendations().getFirst().type())
+                .isEqualTo(AiAnalysisResult.RecommendationType.EVIDENCE_BASED);
+        assertThat(result.recommendations().getFirst().reason())
+                .isEqualTo("Search and related traffic exist.");
         assertThat(result.missingData()).containsExactly("retention");
     }
 }
