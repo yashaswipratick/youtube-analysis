@@ -4,9 +4,11 @@ import com.youtube.analytics.model.AnalyticsRequest;
 import com.youtube.analytics.model.ApiResponse;
 import com.youtube.analytics.model.ChannelAnalyticsResult;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
+import com.youtube.analytics.model.TrafficSourceAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.service.AnalyticsRequestValidator;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
+import com.youtube.analytics.service.YouTubeTrafficSourceAnalyticsService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ import java.util.List;
 public class YouTubeAnalyticsController {
 
     private final YouTubeAnalyticsService analyticsService;
+    private final YouTubeTrafficSourceAnalyticsService trafficSourceAnalyticsService;
 
     @GetMapping("/channel")
     public ResponseEntity<ApiResponse<ChannelAnalyticsResult>> getChannelAnalytics(
@@ -97,8 +100,30 @@ public class YouTubeAnalyticsController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
+    @GetMapping("/video/{videoId}/traffic-sources")
+    public ResponseEntity<ApiResponse<TrafficSourceAnalyticsResult>> getVideoTrafficSources(
+            @PathVariable String videoId,
+            @RequestParam(required = false)
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd")
+            String startDate,
+            @RequestParam(required = false)
+            @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
+            String endDate,
+            @RequestParam(required = false) List<String> metrics) {
+
+        AnalyticsRequestValidator.validateVideoId(videoId);
+        AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
+        log.info("GET /video/{}/traffic-sources | {} → {}", videoId, startDate, endDate);
+
+        TrafficSourceAnalyticsResult result = trafficSourceAnalyticsService.getVideoTrafficSources(
+                videoId, startDate, endDate, metrics);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
     @PostMapping("/videos")
-    public ResponseEntity<ApiResponse<List<VideoAnalyticsResult>>> getMultipleVideoAnalytics(
+    public ResponseEntity<ApiResponse<List<VideoAnalyticsResult>> > getMultipleVideoAnalytics(
             @Valid @RequestBody AnalyticsRequest request) {
 
         request.getVideoIds().forEach(AnalyticsRequestValidator::validateVideoId);
