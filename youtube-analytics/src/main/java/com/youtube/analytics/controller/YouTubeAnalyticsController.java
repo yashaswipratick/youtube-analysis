@@ -1,5 +1,7 @@
 package com.youtube.analytics.controller;
 
+import com.youtube.analytics.model.AiAnalysisRequest;
+import com.youtube.analytics.model.AiAnalysisResult;
 import com.youtube.analytics.model.AnalyticsRequest;
 import com.youtube.analytics.model.ApiResponse;
 import com.youtube.analytics.model.ChannelAnalyticsResult;
@@ -9,6 +11,7 @@ import com.youtube.analytics.model.GeographyAnalyticsResult;
 import com.youtube.analytics.model.TrafficSourceAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.service.AnalyticsRequestValidator;
+import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
 import com.youtube.analytics.service.YouTubeChannelGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeGeographyAnalyticsService;
@@ -41,6 +44,17 @@ public class YouTubeAnalyticsController {
     private final YouTubeTrafficSourceAnalyticsService trafficSourceAnalyticsService;
     private final YouTubeGeographyAnalyticsService geographyAnalyticsService;
     private final YouTubeChannelGeographyAnalyticsService channelGeographyAnalyticsService;
+    private final OpenAiAnalysisService openAiAnalysisService;
+
+    @PostMapping("/ai/analyze")
+    public ResponseEntity<ApiResponse<AiAnalysisResult>> analyzeWithAi(
+            @Valid @RequestBody AiAnalysisRequest request) {
+
+        log.info("POST /ai/analyze | contextPresent={}",
+                request.context() != null && !request.context().isEmpty());
+
+        return ResponseEntity.ok(ApiResponse.success(openAiAnalysisService.analyze(request)));
+    }
 
     @GetMapping("/channel")
     public ResponseEntity<ApiResponse<ChannelAnalyticsResult>> getChannelAnalytics(
@@ -53,13 +67,10 @@ public class YouTubeAnalyticsController {
             @RequestParam(required = false) List<String> metrics) {
 
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
-
         log.info("GET /channel | {} → {}", startDate, endDate);
 
-        ChannelAnalyticsResult result = analyticsService.getChannelAnalytics(
-                startDate, endDate, metrics);
-
-        return ResponseEntity.ok(ApiResponse.success(result));
+        return ResponseEntity.ok(ApiResponse.success(
+                analyticsService.getChannelAnalytics(startDate, endDate, metrics)));
     }
 
     @GetMapping("/channel/geography")
@@ -73,14 +84,10 @@ public class YouTubeAnalyticsController {
             @RequestParam(required = false) List<String> metrics) {
 
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
-
         log.info("GET /channel/geography | {} → {}", startDate, endDate);
 
-        ChannelGeographyAnalyticsResult result =
-                channelGeographyAnalyticsService.getChannelGeographyAnalytics(
-                        startDate, endDate, metrics);
-
-        return ResponseEntity.ok(ApiResponse.success(result));
+        return ResponseEntity.ok(ApiResponse.success(
+                channelGeographyAnalyticsService.getChannelGeographyAnalytics(startDate, endDate, metrics)));
     }
 
     @GetMapping("/video/{videoId}")
@@ -96,13 +103,10 @@ public class YouTubeAnalyticsController {
 
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
-
         log.info("GET /video/{} | {} → {}", videoId, startDate, endDate);
 
-        VideoAnalyticsResult result = analyticsService.getSingleVideoAnalytics(
-                videoId, startDate, endDate, metrics);
-
-        return ResponseEntity.ok(ApiResponse.success(result));
+        return ResponseEntity.ok(ApiResponse.success(
+                analyticsService.getSingleVideoAnalytics(videoId, startDate, endDate, metrics)));
     }
 
     @GetMapping("/video/{videoId}/daily")
@@ -118,13 +122,10 @@ public class YouTubeAnalyticsController {
 
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
-
         log.info("GET /video/{}/daily | {} → {}", videoId, startDate, endDate);
 
-        DailyVideoAnalyticsResult result = analyticsService.getDailyVideoAnalytics(
-                videoId, startDate, endDate, metrics);
-
-        return ResponseEntity.ok(ApiResponse.success(result));
+        return ResponseEntity.ok(ApiResponse.success(
+                analyticsService.getDailyVideoAnalytics(videoId, startDate, endDate, metrics)));
     }
 
     @GetMapping("/video/{videoId}/traffic-sources")
@@ -140,14 +141,10 @@ public class YouTubeAnalyticsController {
 
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
-
         log.info("GET /video/{}/traffic-sources | {} → {}", videoId, startDate, endDate);
 
-        TrafficSourceAnalyticsResult result =
-                trafficSourceAnalyticsService.getVideoTrafficSources(
-                        videoId, startDate, endDate, metrics);
-
-        return ResponseEntity.ok(ApiResponse.success(result));
+        return ResponseEntity.ok(ApiResponse.success(
+                trafficSourceAnalyticsService.getVideoTrafficSources(videoId, startDate, endDate, metrics)));
     }
 
     @GetMapping("/video/{videoId}/geography")
@@ -163,14 +160,10 @@ public class YouTubeAnalyticsController {
 
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
-
         log.info("GET /video/{}/geography | {} → {}", videoId, startDate, endDate);
 
-        GeographyAnalyticsResult result =
-                geographyAnalyticsService.getVideoGeography(
-                        videoId, startDate, endDate, metrics);
-
-        return ResponseEntity.ok(ApiResponse.success(result));
+        return ResponseEntity.ok(ApiResponse.success(
+                geographyAnalyticsService.getVideoGeography(videoId, startDate, endDate, metrics)));
     }
 
     @PostMapping("/videos")
@@ -178,22 +171,13 @@ public class YouTubeAnalyticsController {
             @Valid @RequestBody AnalyticsRequest request) {
 
         request.getVideoIds().forEach(AnalyticsRequestValidator::validateVideoId);
-        AnalyticsRequestValidator.validateProvidedDates(
-                request.getStartDate(), request.getEndDate());
+        AnalyticsRequestValidator.validateProvidedDates(request.getStartDate(), request.getEndDate());
 
         log.info("POST /videos | count={} | {} → {}",
-                request.getVideoIds().size(),
-                request.getStartDate(),
-                request.getEndDate());
+                request.getVideoIds().size(), request.getStartDate(), request.getEndDate());
 
-        List<VideoAnalyticsResult> results =
-                analyticsService.getMultipleVideoAnalytics(
-                        request.getVideoIds(),
-                        request.getStartDate(),
-                        request.getEndDate(),
-                        request.getMetrics());
-
-        return ResponseEntity.ok(ApiResponse.success(results));
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getMultipleVideoAnalytics(
+                request.getVideoIds(), request.getStartDate(), request.getEndDate(), request.getMetrics())));
     }
 
     @GetMapping("/videos/all")
@@ -207,13 +191,9 @@ public class YouTubeAnalyticsController {
             @RequestParam(required = false) List<String> metrics) {
 
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
-
         log.info("GET /videos/all | {} → {}", startDate, endDate);
 
-        List<VideoAnalyticsResult> results =
-                analyticsService.getAllVideosAnalytics(
-                        startDate, endDate, metrics);
-
-        return ResponseEntity.ok(ApiResponse.success(results));
+        return ResponseEntity.ok(ApiResponse.success(
+                analyticsService.getAllVideosAnalytics(startDate, endDate, metrics)));
     }
 }
