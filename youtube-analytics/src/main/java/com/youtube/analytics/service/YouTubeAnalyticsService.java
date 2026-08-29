@@ -1,11 +1,13 @@
 package com.youtube.analytics.service;
 
+import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
+import com.youtube.analytics.model.YouTubeAnalyticsApiResponse;
+import com.youtube.analytics.model.YouTubeAnalyticsColumnHeader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -18,6 +20,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Calls the YouTube Analytics API v2 to fetch video-level metrics.
@@ -41,7 +44,7 @@ public class YouTubeAnalyticsService {
     private static final String CHANNEL_IDS = "channel==MINE";
     private static final int ANALYTICS_BATCH_SIZE = 200;
 
-    @Value("${youtube.analytics.default-metrics:views,estimatedMinutesWatched,averageViewDuration,likes,comments,shares,subscribersGained}")
+    @Value("${youtube.analytics.default-metrics:views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,comments,shares,subscribersGained,subscribersLost}")
     private String defaultMetrics;
 
     private final WebClient youTubeWebClient;
@@ -56,9 +59,11 @@ public class YouTubeAnalyticsService {
             String endDate,
             List<String> metrics) {
 
+        AnalyticsRequestValidator.validateVideoId(videoId);
         String resolvedStart = resolveStartDate(startDate);
-        String resolvedEnd   = resolveEndDate(endDate);
-        String resolvedMetrics = resolveMetrics(metrics);
+        String resolvedEnd = resolveEndDate(endDate);
+        AnalyticsRequestValidator.validateProvidedDates(resolvedStart, resolvedEnd);
+        List<String> resolvedMetrics = resolveMetrics(metrics);
 
         log.info("Fetching single video analytics: {} | {} → {} | metrics: {}",
                 videoId, resolvedStart, resolvedEnd, resolvedMetrics);
@@ -67,17 +72,12 @@ public class YouTubeAnalyticsService {
                 .queryParam("ids", CHANNEL_IDS)
                 .queryParam("startDate", resolvedStart)
                 .queryParam("endDate", resolvedEnd)
-                .queryParam("metrics", resolvedMetrics)
+                .queryParam("metrics", String.join(",", resolvedMetrics))
                 .queryParam("filters", "video==" + videoId)
                 .build()
                 .toUri();
 
-        Map<?, ?> response = youTubeWebClient.get()
-                .uri(uri)
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
-        log.info("Response from YouTube API is {}", response);
+        YouTubeAnalyticsApiResponse response = fetchAnalyticsResponse(uri);
 
         Map<String, Object> metricsMap = parseSingleRowResponse(response);
 
@@ -104,9 +104,11 @@ public class YouTubeAnalyticsService {
             String endDate,
             List<String> metrics) {
 
-        String resolvedStart   = resolveStartDate(startDate);
-        String resolvedEnd     = resolveEndDate(endDate);
-        String resolvedMetrics = resolveMetrics(metrics);
+        videoIds.forEach(AnalyticsRequestValidator::validateVideoId);
+        String resolvedStart = resolveStartDate(startDate);
+        String resolvedEnd = resolveEndDate(endDate);
+        AnalyticsRequestValidator.validateProvidedDates(resolvedStart, resolvedEnd);
+        List<String> resolvedMetrics = resolveMetrics(metrics);
 
         log.info("Fetching analytics for {} videos | {} → {} | metrics: {}",
                 videoIds.size(), resolvedStart, resolvedEnd, resolvedMetrics);
@@ -125,29 +127,13 @@ public class YouTubeAnalyticsService {
                     .queryParam("ids", CHANNEL_IDS)
                     .queryParam("startDate", resolvedStart)
                     .queryParam("endDate", resolvedEnd)
-                    .queryParam("metrics", resolvedMetrics)
+                    .queryParam("metrics", String.join(",", resolvedMetrics))
                     .queryParam("filters", filter)
                     .queryParam("dimensions", "video")
                     .build()
                     .toUri();
 
-            Map<?, ?> response = youTubeWebClient.get()
-                    .uri(uri)
-                    .retrieve()
-                    .onStatus(
-                            HttpStatusCode::isError,
-                            responseData -> responseData.bodyToMono(String.class)
-                                    .flatMap(body -> {
-                                        log.error("YouTube API error response: {}", body);
-                                        return Mono.error(
-                                                new RuntimeException(
-                                                        "YouTube API returned " + responseData.statusCode() + ": " + body
-                                                )
-                                        );
-                                    })
-                    )
-                    .bodyToMono(Map.class)
-                    .block();
+            YouTubeAnalyticsApiResponse response = fetchAnalyticsResponse(uri);
 
             results.addAll(parseMultiVideoResponse(response, resolvedStart, resolvedEnd, allMeta));
         }
@@ -181,32 +167,31 @@ public class YouTubeAnalyticsService {
     // Response parsing
     // ---------------------------------------------------------------------------
 
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> parseSingleRowResponse(Map<?, ?> response) {
+    private Map<String, Object> parseSingleRowResponse(YouTubeAnalyticsApiResponse response) {
         Map<String, Object> metricsMap = new LinkedHashMap<>();
         if (response == null) return metricsMap;
 
-        List<?> columnHeaders = (List<?>) response.get("columnHeaders");
-        List<?> rows = (List<?>) response.get("rows");
+        List<YouTubeAnalyticsColumnHeader> columnHeaders = response.getColumnHeaders();
+        List<List<Object>> rows = response.getRows();
 
         if (columnHeaders == null || rows == null || rows.isEmpty()) {
             log.warn("Analytics API returned no data rows");
             return metricsMap;
         }
 
-        List<?> firstRow = (List<?>) rows.get(0);
-        for (int i = 0; i < columnHeaders.size(); i++) {
-            Map<?, ?> header = (Map<?, ?>) columnHeaders.get(i);
-            String colName = (String) header.get("name");
-            metricsMap.put(colName, firstRow.get(i));
+        List<Object> firstRow = rows.get(0);
+        for (int i = 0; i < columnHeaders.size() && i < firstRow.size(); i++) {
+            String colName = columnHeaders.get(i).getName();
+            if (colName != null) {
+                metricsMap.put(colName, firstRow.get(i));
+            }
         }
 
         return metricsMap;
     }
 
-    @SuppressWarnings("unchecked")
     private List<VideoAnalyticsResult> parseMultiVideoResponse(
-            Map<?, ?> response,
+            YouTubeAnalyticsApiResponse response,
             String startDate,
             String endDate,
             Map<String, VideoMeta> metaMap) {
@@ -214,18 +199,16 @@ public class YouTubeAnalyticsService {
         List<VideoAnalyticsResult> results = new ArrayList<>();
         if (response == null) return results;
 
-        List<?> columnHeaders = (List<?>) response.get("columnHeaders");
-        List<?> rows = (List<?>) response.get("rows");
+        List<YouTubeAnalyticsColumnHeader> columnHeaders = response.getColumnHeaders();
+        List<List<Object>> rows = response.getRows();
         if (columnHeaders == null || rows == null) return results;
 
-        for (Object rowObj : rows) {
-            List<?> row = (List<?>) rowObj;
+        for (List<Object> row : rows) {
             String videoId = null;
             Map<String, Object> metricsMap = new LinkedHashMap<>();
 
-            for (int i = 0; i < columnHeaders.size(); i++) {
-                Map<?, ?> header = (Map<?, ?>) columnHeaders.get(i);
-                String colName = (String) header.get("name");
+            for (int i = 0; i < columnHeaders.size() && i < row.size(); i++) {
+                String colName = columnHeaders.get(i).getName();
                 if ("video".equals(colName)) {
                     videoId = String.valueOf(row.get(i));
                 } else {
@@ -264,10 +247,25 @@ public class YouTubeAnalyticsService {
                 : LocalDate.now().toString();
     }
 
-    private String resolveMetrics(List<String> metrics) {
-        return (metrics != null && !metrics.isEmpty())
-                ? String.join(",", metrics)
-                : defaultMetrics;
+    private List<String> resolveMetrics(List<String> metrics) {
+        List<String> requestedMetrics = (metrics == null || metrics.isEmpty())
+                ? Stream.of(defaultMetrics.split(",")).map(String::trim).toList()
+                : metrics.stream().flatMap(metric -> metric == null
+                        ? Stream.of((String) null)
+                        : Stream.of(metric.split(","))).map(value -> value == null ? null : value.trim()).toList();
+        return AnalyticsRequestValidator.validateVideoMetrics(requestedMetrics);
+    }
+
+    private YouTubeAnalyticsApiResponse fetchAnalyticsResponse(URI uri) {
+        return youTubeWebClient.get()
+                .uri(uri)
+                .retrieve()
+                .onStatus(status -> status.isError(), response -> {
+                    log.warn("YouTube Analytics API request failed with status {}", response.statusCode().value());
+                    return Mono.error(new YouTubeAnalyticsApiException(response.statusCode()));
+                })
+                .bodyToMono(YouTubeAnalyticsApiResponse.class)
+                .block();
     }
 
     private <T> List<List<T>> partition(List<T> list, int size) {

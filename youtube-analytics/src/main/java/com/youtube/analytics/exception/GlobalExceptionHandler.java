@@ -20,19 +20,40 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleWebClientError(
             WebClientResponseException ex) {
 
-        log.error(
-                "YouTube API call failed | status={} | responseBody={}",
-                ex.getStatusCode(),
-                ex.getResponseBodyAsString()
-        );
+        log.warn("YouTube API call failed | status={}", ex.getStatusCode());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_GATEWAY)
-                .body(ApiResponse.error(
-                        "YouTube API error: "
-                                + ex.getStatusCode()
-                                + " — "
-                                + ex.getResponseBodyAsString()));
+                .body(ApiResponse.error("YouTube API request failed"));
+    }
+
+    @ExceptionHandler(YouTubeAnalyticsApiException.class)
+    public ResponseEntity<ApiResponse<Void>> handleYouTubeAnalyticsError(YouTubeAnalyticsApiException ex) {
+        int upstreamStatus = ex.getStatusCode().value();
+        HttpStatus responseStatus = switch (upstreamStatus) {
+            case 400 -> HttpStatus.BAD_REQUEST;
+            case 401 -> HttpStatus.UNAUTHORIZED;
+            case 403 -> HttpStatus.FORBIDDEN;
+            case 404 -> HttpStatus.NOT_FOUND;
+            case 429 -> HttpStatus.TOO_MANY_REQUESTS;
+            default -> HttpStatus.BAD_GATEWAY;
+        };
+        String message = switch (upstreamStatus) {
+            case 400 -> "YouTube Analytics rejected the report request";
+            case 401 -> "YouTube authorization is missing or expired. Please sign in again.";
+            case 403 -> "You are not allowed to access analytics for this video";
+            case 404 -> "The requested YouTube analytics resource was not found";
+            case 429 -> "YouTube Analytics rate limit exceeded. Please try again later.";
+            default -> "YouTube Analytics is temporarily unavailable";
+        };
+        log.warn("YouTube Analytics API failed | upstreamStatus={}", upstreamStatus);
+        return ResponseEntity.status(responseStatus).body(ApiResponse.error(message));
+    }
+
+    @ExceptionHandler(InvalidAnalyticsRequestException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidAnalyticsRequest(InvalidAnalyticsRequestException ex) {
+        log.warn("Invalid analytics request: {}", ex.getMessage());
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalStateException.class)

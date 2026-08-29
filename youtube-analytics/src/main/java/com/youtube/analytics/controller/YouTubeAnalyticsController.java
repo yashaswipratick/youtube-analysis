@@ -4,6 +4,7 @@ import com.youtube.analytics.model.AnalyticsRequest;
 import com.youtube.analytics.model.ApiResponse;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
+import com.youtube.analytics.service.AnalyticsRequestValidator;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
@@ -56,6 +57,9 @@ public class YouTubeAnalyticsController {
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
 
+        AnalyticsRequestValidator.validateVideoId(videoId);
+        AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+
         log.info("GET /video/{} | {} → {}", videoId, startDate, endDate);
 
         VideoAnalyticsResult result = analyticsService.getSingleVideoAnalytics(
@@ -78,6 +82,9 @@ public class YouTubeAnalyticsController {
     @PostMapping("/videos")
     public ResponseEntity<ApiResponse<List<VideoAnalyticsResult>>> getMultipleVideoAnalytics(
             @Valid @RequestBody AnalyticsRequest request) {
+
+        request.getVideoIds().forEach(AnalyticsRequestValidator::validateVideoId);
+        AnalyticsRequestValidator.validateProvidedDates(request.getStartDate(), request.getEndDate());
 
         log.info("POST /videos | count={} | {} → {}",
                 request.getVideoIds().size(), request.getStartDate(), request.getEndDate());
@@ -107,6 +114,8 @@ public class YouTubeAnalyticsController {
             @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd")
             String endDate,
             @RequestParam(required = false) List<String> metrics) {
+
+        AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
 
         log.info("GET /videos/all | {} → {}", startDate, endDate);
 

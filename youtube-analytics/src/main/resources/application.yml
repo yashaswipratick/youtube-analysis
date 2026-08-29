@@ -31,8 +31,10 @@ server:
   port: 8080
 
 youtube:
+  oauth:
+    credentials-file: /Users/yashaswipratick/Documents/youtube-analytics/screts.json
   analytics:
-    default-metrics: views,estimatedMinutesWatched,averageViewDuration,likes,comments,shares,subscribersGained
+    default-metrics: views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,comments,shares,subscribersGained,subscribersLost
 
 logging:
   level:
