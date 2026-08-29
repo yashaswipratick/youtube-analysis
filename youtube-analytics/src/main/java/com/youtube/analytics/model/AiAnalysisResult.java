@@ -11,6 +11,17 @@ public record AiAnalysisResult(
         List<String> observations,
         List<String> strengths,
         List<String> weaknesses,
-        List<String> recommendations,
+        List<Recommendation> recommendations,
         List<String> missingData) {
+
+    public record Recommendation(
+            String recommendation,
+            RecommendationType type,
+            String reason) {
+    }
+
+    public enum RecommendationType {
+        EVIDENCE_BASED,
+        EXPERIMENTAL
+    }
 }
