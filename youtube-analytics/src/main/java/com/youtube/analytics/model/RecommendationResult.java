@@ -10,10 +10,28 @@ public record RecommendationResult(
         List<String> missingData) {
 
     public record Recommendation(
+            Priority priority,
+            Area area,
             String recommendation,
             RecommendationType type,
             String evidence,
-            Confidence confidence) {
+            Confidence confidence,
+            String measurement) {
+    }
+
+    public enum Priority {
+        HIGH,
+        MEDIUM,
+        LOW
+    }
+
+    public enum Area {
+        RETENTION,
+        ENGAGEMENT,
+        SUBSCRIBER_CONVERSION,
+        WATCH_TIME,
+        DISCOVERY,
+        PACKAGING
     }
 
     public enum RecommendationType {
