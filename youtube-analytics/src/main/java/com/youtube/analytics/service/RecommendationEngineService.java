@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /** Deterministic 7G recommendation engine. AI interpretation is intentionally separate. */
@@ -106,12 +107,13 @@ public class RecommendationEngineService {
         Number watchMinutes = number(metrics.get("estimatedMinutesWatched"));
         Number views = number(metrics.get("views"));
         if (watchMinutes != null && views != null && views.doubleValue() > 0) {
+            double minutesPerView = watchMinutes.doubleValue() / views.doubleValue();
             recommendations.add(new RecommendationResult.Recommendation(
                     RecommendationResult.Priority.MEDIUM,
                     RecommendationResult.Area.WATCH_TIME,
                     "Track estimated watch time per view when comparing future videos.",
                     RecommendationResult.RecommendationType.EVIDENCE_BASED,
-                    "Estimated minutes watched and views are both available, allowing watch minutes per view to be calculated without assuming video duration.",
+                    String.format(Locale.ROOT, "Estimated watch time is %.2f minutes per view.", minutesPerView),
                     RecommendationResult.Confidence.HIGH,
                     "Compare watch minutes per view across comparable videos."));
         } else {
@@ -139,27 +141,64 @@ public class RecommendationEngineService {
     private void addRetentionRecommendation(VideoRetentionAnalyticsResult retention,
                                              List<RecommendationResult.Recommendation> recommendations,
                                              List<String> missingData) {
-        if (retention == null) {
-            return;
-        }
+        if (retention == null) return;
 
         if (retention.getAverageViewPercentage() != null) {
-            RecommendationResult.Priority priority = retention.getAverageViewPercentage() < 35.0
-                    ? RecommendationResult.Priority.HIGH
-                    : RecommendationResult.Priority.MEDIUM;
+            Double average = retention.getAverageViewPercentage();
+            List<VideoRetentionAnalyticsResult.RetentionPoint> points = retention.getRetention();
+            VideoRetentionAnalyticsResult.RetentionPoint firstPoint = points == null || points.isEmpty() ? null : points.get(0);
+            VideoRetentionAnalyticsResult.RetentionPoint earlyPoint = findPointAtOrAfter(points, 0.05);
+
+            boolean earlyDrop = firstPoint != null && earlyPoint != null
+                    && firstPoint.getAudienceWatchRatio() != null
+                    && earlyPoint.getAudienceWatchRatio() != null
+                    && firstPoint.getAudienceWatchRatio() - earlyPoint.getAudienceWatchRatio() >= 0.20;
+
+            String evidence;
+            String recommendation;
+            RecommendationResult.Confidence confidence;
+            if (earlyDrop) {
+                evidence = String.format(Locale.ROOT,
+                        "Early retention drops from %.2f%% at %.0f%% of video elapsed to %.2f%% at %.0f%% elapsed; average view percentage is %.2f%%.",
+                        firstPoint.getAudienceWatchRatio() * 100,
+                        firstPoint.getElapsedVideoTimeRatio() * 100,
+                        earlyPoint.getAudienceWatchRatio() * 100,
+                        earlyPoint.getElapsedVideoTimeRatio() * 100,
+                        average);
+                recommendation = "Test a stronger outcome-first opening and move the strongest payoff earlier in future videos.";
+                confidence = RecommendationResult.Confidence.HIGH;
+            } else if (average < 35.0) {
+                evidence = String.format(Locale.ROOT, "Average view percentage is %.2f%%; the available retention curve does not establish a specific early-drop pattern.", average);
+                recommendation = "Test improvements to the opening and overall pacing, while using retention segments to measure the result.";
+                confidence = RecommendationResult.Confidence.MEDIUM;
+            } else {
+                evidence = String.format(Locale.ROOT, "Average view percentage is %.2f%% and no high-confidence early-drop pattern was detected from the available curve.", average);
+                recommendation = "Preserve the current pacing while testing small improvements to the opening and structure.";
+                confidence = RecommendationResult.Confidence.MEDIUM;
+            }
+
             recommendations.add(new RecommendationResult.Recommendation(
-                    priority,
+                    earlyDrop || average < 35.0 ? RecommendationResult.Priority.HIGH : RecommendationResult.Priority.MEDIUM,
                     RecommendationResult.Area.RETENTION,
-                    retention.getAverageViewPercentage() < 35.0
-                            ? "Test a stronger, outcome-first opening and move the strongest payoff earlier in future videos."
-                            : "Preserve the current pacing while testing small improvements to the opening and structure.",
+                    recommendation,
                     RecommendationResult.RecommendationType.EXPERIMENTAL,
-                    "Average view percentage is " + String.format(java.util.Locale.ROOT, "%.2f%%", retention.getAverageViewPercentage()) + ".",
-                    retention.getAverageViewPercentage() < 35.0 ? RecommendationResult.Confidence.HIGH : RecommendationResult.Confidence.MEDIUM,
+                    evidence,
+                    confidence,
                     "Compare average view percentage and the first retention segment against the current video baseline."));
         } else {
             missingData.add("Average view percentage is not available in the retention response.");
         }
+    }
+
+    private VideoRetentionAnalyticsResult.RetentionPoint findPointAtOrAfter(
+            List<VideoRetentionAnalyticsResult.RetentionPoint> points, double targetRatio) {
+        if (points == null) return null;
+        for (VideoRetentionAnalyticsResult.RetentionPoint point : points) {
+            if (point.getElapsedVideoTimeRatio() != null && point.getElapsedVideoTimeRatio() >= targetRatio) {
+                return point;
+            }
+        }
+        return null;
     }
 
     private void addMissingData(Map<String, Object> metrics,
@@ -178,6 +217,6 @@ public class RecommendationEngineService {
     }
 
     private String formatPercent(double value) {
-        return String.format(java.util.Locale.ROOT, "%.2f%%", value * 100);
+        return String.format(Locale.ROOT, "%.2f%%", value * 100);
     }
 }
