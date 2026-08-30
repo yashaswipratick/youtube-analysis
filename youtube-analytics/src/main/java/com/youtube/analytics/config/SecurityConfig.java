@@ -18,6 +18,9 @@ public class SecurityConfig {
                         "/oauth/**",
                         "/login/**",
                         "/error",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
                         "/api/youtube/analytics/ai/analyze",
                         "/api/youtube/analytics/**"
                 ).permitAll()
