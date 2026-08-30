@@ -32,9 +32,9 @@ public class RetentionAnalysisService {
         List<VideoRetentionAnalyticsResult.RetentionPoint> points = retention.getRetention() == null
                 ? List.of()
                 : retention.getRetention().stream()
-                    .filter(p -> p != null && p.getElapsedVideoTimeRatio() != null && p.getAudienceWatchRatio() != null)
-                    .sorted(Comparator.comparing(VideoRetentionAnalyticsResult.RetentionPoint::getElapsedVideoTimeRatio))
-                    .toList();
+                .filter(p -> p != null && p.getElapsedVideoTimeRatio() != null && p.getAudienceWatchRatio() != null)
+                .sorted(Comparator.comparing(VideoRetentionAnalyticsResult.RetentionPoint::getElapsedVideoTimeRatio))
+                .toList();
 
         if (retention.getAverageViewPercentage() == null) {
             missing.add("Average view percentage is unavailable; overall retention severity cannot be scored from the average.");
@@ -119,7 +119,7 @@ public class RetentionAnalysisService {
             }
         }
         return finding("STRONGEST_SECTION", bestFrom, bestTo, 0,
-                "Highest adjacent retention level is approximately " + format(bestAverage) + "%.");
+                "Highest adjacent retention level is approximately " + format(bestAverage) + "%." );
     }
 
     private RetentionAnalysisResult.RetentionFinding findWeakestSection(List<VideoRetentionAnalyticsResult.RetentionPoint> points) {
@@ -161,8 +161,15 @@ public class RetentionAnalysisService {
         RetentionAnalysisResult.RetentionSeverity severity = end < 10 ? RetentionAnalysisResult.RetentionSeverity.CRITICAL
                 : end < 20 ? RetentionAnalysisResult.RetentionSeverity.WEAK
                 : RetentionAnalysisResult.RetentionSeverity.HEALTHY;
-        return new RetentionAnalysisResult.RetentionFinding("END_RETENTION", from, to,
-                end - percentage(from.getAudienceWatchRatio()), severity,
+        double change = end - percentage(from.getAudienceWatchRatio());
+        return new RetentionAnalysisResult.RetentionFinding(
+                "END_RETENTION",
+                from.getElapsedVideoTimeRatio() * 100,
+                to.getElapsedVideoTimeRatio() * 100,
+                from.getAudienceWatchRatio() * 100,
+                to.getAudienceWatchRatio() * 100,
+                change,
+                severity,
                 "Retention at the end of the available curve is " + format(end) + "%." );
     }
 
