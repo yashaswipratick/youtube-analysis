@@ -55,7 +55,8 @@ class RecommendationEngineServiceTest {
         assertThat(retentionRecommendation.priority()).isEqualTo(RecommendationResult.Priority.HIGH);
         assertThat(retentionRecommendation.type()).isEqualTo(RecommendationResult.RecommendationType.EXPERIMENTAL);
         assertThat(retentionRecommendation.confidence()).isEqualTo(RecommendationResult.Confidence.HIGH);
-        assertThat(retentionRecommendation.evidence()).contains("2%", "71.43%", "5%", "50.00%");
+        assertThat(retentionRecommendation.evidence())
+                .contains("94.64%", "1%", "50.00%", "5%", "24.99%");
         assertThat(retentionRecommendation.recommendation()).contains("outcome-first opening");
         assertThat(retentionRecommendation.measurement()).contains("first retention segment");
     }
