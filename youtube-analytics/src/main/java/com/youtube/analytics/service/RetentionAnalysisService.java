@@ -134,7 +134,7 @@ public class RetentionAnalysisService {
                     .mapToDouble(p -> percentage(p.getAudienceWatchRatio()))
                     .average().orElse(endAudience);
             double volatility = calculateVolatility(window);
-            RetentionAnalysisResult.RetentionSeverity segmentSeverity = severityForSegment(change, volatility);
+            RetentionAnalysisResult.RetentionSeverity segmentSeverity = severityForSegment(change);
             String signal = buildSegmentSignal(change, volatility, startAudience, endAudience);
 
             segments.add(new RetentionAnalysisResult.RetentionSegment(
@@ -169,9 +169,9 @@ public class RetentionAnalysisService {
         return "DECLINE_WITH_VARIATION";
     }
 
-    private RetentionAnalysisResult.RetentionSeverity severityForSegment(double change, double volatility) {
+    private RetentionAnalysisResult.RetentionSeverity severityForSegment(double change) {
         if (change <= -30) return RetentionAnalysisResult.RetentionSeverity.CRITICAL;
-        if (change <= -15) return RetentionAnalysisResult.RetentionSeverity.WEAK;
+        if (change <= -10) return RetentionAnalysisResult.RetentionSeverity.WEAK;
         return RetentionAnalysisResult.RetentionSeverity.HEALTHY;
     }
 
@@ -320,7 +320,7 @@ public class RetentionAnalysisService {
     private RetentionAnalysisResult.RetentionSeverity severityForChange(double change) {
         double magnitude = Math.abs(change);
         if (magnitude >= 30) return RetentionAnalysisResult.RetentionSeverity.CRITICAL;
-        if (magnitude >= 15) return RetentionAnalysisResult.RetentionSeverity.WEAK;
+        if (magnitude >= 10) return RetentionAnalysisResult.RetentionSeverity.WEAK;
         return RetentionAnalysisResult.RetentionSeverity.HEALTHY;
     }
 
