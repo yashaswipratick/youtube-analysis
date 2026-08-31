@@ -56,11 +56,7 @@ public class RetentionAnalysisService {
         List<RetentionAnalysisResult.RetentionFinding> recoveries = findMeaningfulRecoveries(points);
         RetentionAnalysisResult.RetentionFinding ending = findEnding(points);
 
-        if (points.size() < 2) {
-            segments = List.of();
-        }
-
-        List<String> recommendations = buildRecommendations(severity, earlyDrop, largestDrop, strongest, weakest, ending, segments);
+        List<String> recommendations = buildRecommendations(severity, earlyDrop, largestDrop, strongest, ending, segments);
 
         return new RetentionAnalysisResult(
                 retention.getVideoId(),
@@ -176,7 +172,6 @@ public class RetentionAnalysisService {
     private RetentionAnalysisResult.RetentionSeverity severityForSegment(double change, double volatility) {
         if (change <= -30) return RetentionAnalysisResult.RetentionSeverity.CRITICAL;
         if (change <= -15) return RetentionAnalysisResult.RetentionSeverity.WEAK;
-        if (volatility <= VOLATILITY_NOISE_THRESHOLD && change >= -5) return RetentionAnalysisResult.RetentionSeverity.HEALTHY;
         return RetentionAnalysisResult.RetentionSeverity.HEALTHY;
     }
 
@@ -194,11 +189,13 @@ public class RetentionAnalysisService {
     private RetentionAnalysisResult.RetentionFinding findWeakestMeaningfulSegment(List<RetentionAnalysisResult.RetentionSegment> segments) {
         if (segments.isEmpty()) return null;
         RetentionAnalysisResult.RetentionSegment worst = segments.stream()
+                .filter(s -> s.fromVideoPercent() < 90.0)
                 .min(Comparator.comparing(RetentionAnalysisResult.RetentionSegment::averageAudiencePercent))
-                .orElse(segments.get(0));
+                .orElse(null);
+        if (worst == null) return null;
         return segmentFinding("WEAKEST_SECTION", worst,
-                "Lowest meaningful segment retention averages " + format(worst.averageAudiencePercent()) + "%. "
-                        + "Low end retention is expected later in a video, so segment context matters.");
+                "Lowest pre-ending segment retention averages " + format(worst.averageAudiencePercent()) + "%. "
+                        + "The final 10% is excluded because low absolute retention there is expected from cumulative audience loss.");
     }
 
     private RetentionAnalysisResult.RetentionFinding segmentFinding(String type, RetentionAnalysisResult.RetentionSegment segment, String evidence) {
@@ -216,12 +213,34 @@ public class RetentionAnalysisService {
     private List<RetentionAnalysisResult.RetentionFinding> findMeaningfulRecoveries(List<VideoRetentionAnalyticsResult.RetentionPoint> points) {
         List<RetentionAnalysisResult.RetentionFinding> results = new ArrayList<>();
         if (points.size() < 2) return results;
+
+        VideoRetentionAnalyticsResult.RetentionPoint recoveryStart = null;
+        VideoRetentionAnalyticsResult.RetentionPoint recoveryEnd = null;
+        double accumulatedRecovery = 0;
+
         for (int i = 1; i < points.size(); i++) {
-            double change = percentage(points.get(i).getAudienceWatchRatio()) - percentage(points.get(i - 1).getAudienceWatchRatio());
-            if (change >= RECOVERY_THRESHOLD) {
-                results.add(finding("RECOVERY", points.get(i - 1), points.get(i), change,
-                        "Retention recovers by " + format(change) + " percentage points; treat this as a candidate recovery signal, not proof of why viewers returned or stayed."));
+            VideoRetentionAnalyticsResult.RetentionPoint previous = points.get(i - 1);
+            VideoRetentionAnalyticsResult.RetentionPoint current = points.get(i);
+            double change = percentage(current.getAudienceWatchRatio()) - percentage(previous.getAudienceWatchRatio());
+
+            if (change > 0) {
+                if (recoveryStart == null) recoveryStart = previous;
+                recoveryEnd = current;
+                accumulatedRecovery += change;
+            } else {
+                if (recoveryStart != null && accumulatedRecovery >= MEANINGFUL_RECOVERY) {
+                    results.add(finding("RECOVERY", recoveryStart, recoveryEnd, accumulatedRecovery,
+                            "Retention recovers by " + format(accumulatedRecovery) + " percentage points across a consecutive rising run; treat this as a candidate recovery signal, not proof of why viewers returned or stayed."));
+                }
+                recoveryStart = null;
+                recoveryEnd = null;
+                accumulatedRecovery = 0;
             }
+        }
+
+        if (recoveryStart != null && accumulatedRecovery >= MEANINGFUL_RECOVERY) {
+            results.add(finding("RECOVERY", recoveryStart, recoveryEnd, accumulatedRecovery,
+                    "Retention recovers by " + format(accumulatedRecovery) + " percentage points across a consecutive rising run; treat this as a candidate recovery signal, not proof of why viewers returned or stayed."));
         }
         return results;
     }
@@ -253,12 +272,13 @@ public class RetentionAnalysisService {
                                                RetentionAnalysisResult.RetentionFinding earlyDrop,
                                                RetentionAnalysisResult.RetentionFinding largestDrop,
                                                RetentionAnalysisResult.RetentionFinding strongest,
-                                               RetentionAnalysisResult.RetentionFinding weakest,
                                                RetentionAnalysisResult.RetentionFinding ending,
                                                List<RetentionAnalysisResult.RetentionSegment> segments) {
         List<String> recommendations = new ArrayList<>();
         if (earlyDrop != null) {
             recommendations.add("Prioritize the opening: reduce setup and surface the strongest outcome or visual within the first 5% of the video.");
+        } else if (largestDrop != null && Math.abs(largestDrop.changePercentagePoints()) >= 10) {
+            recommendations.add("Inspect the section around the largest retention drop and test removing or shortening the content immediately before that point.");
         }
         RetentionAnalysisResult.RetentionSegment largestSegmentDrop = segments.stream()
                 .filter(s -> s.changePercentagePoints() <= -MEANINGFUL_SECTION_DROP)
