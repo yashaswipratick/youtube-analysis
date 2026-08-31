@@ -14,6 +14,7 @@ public record RetentionAnalysisResult(
         RetentionFinding weakestSection,
         List<RetentionFinding> recoverySections,
         RetentionFinding endRetention,
+        List<RetentionSegment> segments,
         List<String> recommendations,
         List<String> missingData) {
 
@@ -34,5 +35,18 @@ public record RetentionAnalysisResult(
             Double changePercentagePoints,
             RetentionSeverity severity,
             String evidence) {
+    }
+
+    /** Fixed video windows used to compare meaningful retention sections. */
+    public record RetentionSegment(
+            Double fromVideoPercent,
+            Double toVideoPercent,
+            Double startAudiencePercent,
+            Double endAudiencePercent,
+            Double averageAudiencePercent,
+            Double changePercentagePoints,
+            Double volatilityPercentagePoints,
+            RetentionSeverity severity,
+            String signal) {
     }
 }
