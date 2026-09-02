@@ -9,11 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Diagnoses whether weak video discovery is primarily caused by reach or packaging.
- * Thresholds are deliberately conservative because YouTube does not expose a
- * universal "good" impressions benchmark for every channel.
- */
+/** Diagnoses whether weak video discovery is primarily caused by reach or packaging. */
 @Service
 @RequiredArgsConstructor
 public class DiscoveryOptimizationService {
@@ -21,7 +17,6 @@ public class DiscoveryOptimizationService {
     private static final double STRONG_CTR = 8.0;
     private static final double HEALTHY_CTR = 5.0;
     private static final double WEAK_CTR = 2.5;
-
     private static final double STRONG_REACH_VIEWS_PER_DAY = 1000.0;
     private static final double HEALTHY_REACH_VIEWS_PER_DAY = 300.0;
     private static final double WEAK_REACH_VIEWS_PER_DAY = 50.0;
@@ -30,9 +25,7 @@ public class DiscoveryOptimizationService {
 
     public DiscoveryOptimizationResult analyze(String videoId, String startDate, String endDate) {
         VideoAnalyticsResult analytics = analyticsService.getSingleVideoAnalytics(
-                videoId,
-                startDate,
-                endDate,
+                videoId, startDate, endDate,
                 List.of("views", "impressions", "impressionsClickThroughRate"));
 
         Map<String, Object> metrics = analytics.getMetrics();
@@ -47,19 +40,14 @@ public class DiscoveryOptimizationService {
 
         double days = inclusiveDays(analytics.getStartDate(), analytics.getEndDate());
         Double viewsPerDay = views == null ? null : views / days;
-
         DiscoveryOptimizationResult.DiscoveryStatus reachStatus = classifyReach(viewsPerDay);
         DiscoveryOptimizationResult.DiscoveryStatus packagingStatus = classifyCtr(ctr);
         DiscoveryOptimizationResult.DiscoveryDiagnosis diagnosis = diagnose(reachStatus, packagingStatus, missingData);
 
         return DiscoveryOptimizationResult.builder()
-                .videoId(videoId)
-                .views(views)
-                .impressions(impressions)
-                .impressionsClickThroughRate(ctr)
-                .viewsPerDay(viewsPerDay)
-                .reachStatus(reachStatus)
-                .packagingStatus(packagingStatus)
+                .videoId(videoId).views(views).impressions(impressions)
+                .impressionsClickThroughRate(ctr).viewsPerDay(viewsPerDay)
+                .reachStatus(reachStatus).packagingStatus(packagingStatus)
                 .primaryDiagnosis(diagnosis)
                 .recommendations(buildRecommendations(diagnosis, ctr, impressions))
                 .missingData(missingData)
@@ -86,7 +74,8 @@ public class DiscoveryOptimizationService {
             DiscoveryOptimizationResult.DiscoveryStatus reach,
             DiscoveryOptimizationResult.DiscoveryStatus packaging,
             List<String> missingData) {
-        if (missingData.contains("views") || missingData.contains("impressionsClickThroughRate")) {
+        if (missingData.contains("views") || missingData.contains("impressions")
+                || missingData.contains("impressionsClickThroughRate")) {
             return DiscoveryOptimizationResult.DiscoveryDiagnosis.INSUFFICIENT_DATA;
         }
         boolean lowReach = reach == DiscoveryOptimizationResult.DiscoveryStatus.WEAK
@@ -122,11 +111,11 @@ public class DiscoveryOptimizationService {
         return recommendations;
     }
 
-    private long toLong(Object value) {
+    private Long toLong(Object value) {
         if (value instanceof Number number) return number.longValue();
-        if (value == null) return 0L;
+        if (value == null) return null;
         try { return Long.parseLong(String.valueOf(value)); }
-        catch (NumberFormatException ex) { return 0L; }
+        catch (NumberFormatException ex) { return null; }
     }
 
     private Double toDouble(Object value) {
