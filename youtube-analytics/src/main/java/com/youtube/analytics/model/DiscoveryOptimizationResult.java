@@ -5,9 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * Explains whether a video's discovery problem is primarily reach or packaging.
- */
+/** Explains whether a video's discovery problem is primarily caused by reach or packaging. */
 @Data
 @Builder
 public class DiscoveryOptimizationResult {
@@ -17,6 +15,7 @@ public class DiscoveryOptimizationResult {
     private Long impressions;
     private Double impressionsClickThroughRate;
     private Double viewsPerDay;
+    private Double impressionsPerDay;
     private DiscoveryStatus reachStatus;
     private DiscoveryStatus packagingStatus;
     private DiscoveryDiagnosis primaryDiagnosis;
