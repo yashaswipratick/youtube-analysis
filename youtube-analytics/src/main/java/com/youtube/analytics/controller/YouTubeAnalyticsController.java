@@ -7,6 +7,7 @@ import com.youtube.analytics.model.ApiResponse;
 import com.youtube.analytics.model.ChannelAnalyticsResult;
 import com.youtube.analytics.model.ChannelGeographyAnalyticsResult;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
+import com.youtube.analytics.model.DiscoveryOptimizationResult;
 import com.youtube.analytics.model.GeographyAnalyticsResult;
 import com.youtube.analytics.model.RecommendationRequest;
 import com.youtube.analytics.model.RecommendationResult;
@@ -14,6 +15,7 @@ import com.youtube.analytics.model.TrafficSourceAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.model.VideoRetentionAnalyticsResult;
 import com.youtube.analytics.service.AnalyticsRequestValidator;
+import com.youtube.analytics.service.DiscoveryOptimizationService;
 import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.RecommendationEngineService;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
@@ -50,23 +52,20 @@ public class YouTubeAnalyticsController {
     private final YouTubeChannelGeographyAnalyticsService channelGeographyAnalyticsService;
     private final OpenAiAnalysisService openAiAnalysisService;
     private final RecommendationEngineService recommendationEngineService;
+    private final DiscoveryOptimizationService discoveryOptimizationService;
 
     @PostMapping("/ai/analyze")
-    public ResponseEntity<ApiResponse<AiAnalysisResult>> analyzeWithAi(
-            @Valid @RequestBody AiAnalysisRequest request) {
-        log.info("POST /ai/analyze | contextPresent={}",
-                request.context() != null && !request.context().isEmpty());
+    public ResponseEntity<ApiResponse<AiAnalysisResult>> analyzeWithAi(@Valid @RequestBody AiAnalysisRequest request) {
+        log.info("POST /ai/analyze | contextPresent={}", request.context() != null && !request.context().isEmpty());
         return ResponseEntity.ok(ApiResponse.success(openAiAnalysisService.analyze(request)));
     }
 
     @PostMapping("/recommendations")
-    public ResponseEntity<ApiResponse<RecommendationResult>> getRecommendations(
-            @Valid @RequestBody RecommendationRequest request) {
+    public ResponseEntity<ApiResponse<RecommendationResult>> getRecommendations(@Valid @RequestBody RecommendationRequest request) {
         AnalyticsRequestValidator.validateVideoId(request.videoId());
         AnalyticsRequestValidator.validateProvidedDates(request.startDate(), request.endDate());
         log.info("POST /recommendations | videoId={} | {} → {}", request.videoId(), request.startDate(), request.endDate());
-        return ResponseEntity.ok(ApiResponse.success(
-                recommendationEngineService.recommend(request.videoId(), request.startDate(), request.endDate())));
+        return ResponseEntity.ok(ApiResponse.success(recommendationEngineService.recommend(request.videoId(), request.startDate(), request.endDate())));
     }
 
     @GetMapping("/channel")
@@ -110,6 +109,28 @@ public class YouTubeAnalyticsController {
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /video/{}/retention | {} → {}", videoId, startDate, endDate);
         return ResponseEntity.ok(ApiResponse.success(analyticsService.getVideoRetentionAnalytics(videoId, startDate, endDate)));
+    }
+
+    @GetMapping("/video/{videoId}/retention/analysis")
+    public ResponseEntity<ApiResponse<com.youtube.analytics.model.RetentionAnalysisResult>> getVideoRetentionAnalysis(
+            @PathVariable String videoId,
+            @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd") String startDate,
+            @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd") String endDate) {
+        AnalyticsRequestValidator.validateVideoId(videoId);
+        AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+        log.info("GET /video/{}/retention/analysis | {} → {}", videoId, startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(analyticsService.getVideoRetentionAnalysis(videoId, startDate, endDate)));
+    }
+
+    @GetMapping("/video/{videoId}/discovery")
+    public ResponseEntity<ApiResponse<DiscoveryOptimizationResult>> getDiscoveryOptimization(
+            @PathVariable String videoId,
+            @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be yyyy-MM-dd") String startDate,
+            @RequestParam(required = false) @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be yyyy-MM-dd") String endDate) {
+        AnalyticsRequestValidator.validateVideoId(videoId);
+        AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
+        log.info("GET /video/{}/discovery | {} → {}", videoId, startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(discoveryOptimizationService.analyze(videoId, startDate, endDate)));
     }
 
     @GetMapping("/video/{videoId}/daily")
