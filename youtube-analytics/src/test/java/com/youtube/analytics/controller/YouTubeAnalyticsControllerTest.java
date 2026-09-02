@@ -2,8 +2,10 @@ package com.youtube.analytics.controller;
 
 import com.youtube.analytics.exception.GlobalExceptionHandler;
 import com.youtube.analytics.model.VideoAnalyticsResult;
+import com.youtube.analytics.service.DiscoveryOptimizationService;
 import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.RecommendationEngineService;
+import com.youtube.analytics.service.RetentionAnalysisService;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
 import com.youtube.analytics.service.YouTubeChannelGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeGeographyAnalyticsService;
@@ -34,6 +36,8 @@ class YouTubeAnalyticsControllerTest {
         YouTubeChannelGeographyAnalyticsService channelGeographyService = mock(YouTubeChannelGeographyAnalyticsService.class);
         OpenAiAnalysisService openAiAnalysisService = mock(OpenAiAnalysisService.class);
         RecommendationEngineService recommendationEngineService = mock(RecommendationEngineService.class);
+        RetentionAnalysisService retentionAnalysisService = mock(RetentionAnalysisService.class);
+        DiscoveryOptimizationService discoveryOptimizationService = mock(DiscoveryOptimizationService.class);
 
         when(service.getSingleVideoAnalytics(any(), any(), any(), any())).thenReturn(VideoAnalyticsResult.builder()
                 .videoId("laQbWAoa3NI")
@@ -49,7 +53,9 @@ class YouTubeAnalyticsControllerTest {
                         geographyService,
                         channelGeographyService,
                         openAiAnalysisService,
-                        recommendationEngineService))
+                        recommendationEngineService,
+                        retentionAnalysisService,
+                        discoveryOptimizationService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
