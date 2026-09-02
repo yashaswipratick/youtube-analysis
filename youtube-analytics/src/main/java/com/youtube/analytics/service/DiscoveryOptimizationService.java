@@ -17,9 +17,9 @@ public class DiscoveryOptimizationService {
     private static final double STRONG_CTR = 8.0;
     private static final double HEALTHY_CTR = 5.0;
     private static final double WEAK_CTR = 2.5;
-    private static final double STRONG_REACH_VIEWS_PER_DAY = 1000.0;
-    private static final double HEALTHY_REACH_VIEWS_PER_DAY = 300.0;
-    private static final double WEAK_REACH_VIEWS_PER_DAY = 50.0;
+    private static final double STRONG_REACH_IMPRESSIONS_PER_DAY = 10000.0;
+    private static final double HEALTHY_REACH_IMPRESSIONS_PER_DAY = 3000.0;
+    private static final double WEAK_REACH_IMPRESSIONS_PER_DAY = 500.0;
 
     private final YouTubeAnalyticsService analyticsService;
 
@@ -40,13 +40,15 @@ public class DiscoveryOptimizationService {
 
         double days = inclusiveDays(analytics.getStartDate(), analytics.getEndDate());
         Double viewsPerDay = views == null ? null : views / days;
-        DiscoveryOptimizationResult.DiscoveryStatus reachStatus = classifyReach(viewsPerDay);
+        Double impressionsPerDay = impressions == null ? null : impressions / days;
+        DiscoveryOptimizationResult.DiscoveryStatus reachStatus = classifyReach(impressionsPerDay);
         DiscoveryOptimizationResult.DiscoveryStatus packagingStatus = classifyCtr(ctr);
         DiscoveryOptimizationResult.DiscoveryDiagnosis diagnosis = diagnose(reachStatus, packagingStatus, missingData);
 
         return DiscoveryOptimizationResult.builder()
                 .videoId(videoId).views(views).impressions(impressions)
                 .impressionsClickThroughRate(ctr).viewsPerDay(viewsPerDay)
+                .impressionsPerDay(impressionsPerDay)
                 .reachStatus(reachStatus).packagingStatus(packagingStatus)
                 .primaryDiagnosis(diagnosis)
                 .recommendations(buildRecommendations(diagnosis, ctr, impressions))
@@ -54,11 +56,11 @@ public class DiscoveryOptimizationService {
                 .build();
     }
 
-    private DiscoveryOptimizationResult.DiscoveryStatus classifyReach(Double viewsPerDay) {
-        if (viewsPerDay == null) return DiscoveryOptimizationResult.DiscoveryStatus.UNKNOWN;
-        if (viewsPerDay >= STRONG_REACH_VIEWS_PER_DAY) return DiscoveryOptimizationResult.DiscoveryStatus.STRONG;
-        if (viewsPerDay >= HEALTHY_REACH_VIEWS_PER_DAY) return DiscoveryOptimizationResult.DiscoveryStatus.HEALTHY;
-        if (viewsPerDay >= WEAK_REACH_VIEWS_PER_DAY) return DiscoveryOptimizationResult.DiscoveryStatus.WEAK;
+    private DiscoveryOptimizationResult.DiscoveryStatus classifyReach(Double impressionsPerDay) {
+        if (impressionsPerDay == null) return DiscoveryOptimizationResult.DiscoveryStatus.UNKNOWN;
+        if (impressionsPerDay >= STRONG_REACH_IMPRESSIONS_PER_DAY) return DiscoveryOptimizationResult.DiscoveryStatus.STRONG;
+        if (impressionsPerDay >= HEALTHY_REACH_IMPRESSIONS_PER_DAY) return DiscoveryOptimizationResult.DiscoveryStatus.HEALTHY;
+        if (impressionsPerDay >= WEAK_REACH_IMPRESSIONS_PER_DAY) return DiscoveryOptimizationResult.DiscoveryStatus.WEAK;
         return DiscoveryOptimizationResult.DiscoveryStatus.CRITICAL;
     }
 
@@ -74,10 +76,7 @@ public class DiscoveryOptimizationService {
             DiscoveryOptimizationResult.DiscoveryStatus reach,
             DiscoveryOptimizationResult.DiscoveryStatus packaging,
             List<String> missingData) {
-        if (missingData.contains("views") || missingData.contains("impressions")
-                || missingData.contains("impressionsClickThroughRate")) {
-            return DiscoveryOptimizationResult.DiscoveryDiagnosis.INSUFFICIENT_DATA;
-        }
+        if (!missingData.isEmpty()) return DiscoveryOptimizationResult.DiscoveryDiagnosis.INSUFFICIENT_DATA;
         boolean lowReach = reach == DiscoveryOptimizationResult.DiscoveryStatus.WEAK
                 || reach == DiscoveryOptimizationResult.DiscoveryStatus.CRITICAL;
         boolean lowCtr = packaging == DiscoveryOptimizationResult.DiscoveryStatus.WEAK
@@ -101,7 +100,7 @@ public class DiscoveryOptimizationService {
                 recommendations.add("Then test a stronger title and thumbnail to improve impression-to-view conversion.");
             }
             case HEALTHY_DISCOVERY -> recommendations.add("Discovery signals are healthy; preserve the current packaging pattern and focus next on retention and watch time.");
-            case INSUFFICIENT_DATA -> recommendations.add("Collect impressions and impression click-through rate before making a discovery or packaging decision.");
+            case INSUFFICIENT_DATA -> recommendations.add("Collect views, impressions, and impression click-through rate before making a discovery or packaging decision.");
         }
         if (impressions != null && impressions == 0) {
             recommendations.add("No impressions were recorded, so CTR is not actionable yet.");
