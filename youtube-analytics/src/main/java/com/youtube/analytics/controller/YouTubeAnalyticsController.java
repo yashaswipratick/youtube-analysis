@@ -58,17 +58,21 @@ public class YouTubeAnalyticsController {
     private final DiscoveryOptimizationService discoveryOptimizationService;
 
     @PostMapping("/ai/analyze")
-    public ResponseEntity<ApiResponse<AiAnalysisResult>> analyzeWithAi(@Valid @RequestBody AiAnalysisRequest request) {
-        log.info("POST /ai/analyze | contextPresent={}", request.context() != null && !request.context().isEmpty());
+    public ResponseEntity<ApiResponse<AiAnalysisResult>> analyzeWithAi(
+            @Valid @RequestBody AiAnalysisRequest request) {
+        log.info("POST /ai/analyze | contextPresent={}",
+                request.context() != null && !request.context().isEmpty());
         return ResponseEntity.ok(ApiResponse.success(openAiAnalysisService.analyze(request)));
     }
 
     @PostMapping("/recommendations")
-    public ResponseEntity<ApiResponse<RecommendationResult>> getRecommendations(@Valid @RequestBody RecommendationRequest request) {
+    public ResponseEntity<ApiResponse<RecommendationResult>> getRecommendations(
+            @Valid @RequestBody RecommendationRequest request) {
         AnalyticsRequestValidator.validateVideoId(request.videoId());
         AnalyticsRequestValidator.validateProvidedDates(request.startDate(), request.endDate());
         log.info("POST /recommendations | videoId={} | {} → {}", request.videoId(), request.startDate(), request.endDate());
-        return ResponseEntity.ok(ApiResponse.success(recommendationEngineService.recommend(request.videoId(), request.startDate(), request.endDate())));
+        return ResponseEntity.ok(ApiResponse.success(
+                recommendationEngineService.recommend(request.videoId(), request.startDate(), request.endDate())));
     }
 
     @GetMapping("/channel")
@@ -122,7 +126,8 @@ public class YouTubeAnalyticsController {
         AnalyticsRequestValidator.validateVideoId(videoId);
         AnalyticsRequestValidator.validateProvidedDates(startDate, endDate);
         log.info("GET /video/{}/retention/analysis | {} → {}", videoId, startDate, endDate);
-        return ResponseEntity.ok(ApiResponse.success(retentionAnalysisService.analyze(videoId, startDate, endDate)));
+        VideoRetentionAnalyticsResult retention = analyticsService.getVideoRetentionAnalytics(videoId, startDate, endDate);
+        return ResponseEntity.ok(ApiResponse.success(retentionAnalysisService.analyze(retention)));
     }
 
     @GetMapping("/video/{videoId}/discovery")
