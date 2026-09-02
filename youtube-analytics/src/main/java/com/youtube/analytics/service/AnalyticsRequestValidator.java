@@ -19,7 +19,7 @@ public final class AnalyticsRequestValidator {
     private static final Set<String> VIDEO_METRICS = Set.of(
             "views", "engagedViews", "estimatedMinutesWatched", "averageViewDuration",
             "averageViewPercentage", "likes", "comments", "shares", "subscribersGained",
-            "subscribersLost", "impressions", "impressionsClickThroughRate");
+            "subscribersLost");
 
     private AnalyticsRequestValidator() {
     }
