@@ -19,7 +19,7 @@ public class DiscoveryOptimizationService {
     private static final double WEAK_CTR = 2.5;
     private static final double STRONG_REACH_IMPRESSIONS_PER_DAY = 10000.0;
     private static final double HEALTHY_REACH_IMPRESSIONS_PER_DAY = 3000.0;
-    private static final double WEAK_REACH_IMPRESSIONS_PER_DAY = 500.0;
+    private static final double WEAK_REACH_IMPRESSIONS_PER_DAY = 100.0;
 
     private final YouTubeAnalyticsService analyticsService;
 
