@@ -2,6 +2,7 @@ package com.youtube.analytics.service;
 
 import com.youtube.analytics.model.DiscoveryOptimizationResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
+import com.youtube.analytics.model.YouTubeReachReportResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -22,23 +23,24 @@ public class DiscoveryOptimizationService {
     private static final double WEAK_REACH_IMPRESSIONS_PER_DAY = 100.0;
 
     private final YouTubeAnalyticsService analyticsService;
+    private final YouTubeReachReportingService reachReportingService;
 
     public DiscoveryOptimizationResult analyze(String videoId, String startDate, String endDate) {
         VideoAnalyticsResult analytics = analyticsService.getSingleVideoAnalytics(
-                videoId, startDate, endDate,
-                List.of("views", "impressions", "impressionsClickThroughRate"));
+                videoId, startDate, endDate, List.of("views"));
+        YouTubeReachReportResult reach = reachReportingService.getVideoReach(videoId, startDate, endDate);
 
         Map<String, Object> metrics = analytics.getMetrics();
         Long views = toLong(metrics.get("views"));
-        Long impressions = toLong(metrics.get("impressions"));
-        Double ctr = toDouble(metrics.get("impressionsClickThroughRate"));
+        Long impressions = reach.impressions();
+        Double ctr = reach.impressionsClickThroughRate();
 
         List<String> missingData = new ArrayList<>();
         if (views == null) missingData.add("views");
         if (impressions == null) missingData.add("impressions");
         if (ctr == null) missingData.add("impressionsClickThroughRate");
 
-        double days = inclusiveDays(analytics.getStartDate(), analytics.getEndDate());
+        double days = inclusiveDays(startDate, endDate);
         Double viewsPerDay = views == null ? null : views / days;
         Double impressionsPerDay = impressions == null ? null : impressions / days;
         DiscoveryOptimizationResult.DiscoveryStatus reachStatus = classifyReach(impressionsPerDay);
@@ -114,13 +116,6 @@ public class DiscoveryOptimizationService {
         if (value instanceof Number number) return number.longValue();
         if (value == null) return null;
         try { return Long.parseLong(String.valueOf(value)); }
-        catch (NumberFormatException ex) { return null; }
-    }
-
-    private Double toDouble(Object value) {
-        if (value instanceof Number number) return number.doubleValue();
-        if (value == null) return null;
-        try { return Double.valueOf(String.valueOf(value)); }
         catch (NumberFormatException ex) { return null; }
     }
 
