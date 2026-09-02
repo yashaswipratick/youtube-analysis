@@ -102,7 +102,7 @@ public class DiscoveryOptimizationService {
                 recommendations.add("Then test a stronger title and thumbnail to improve impression-to-view conversion.");
             }
             case HEALTHY_DISCOVERY -> recommendations.add("Discovery signals are healthy; preserve the current packaging pattern and focus next on retention and watch time.");
-            case INSUFFICIENT_DATA -> recommendations.add("Collect views, impressions, and impression click-through rate before making a discovery or packaging decision.");
+            case INSUFFICIENT_DATA -> recommendations.add("Reach report data is not available yet. Retry after the YouTube Reporting API has generated the report.");
         }
         if (impressions != null && impressions == 0) {
             recommendations.add("No impressions were recorded, so CTR is not actionable yet.");
