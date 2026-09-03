@@ -5,7 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 
-/** Explains whether a video's discovery problem is primarily caused by reach or packaging. */
+/** Combined discovery, retention, and view-momentum analysis for a video. */
 @Data
 @Builder
 public class DiscoveryOptimizationResult {
@@ -19,6 +19,8 @@ public class DiscoveryOptimizationResult {
     private DiscoveryStatus reachStatus;
     private DiscoveryStatus packagingStatus;
     private DiscoveryDiagnosis primaryDiagnosis;
+    private RetentionAnalysisResult retentionAnalysis;
+    private ViewVelocity viewVelocity;
     private List<String> recommendations;
     private List<String> missingData;
 
@@ -35,6 +37,21 @@ public class DiscoveryOptimizationResult {
         LOW_REACH,
         LOW_CTR,
         LOW_REACH_AND_LOW_CTR,
+        INSUFFICIENT_DATA
+    }
+
+    /** Compares the second half of the requested daily view window with the first half. */
+    public record ViewVelocity(
+            Double recentViewsPerDay,
+            Double previousViewsPerDay,
+            Double changePercent,
+            MomentumStatus status) {
+    }
+
+    public enum MomentumStatus {
+        ACCELERATING,
+        STABLE,
+        DECELERATING,
         INSUFFICIENT_DATA
     }
 }

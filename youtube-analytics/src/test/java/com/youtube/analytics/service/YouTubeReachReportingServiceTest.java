@@ -106,6 +106,50 @@ class YouTubeReachReportingServiceTest {
         assertThat(result.impressionsClickThroughRate()).isNull();
     }
 
+
+    @Test
+    void returnsUnavailableForEmptyCsv() {
+        ExchangeFunction exchangeFunction = request -> {
+            if (request.method() == HttpMethod.GET && request.url().getPath().equals("/v1/jobs")) {
+                return json("{\"jobs\":[{\"id\":\"job-1\",\"reportTypeId\":\"channel_reach_basic_a1\"}]}");
+            }
+            if (request.method() == HttpMethod.GET && request.url().getPath().equals("/v1/jobs/job-1/reports")) {
+                return json("{\"reports\":[{\"startTime\":\"2026-08-01T00:00:00Z\",\"endTime\":\"2026-08-01T23:59:59Z\",\"downloadUrl\":\"https://reports.test/empty.csv\"}]}");
+            }
+            return csv("");
+        };
+
+        YouTubeReachReportResult result = service(exchangeFunction).getVideoReach(
+                "abc123", "2026-08-01", "2026-08-10");
+
+        assertThat(result.available()).isFalse();
+        assertThat(result.impressions()).isNull();
+        assertThat(result.impressionsClickThroughRate()).isNull();
+    }
+
+    @Test
+    void ignoresMalformedRowsInsteadOfFailingTheWholeReport() {
+        ExchangeFunction exchangeFunction = request -> {
+            if (request.method() == HttpMethod.GET && request.url().getPath().equals("/v1/jobs")) {
+                return json("{\"jobs\":[{\"id\":\"job-1\",\"reportTypeId\":\"channel_reach_basic_a1\"}]}");
+            }
+            if (request.method() == HttpMethod.GET && request.url().getPath().equals("/v1/jobs/job-1/reports")) {
+                return json("{\"reports\":[{\"startTime\":\"2026-08-01T00:00:00Z\",\"endTime\":\"2026-08-01T23:59:59Z\",\"downloadUrl\":\"https://reports.test/malformed.csv\"}]}");
+            }
+            return csv("date,video_id,video_thumbnail_impressions,video_thumbnail_impressions_ctr\n"
+                    + "not-a-date,abc123,100,2.0\n"
+                    + "2026-08-01,abc123,not-a-number,2.0\n"
+                    + "2026-08-01,abc123,200,4.0\n");
+        };
+
+        YouTubeReachReportResult result = service(exchangeFunction).getVideoReach(
+                "abc123", "2026-08-01", "2026-08-10");
+
+        assertThat(result.available()).isTrue();
+        assertThat(result.impressions()).isEqualTo(200L);
+        assertThat(result.impressionsClickThroughRate()).isEqualTo(4.0);
+    }
+
     private YouTubeReachReportingService service(ExchangeFunction exchangeFunction) {
         WebClient client = WebClient.builder().exchangeFunction(exchangeFunction).build();
         return new YouTubeReachReportingService(client, objectMapper);
