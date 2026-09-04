@@ -81,20 +81,25 @@ public class RawVideoAnalysisService {
         List<LocalMediaFile> discoveredVideos = discoveryService.discover().stream()
                 .filter(media -> media.type() == MediaFileType.VIDEO)
                 .toList();
-        List<RawVideoClipAnalysis> approvedVideos = approvedVideoAnalyses(discoveredVideos);
+        List<LocalMediaFile> eligibleVideos = discoveredVideos.stream()
+                .filter(this::isEligibleVideo)
+                .toList();
         String approvalStatus = approvalRequired ? "approved" : "eligible (approval disabled)";
         progressReporter.report(jobId, 5, String.format(
                 "Discovered %d videos; %d %s for processing",
-                discoveredVideos.size(), approvedVideos.size(), approvalStatus));
-        if (approvedVideos.isEmpty()) {
-            throw new IllegalStateException("No approved videos are available in the configured video-analysis.input-directory");
+                discoveredVideos.size(), eligibleVideos.size(), approvalStatus));
+        if (eligibleVideos.isEmpty()) {
+            throw new IllegalStateException("No eligible videos are available in the configured video-analysis.input-directory");
         }
 
+        List<RawVideoClipAnalysis> approvedVideos = new ArrayList<>();
         List<ClipCandidate> candidates = new ArrayList<>();
-        int totalVideos = approvedVideos.size();
+        int totalVideos = eligibleVideos.size();
         for (int index = 0; index < totalVideos; index++) {
-            RawVideoClipAnalysis clip = approvedVideos.get(index);
+            LocalMediaFile media = eligibleVideos.get(index);
             progressReporter.report(jobId, 10 + ((index * 25) / totalVideos), "Analyzing video " + (index + 1) + "/" + totalVideos);
+            RawVideoClipAnalysis clip = approvedVideo(media.relativePath());
+            approvedVideos.add(clip);
             candidates.addAll(scoringService.score(request.storyIntent(), clip));
         }
         progressReporter.report(jobId, 35, "Video analysis completed; scoring edit candidates");

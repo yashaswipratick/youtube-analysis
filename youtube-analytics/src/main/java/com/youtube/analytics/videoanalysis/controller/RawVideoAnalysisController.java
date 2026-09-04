@@ -41,8 +41,9 @@ public class RawVideoAnalysisController {
     }
 
     @PostMapping("/edit-plan")
-    public ResponseEntity<ApiResponse<EditPlan>> buildEditPlan(@Valid @RequestBody RawVideoAnalysisRequest request) {
-        return ResponseEntity.ok(ApiResponse.success(rawVideoAnalysisService.buildEditPlan(request)));
+    @Deprecated
+    public ResponseEntity<ApiResponse<EditJob>> buildEditPlan(@Valid @RequestBody RawVideoAnalysisRequest request) {
+        return ResponseEntity.accepted().body(ApiResponse.success(editJobService.submit(request)));
     }
 
     @PostMapping("/render")

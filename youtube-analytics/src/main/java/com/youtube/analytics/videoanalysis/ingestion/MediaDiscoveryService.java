@@ -21,12 +21,16 @@ public class MediaDiscoveryService {
     );
 
     private final Path inputDirectory;
+    private final Path outputDirectory;
 
     public MediaDiscoveryService(LocalMediaInputProperties properties) {
         if (properties.inputDirectory() == null || properties.inputDirectory().isBlank()) {
             throw new IllegalArgumentException("video-analysis.input-directory must not be blank");
         }
         this.inputDirectory = Path.of(properties.inputDirectory()).toAbsolutePath().normalize();
+        this.outputDirectory = properties.outputDirectory() == null || properties.outputDirectory().isBlank()
+                ? null
+                : Path.of(properties.outputDirectory()).toAbsolutePath().normalize();
     }
 
     public List<LocalMediaFile> discover() {
@@ -37,6 +41,7 @@ public class MediaDiscoveryService {
         try (Stream<Path> paths = Files.walk(inputDirectory)) {
             return paths
                     .filter(Files::isRegularFile)
+                    .filter(path -> outputDirectory == null || !path.startsWith(outputDirectory))
                     .map(this::toMediaFile)
                     .filter(java.util.Objects::nonNull)
                     .sorted(Comparator.comparing(LocalMediaFile::relativePath))
