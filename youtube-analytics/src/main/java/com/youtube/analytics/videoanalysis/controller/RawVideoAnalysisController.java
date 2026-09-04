@@ -1,6 +1,7 @@
 package com.youtube.analytics.videoanalysis.controller;
 
 import com.youtube.analytics.model.ApiResponse;
+import com.youtube.analytics.videoanalysis.model.EditJob;
 import com.youtube.analytics.videoanalysis.model.EditPlan;
 import com.youtube.analytics.videoanalysis.model.RawVideoAnalysisRequest;
 import com.youtube.analytics.videoanalysis.model.RenderJob;
@@ -25,8 +26,19 @@ public class RawVideoAnalysisController {
     private final RawVideoAnalysisService rawVideoAnalysisService;
     private final EditRendererService editRendererService;
     private final RenderJobService renderJobService;
+    private final com.youtube.analytics.videoanalysis.service.EditJobService editJobService;
     private final BenchmarkService benchmarkService;
     private final EditReviewService editReviewService;
+
+    @PostMapping("/edit")
+    public ResponseEntity<ApiResponse<EditJob>> startEdit(@Valid @RequestBody RawVideoAnalysisRequest request) {
+        return ResponseEntity.accepted().body(ApiResponse.success(editJobService.submit(request)));
+    }
+
+    @GetMapping("/edit/{jobId}")
+    public ResponseEntity<ApiResponse<EditJob>> editStatus(@PathVariable String jobId) {
+        return ResponseEntity.ok(ApiResponse.success(editJobService.get(jobId)));
+    }
 
     @PostMapping("/edit-plan")
     public ResponseEntity<ApiResponse<EditPlan>> buildEditPlan(@Valid @RequestBody RawVideoAnalysisRequest request) {
