@@ -32,7 +32,7 @@ class OpenAiAnalysisServiceTest {
         };
 
         OpenAiConfig config = new OpenAiConfig(
-                "/tmp/openai-key", "https://api.openai.com/v1", "gpt-5.6-luna", "gpt-4o-mini-transcribe");
+                "/tmp/openai-key", "https://api.openai.com/v1", "gpt-5.6-luna", "gpt-4o-mini-transcribe", false);
         OpenAiApiKeyProvider keyProvider = new OpenAiApiKeyProvider(config) {
             @Override
             public String getApiKey() {

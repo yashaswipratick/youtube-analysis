@@ -34,8 +34,11 @@ public class VisualSceneAnalysisService {
             for (int i = 0; i < boundaries.size(); i++) {
                 SceneDetector.SceneBoundary boundary = boundaries.get(i);
                 VisualObservation observation = visualSemanticAnalyzer.analyze(frames.get(i).imageFile());
-                String summary = observation.summary() + (observation.environment() == null || observation.environment().isBlank()
-                        || "unknown".equals(observation.environment()) ? "" : ", environment: " + observation.environment());
+                String summary = observation.summary()
+                        + (observation.environment() == null || observation.environment().isBlank()
+                        || "unknown".equals(observation.environment()) ? "" : ", environment: " + observation.environment())
+                        + (observation.objects() == null || observation.objects().isEmpty() ? ""
+                        : ", visible objects: " + String.join(", ", observation.objects()));
                 scenes.add(new SceneSegment(boundary.startMs(), boundary.endMs(), summary, observation.qualityScore()));
             }
             return scenes;
