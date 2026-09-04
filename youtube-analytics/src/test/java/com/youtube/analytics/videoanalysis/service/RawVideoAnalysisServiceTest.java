@@ -12,9 +12,11 @@ import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.model.SceneSegment;
 import com.youtube.analytics.videoanalysis.sequencing.ClipCandidateScoringService;
 import com.youtube.analytics.videoanalysis.sequencing.DurationAwareCandidateSelector;
-import com.youtube.analytics.videoanalysis.sequencing.PacingOptimizer;
+import com.youtube.analytics.videoanalysis.sequencing.GlobalCandidateOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.NarrativeRepairOptimizer;
+import com.youtube.analytics.videoanalysis.sequencing.PacingOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SequenceOptimizer;
+import com.youtube.analytics.videoanalysis.sequencing.SpeechAwareClipOptimizer;
 import com.youtube.analytics.videoanalysis.timeline.TimelineOptimizer;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +37,8 @@ class RawVideoAnalysisServiceTest {
         MediaDiscoveryService discoveryService = mock(MediaDiscoveryService.class);
         ClipCandidateScoringService scoringService = mock(ClipCandidateScoringService.class);
         SequenceOptimizer sequenceOptimizer = mock(SequenceOptimizer.class);
+        GlobalCandidateOptimizer globalOptimizer = mock(GlobalCandidateOptimizer.class);
+        SpeechAwareClipOptimizer speechOptimizer = mock(SpeechAwareClipOptimizer.class);
         DurationAwareCandidateSelector durationSelector = mock(DurationAwareCandidateSelector.class);
         PacingOptimizer pacingOptimizer = mock(PacingOptimizer.class);
         NarrativeRepairOptimizer narrativeRepairOptimizer = mock(NarrativeRepairOptimizer.class);
@@ -57,7 +61,9 @@ class RawVideoAnalysisServiceTest {
         when(fileAnalyzer.analyze("nested/clip.mp4")).thenReturn(analysis);
         when(scoringService.score("weekend getaway from Bangalore", analysis)).thenReturn(List.of());
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
+        when(globalOptimizer.optimize("weekend getaway from Bangalore", List.of(), List.of())).thenReturn(List.of());
         when(narrativeRepairOptimizer.repair("weekend getaway from Bangalore", List.of(), List.of())).thenReturn(List.of());
+        when(speechOptimizer.optimize(List.of(), List.of(analysis))).thenReturn(List.of());
         when(durationSelector.select(List.of(), 8L)).thenReturn(List.of());
         when(pacingOptimizer.optimize(List.of())).thenReturn(List.of());
         when(timelineOptimizer.buildPlan("bangalore-trip", "weekend getaway from Bangalore", List.of(), 8L))
@@ -65,7 +71,8 @@ class RawVideoAnalysisServiceTest {
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService, discoveryService, new LocalMediaInputProperties("/tmp", true, "renders"),
-                scoringService, sequenceOptimizer, durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
+                scoringService, sequenceOptimizer, globalOptimizer, speechOptimizer, durationSelector,
+                pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
 
         EditPlan result = service.buildEditPlan(
                 new RawVideoAnalysisRequest("bangalore-trip", "weekend getaway from Bangalore", 8L));
@@ -86,6 +93,8 @@ class RawVideoAnalysisServiceTest {
                 new LocalMediaInputProperties("/tmp", true, "renders"),
                 mock(ClipCandidateScoringService.class),
                 mock(SequenceOptimizer.class),
+                mock(GlobalCandidateOptimizer.class),
+                mock(SpeechAwareClipOptimizer.class),
                 mock(DurationAwareCandidateSelector.class),
                 mock(PacingOptimizer.class),
                 mock(NarrativeRepairOptimizer.class),
@@ -102,6 +111,8 @@ class RawVideoAnalysisServiceTest {
         MediaDiscoveryService discoveryService = mock(MediaDiscoveryService.class);
         ClipCandidateScoringService scoringService = mock(ClipCandidateScoringService.class);
         SequenceOptimizer sequenceOptimizer = mock(SequenceOptimizer.class);
+        GlobalCandidateOptimizer globalOptimizer = mock(GlobalCandidateOptimizer.class);
+        SpeechAwareClipOptimizer speechOptimizer = mock(SpeechAwareClipOptimizer.class);
         DurationAwareCandidateSelector durationSelector = mock(DurationAwareCandidateSelector.class);
         PacingOptimizer pacingOptimizer = mock(PacingOptimizer.class);
         NarrativeRepairOptimizer narrativeRepairOptimizer = mock(NarrativeRepairOptimizer.class);
@@ -117,14 +128,17 @@ class RawVideoAnalysisServiceTest {
         when(fileAnalyzer.analyze("clip.mp4")).thenReturn(analysis);
         when(scoringService.score("story", analysis)).thenReturn(List.of());
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
+        when(globalOptimizer.optimize("story", List.of(), List.of())).thenReturn(List.of());
         when(narrativeRepairOptimizer.repair("story", List.of(), List.of())).thenReturn(List.of());
+        when(speechOptimizer.optimize(List.of(), List.of(analysis))).thenReturn(List.of());
         when(durationSelector.select(List.of(), 8L)).thenReturn(List.of());
         when(pacingOptimizer.optimize(List.of())).thenReturn(List.of());
         when(timelineOptimizer.buildPlan("project", "story", List.of(), 8L)).thenReturn(expected);
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService, discoveryService, new LocalMediaInputProperties("/tmp", false, "renders"),
-                scoringService, sequenceOptimizer, durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
+                scoringService, sequenceOptimizer, globalOptimizer, speechOptimizer, durationSelector,
+                pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
 
         assertEquals(expected, service.buildEditPlan(new RawVideoAnalysisRequest("project", "story", 8L)));
         verify(fileAnalyzer).analyze("clip.mp4");

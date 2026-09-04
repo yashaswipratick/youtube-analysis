@@ -22,13 +22,16 @@ public class EditRendererService {
     private final MediaApprovalService approvalService;
     private final LocalMediaInputProperties inputProperties;
     private final FfprobeMediaMetadataService metadataService;
+    private final AudioMixService audioMixService;
 
     public EditRendererService(MediaApprovalService approvalService,
                                LocalMediaInputProperties inputProperties,
-                               FfprobeMediaMetadataService metadataService) {
+                               FfprobeMediaMetadataService metadataService,
+                               AudioMixService audioMixService) {
         this.approvalService = approvalService;
         this.inputProperties = inputProperties;
         this.metadataService = metadataService;
+        this.audioMixService = audioMixService;
     }
 
     public Path render(EditPlan plan) {
@@ -51,7 +54,7 @@ public class EditRendererService {
                 run(List.of(MediaToolResolver.resolve("ffmpeg"), "-y", "-f", "concat", "-safe", "0",
                         "-i", concatFile.toString(), "-c", "copy", "-movflags", "+faststart", output.toString()),
                         "ffmpeg failed while assembling the edit");
-                return output;
+                return audioMixService.mix(output);
             } finally {
                 deleteRecursively(workDirectory);
             }

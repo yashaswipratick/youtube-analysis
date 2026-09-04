@@ -10,8 +10,10 @@ import com.youtube.analytics.videoanalysis.model.EditPlan;
 import com.youtube.analytics.videoanalysis.model.RawVideoAnalysisRequest;
 import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.sequencing.ClipCandidateScoringService;
+import com.youtube.analytics.videoanalysis.sequencing.GlobalCandidateOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.DurationAwareCandidateSelector;
 import com.youtube.analytics.videoanalysis.sequencing.PacingOptimizer;
+import com.youtube.analytics.videoanalysis.sequencing.SpeechAwareClipOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.NarrativeRepairOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SequenceOptimizer;
 import com.youtube.analytics.videoanalysis.timeline.TimelineOptimizer;
@@ -28,6 +30,8 @@ public class RawVideoAnalysisService {
     private final boolean approvalRequired;
     private final ClipCandidateScoringService scoringService;
     private final SequenceOptimizer sequenceOptimizer;
+    private final GlobalCandidateOptimizer globalCandidateOptimizer;
+    private final SpeechAwareClipOptimizer speechAwareClipOptimizer;
     private final DurationAwareCandidateSelector durationAwareCandidateSelector;
     private final PacingOptimizer pacingOptimizer;
     private final NarrativeRepairOptimizer narrativeRepairOptimizer;
@@ -39,6 +43,8 @@ public class RawVideoAnalysisService {
                                    LocalMediaInputProperties inputProperties,
                                    ClipCandidateScoringService scoringService,
                                    SequenceOptimizer sequenceOptimizer,
+                                   GlobalCandidateOptimizer globalCandidateOptimizer,
+                                   SpeechAwareClipOptimizer speechAwareClipOptimizer,
                                    DurationAwareCandidateSelector durationAwareCandidateSelector,
                                    PacingOptimizer pacingOptimizer,
                                    NarrativeRepairOptimizer narrativeRepairOptimizer,
@@ -49,6 +55,8 @@ public class RawVideoAnalysisService {
         this.approvalRequired = inputProperties.approvalRequired();
         this.scoringService = scoringService;
         this.sequenceOptimizer = sequenceOptimizer;
+        this.globalCandidateOptimizer = globalCandidateOptimizer;
+        this.speechAwareClipOptimizer = speechAwareClipOptimizer;
         this.durationAwareCandidateSelector = durationAwareCandidateSelector;
         this.pacingOptimizer = pacingOptimizer;
         this.narrativeRepairOptimizer = narrativeRepairOptimizer;
@@ -65,11 +73,14 @@ public class RawVideoAnalysisService {
         List<ClipCandidate> candidates = new ArrayList<>();
         approvedVideos.forEach(clip -> candidates.addAll(scoringService.score(request.storyIntent(), clip)));
         List<ClipCandidate> orderedCandidates = sequenceOptimizer.optimize(candidates);
-        List<ClipCandidate> repairedCandidates = narrativeRepairOptimizer.repair(
+        List<ClipCandidate> globallyOptimizedCandidates = globalCandidateOptimizer.optimize(
                 request.storyIntent(), orderedCandidates, candidates);
+        List<ClipCandidate> repairedCandidates = narrativeRepairOptimizer.repair(
+                request.storyIntent(), globallyOptimizedCandidates, candidates);
+        List<ClipCandidate> speechSafeCandidates = speechAwareClipOptimizer.optimize(repairedCandidates, approvedVideos);
         List<ClipCandidate> selectedCandidates = durationAwareCandidateSelector.select(
 
-                repairedCandidates, request.targetDurationMinutes());
+                speechSafeCandidates, request.targetDurationMinutes());
         List<ClipCandidate> pacedCandidates = pacingOptimizer.optimize(selectedCandidates);
         return timelineOptimizer.buildPlan(request.projectId(), request.storyIntent(),
                 pacedCandidates, request.targetDurationMinutes());
