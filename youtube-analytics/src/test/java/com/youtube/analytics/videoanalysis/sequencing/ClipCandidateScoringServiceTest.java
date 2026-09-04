@@ -50,6 +50,23 @@ class ClipCandidateScoringServiceTest {
     }
 
     @Test
+    void temporallyStableVisualScoreInfluencesCandidateRanking() {
+        RawVideoClipAnalysis analysis = new RawVideoClipAnalysis(
+                "drive.mp4", 10000,
+                List.of(
+                        new SceneSegment(0, 5000, "Driving on a mountain road", 0.90),
+                        new SceneSegment(5000, 10000, "Driving on a mountain road", 0.60)),
+                List.of(new SpeechSegment(1000, 9000, "We are driving", 0.80)),
+                new AudioProfile(true, 0.80, 0.10, false), 0.80);
+
+        List<ClipCandidate> candidates = scoringService.score("mountain drive", analysis);
+
+        assertThat(candidates).hasSize(2);
+        assertThat(candidates.get(0).sourceStartMs()).isEqualTo(0L);
+        assertThat(candidates.get(0).score()).isGreaterThan(candidates.get(1).score());
+    }
+
+    @Test
     void scoreIsBoundedAndTieBreaksBySourceStart() {
         RawVideoClipAnalysis analysis = new RawVideoClipAnalysis(
                 "clip.mp4", 10000,
