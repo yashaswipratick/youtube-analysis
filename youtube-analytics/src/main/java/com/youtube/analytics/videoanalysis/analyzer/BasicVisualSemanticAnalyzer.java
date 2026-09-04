@@ -1,6 +1,7 @@
 package com.youtube.analytics.videoanalysis.analyzer;
 
 import com.youtube.analytics.videoanalysis.model.VisualObservation;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -10,6 +11,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 @Service
+@ConditionalOnProperty(prefix = "openai", name = "visual-analysis-enabled", havingValue = "false")
 public class BasicVisualSemanticAnalyzer implements VisualSemanticAnalyzer {
     @Override
     public VisualObservation analyze(Path imageFile) {

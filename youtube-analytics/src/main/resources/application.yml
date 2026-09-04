@@ -38,10 +38,11 @@ youtube:
 
 openai:
   # Local development only. Never commit the key file itself.
-  api-key-file: ${OPENAI_API_KEY_FILE:/Users/yashaswipratick/Documents/OPEN_API_KEY.txt}
+  api-key-file: ${OPENAI_API_KEY_FILE:/Users/yashaswipratick/Desktop/OPEN_API_KEY.txt}
   base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
   model: ${OPENAI_MODEL:gpt-5.6-luna}
   transcription-model: ${OPENAI_TRANSCRIPTION_MODEL:gpt-4o-mini-transcribe}
+  visual-analysis-enabled: ${OPENAI_VISUAL_ANALYSIS_ENABLED:true}
 
 logging:
   level:

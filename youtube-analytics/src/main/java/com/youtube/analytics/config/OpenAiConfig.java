@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /** Configuration for the OpenAI analysis integration. */
 @ConfigurationProperties(prefix = "openai")
-public record OpenAiConfig(String apiKeyFile, String baseUrl, String model, String transcriptionModel) {
+public record OpenAiConfig(String apiKeyFile, String baseUrl, String model, String transcriptionModel, boolean visualAnalysisEnabled) {
     public String resolvedBaseUrl() {
         return baseUrl == null || baseUrl.isBlank() ? "https://api.openai.com/v1" : baseUrl;
     }
