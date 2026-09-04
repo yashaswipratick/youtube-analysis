@@ -41,6 +41,7 @@ openai:
   api-key-file: ${OPENAI_API_KEY_FILE:/Users/yashaswipratick/Documents/OPEN_API_KEY.txt}
   base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
   model: ${OPENAI_MODEL:gpt-5.6-luna}
+  transcription-model: ${OPENAI_TRANSCRIPTION_MODEL:gpt-4o-mini-transcribe}
 
 logging:
   level:
