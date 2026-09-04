@@ -37,8 +37,28 @@ public class TransitionCoherenceOptimizer {
         double score = 0.0;
         if (previous.sourceFileName().equals(next.sourceFileName())) score += 0.35;
         if (previous.role() != next.role()) score += 0.25;
-        score += 0.40 * tokenOverlap(previous.visualSummary(), next.visualSummary());
+        score += 0.20 * tokenOverlap(previous.visualSummary(), next.visualSummary());
+        score += 0.20 * tokenOverlap(previous.spokenText(), next.spokenText());
+        if (containsContradictoryHandoff(previous, next)) score -= 0.50;
         return score;
+    }
+
+    private boolean containsContradictoryHandoff(ClipCandidate previous, ClipCandidate next) {
+        String previousText = normalize(previous.spokenText());
+        String nextText = normalize(next.spokenText());
+        return hasPair(previousText, nextText, "not going", "going to")
+                || hasPair(previousText, nextText, "haven't arrived", "arrived")
+                || hasPair(previousText, nextText, "didn't arrive", "arrived")
+                || hasPair(previousText, nextText, "not here", "here")
+                || hasPair(previousText, nextText, "leaving", "already arrived");
+    }
+
+    private boolean hasPair(String first, String second, String firstPhrase, String secondPhrase) {
+        return first.contains(firstPhrase) && second.contains(secondPhrase);
+    }
+
+    private String normalize(String value) {
+        return value == null ? "" : value.toLowerCase(Locale.ROOT);
     }
 
     private double tokenOverlap(String first, String second) {

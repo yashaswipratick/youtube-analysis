@@ -39,6 +39,30 @@ class TransitionCoherenceOptimizerTest {
     }
 
     @Test
+    void prefersSpokenContinuityWhenVisualSummariesDiffer() {
+        ClipCandidate previous = candidateWithSpeech("road", "we are heading to the hills", CandidateRole.JOURNEY, 0);
+        ClipCandidate related = candidateWithSpeech("car", "we are heading to the hills now", CandidateRole.JOURNEY, 1000);
+        ClipCandidate unrelated = candidateWithSpeech("car", "we are eating lunch now", CandidateRole.JOURNEY, 2000);
+
+        List<ClipCandidate> ordered = optimizer.optimize(List.of(previous, unrelated, related));
+
+        assertThat(ordered).extracting(ClipCandidate::sourceStartMs)
+                .containsExactly(0L, 1000L, 2000L);
+    }
+
+    @Test
+    void penalizesContradictorySpokenHandoff() {
+        ClipCandidate previous = candidateWithSpeech("road", "we are not going to the hills", CandidateRole.JOURNEY, 0);
+        ClipCandidate contradictory = candidateWithSpeech("hills", "we are going to the hills", CandidateRole.JOURNEY, 1000);
+        ClipCandidate consistent = candidateWithSpeech("road", "we are still driving", CandidateRole.JOURNEY, 2000);
+
+        List<ClipCandidate> ordered = optimizer.optimize(List.of(previous, contradictory, consistent));
+
+        assertThat(ordered).extracting(ClipCandidate::sourceStartMs)
+                .containsExactly(0L, 2000L, 1000L);
+    }
+
+    @Test
     void handlesNullAndSingleCandidate() {
         assertThat(optimizer.optimize(null)).isEmpty();
         ClipCandidate candidate = candidate("road", CandidateRole.JOURNEY, 0);
@@ -46,6 +70,12 @@ class TransitionCoherenceOptimizerTest {
     }
 
     private ClipCandidate candidate(String visualSummary, CandidateRole role, long startMs) {
-        return new ClipCandidate("trip.mp4", startMs, startMs + 1000, role, 0.8, "", visualSummary, List.of());
+        return candidateWithSpeech(visualSummary, "", role, startMs);
+    }
+
+    private ClipCandidate candidateWithSpeech(String visualSummary, String spokenText,
+                                              CandidateRole role, long startMs) {
+        return new ClipCandidate("trip.mp4", startMs, startMs + 1000, role, 0.8,
+                spokenText, visualSummary, List.of());
     }
 }
