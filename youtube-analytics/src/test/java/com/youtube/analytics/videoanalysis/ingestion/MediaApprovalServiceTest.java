@@ -20,7 +20,7 @@ class MediaApprovalServiceTest {
     void unapprovedFileCannotBeResolvedForMediaReading() throws Exception {
         Path video = inputDirectory.resolve("clip.mp4");
         Files.writeString(video, "video-bytes");
-        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true));
+        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true, "renders"));
 
         assertThrows(IllegalStateException.class, () -> service.getApprovedPath("clip.mp4"));
     }
@@ -29,7 +29,7 @@ class MediaApprovalServiceTest {
     void approvedFileCanBeResolvedForLaterMediaReading() throws Exception {
         Path video = inputDirectory.resolve("clip.mp4");
         Files.writeString(video, "video-bytes");
-        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true));
+        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true, "renders"));
 
         assertFalse(service.isApproved("clip.mp4"));
         LocalMediaFile approved = service.approve("clip.mp4");
@@ -43,7 +43,7 @@ class MediaApprovalServiceTest {
     void approvesUppercaseMp4ExtensionAsVideo() throws Exception {
         Path video = inputDirectory.resolve("clip.MP4");
         Files.writeString(video, "video-bytes");
-        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true));
+        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true, "renders"));
 
         LocalMediaFile approved = service.approve("clip.MP4");
 
@@ -56,7 +56,7 @@ class MediaApprovalServiceTest {
 
     @Test
     void rejectsPathTraversalOutsideConfiguredDirectory() {
-        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true));
+        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true, "renders"));
 
         assertThrows(IllegalArgumentException.class, () -> service.approve("../outside.mp4"));
     }
@@ -64,7 +64,7 @@ class MediaApprovalServiceTest {
     @Test
     void rejectsUnsupportedMediaType() throws Exception {
         Files.writeString(inputDirectory.resolve("notes.txt"), "not-media");
-        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true));
+        MediaApprovalService service = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true, "renders"));
 
         assertThrows(IllegalArgumentException.class, () -> service.approve("notes.txt"));
     }

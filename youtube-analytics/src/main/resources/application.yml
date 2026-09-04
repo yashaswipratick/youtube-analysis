@@ -30,6 +30,7 @@ server:
 video-analysis:
   input-directory: /Users/yashaswipratick/Documents/short-drive/Kailashagiri-hills/
   approval-required: true
+  output-directory: renders
 
 youtube:
   oauth:

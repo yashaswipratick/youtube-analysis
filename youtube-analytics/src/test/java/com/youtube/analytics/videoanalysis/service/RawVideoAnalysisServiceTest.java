@@ -64,7 +64,7 @@ class RawVideoAnalysisServiceTest {
                 .thenReturn(expected);
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
-                approvalService, discoveryService, new LocalMediaInputProperties("/tmp", true),
+                approvalService, discoveryService, new LocalMediaInputProperties("/tmp", true, "renders"),
                 scoringService, sequenceOptimizer, durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
 
         EditPlan result = service.buildEditPlan(
@@ -83,7 +83,7 @@ class RawVideoAnalysisServiceTest {
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService,
                 discoveryService,
-                new LocalMediaInputProperties("/tmp", true),
+                new LocalMediaInputProperties("/tmp", true, "renders"),
                 mock(ClipCandidateScoringService.class),
                 mock(SequenceOptimizer.class),
                 mock(DurationAwareCandidateSelector.class),
@@ -123,7 +123,7 @@ class RawVideoAnalysisServiceTest {
         when(timelineOptimizer.buildPlan("project", "story", List.of(), 8L)).thenReturn(expected);
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
-                approvalService, discoveryService, new LocalMediaInputProperties("/tmp", false),
+                approvalService, discoveryService, new LocalMediaInputProperties("/tmp", false, "renders"),
                 scoringService, sequenceOptimizer, durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
 
         assertEquals(expected, service.buildEditPlan(new RawVideoAnalysisRequest("project", "story", 8L)));
