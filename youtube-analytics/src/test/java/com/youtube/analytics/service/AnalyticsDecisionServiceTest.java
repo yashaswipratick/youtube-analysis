@@ -44,6 +44,18 @@ class AnalyticsDecisionServiceTest {
     }
 
     @Test
+    void prioritizesPackagingWhenCtrIsLowButRetentionIsStrong() {
+        DiscoveryOptimizationResult discovery = discovery(
+                DiscoveryOptimizationResult.DiscoveryDiagnosis.LOW_CTR,
+                RetentionAnalysisResult.RetentionSeverity.STRONG,
+                null,
+                List.of());
+
+        assertThat(service.decide(discovery).action())
+                .isEqualTo(AnalyticsDecisionResult.DecisionAction.PACKAGING);
+    }
+
+    @Test
     void prioritizesDistributionWhenReachIsLowAndRetentionIsHealthy() {
         DiscoveryOptimizationResult discovery = discovery(
                 DiscoveryOptimizationResult.DiscoveryDiagnosis.LOW_REACH,
@@ -58,6 +70,18 @@ class AnalyticsDecisionServiceTest {
     }
 
     @Test
+    void prioritizesDistributionWhenReachIsLowAndRetentionIsStrong() {
+        DiscoveryOptimizationResult discovery = discovery(
+                DiscoveryOptimizationResult.DiscoveryDiagnosis.LOW_REACH,
+                RetentionAnalysisResult.RetentionSeverity.STRONG,
+                null,
+                List.of());
+
+        assertThat(service.decide(discovery).action())
+                .isEqualTo(AnalyticsDecisionResult.DecisionAction.DISTRIBUTION_TOPIC);
+    }
+
+    @Test
     void prioritizesDistributionWhenBothReachAndCtrAreLow() {
         DiscoveryOptimizationResult discovery = discovery(
                 DiscoveryOptimizationResult.DiscoveryDiagnosis.LOW_REACH_AND_LOW_CTR,
@@ -68,6 +92,18 @@ class AnalyticsDecisionServiceTest {
         AnalyticsDecisionResult result = service.decide(discovery);
 
         assertThat(result.action()).isEqualTo(AnalyticsDecisionResult.DecisionAction.DISTRIBUTION_TOPIC);
+    }
+
+    @Test
+    void prioritizesDistributionWhenBothReachAndCtrAreLowAndRetentionIsHealthy() {
+        DiscoveryOptimizationResult discovery = discovery(
+                DiscoveryOptimizationResult.DiscoveryDiagnosis.LOW_REACH_AND_LOW_CTR,
+                RetentionAnalysisResult.RetentionSeverity.HEALTHY,
+                null,
+                List.of());
+
+        assertThat(service.decide(discovery).action())
+                .isEqualTo(AnalyticsDecisionResult.DecisionAction.DISTRIBUTION_TOPIC);
     }
 
     @Test
@@ -142,6 +178,18 @@ class AnalyticsDecisionServiceTest {
         DiscoveryOptimizationResult discovery = discovery(
                 DiscoveryOptimizationResult.DiscoveryDiagnosis.LOW_REACH_AND_LOW_CTR,
                 RetentionAnalysisResult.RetentionSeverity.WEAK,
+                null,
+                List.of());
+
+        assertThat(service.decide(discovery).action())
+                .isEqualTo(AnalyticsDecisionResult.DecisionAction.CONTENT_RETENTION);
+    }
+
+    @Test
+    void prioritizesContentRetentionWhenReachAndCtrAreLowAndRetentionIsCritical() {
+        DiscoveryOptimizationResult discovery = discovery(
+                DiscoveryOptimizationResult.DiscoveryDiagnosis.LOW_REACH_AND_LOW_CTR,
+                RetentionAnalysisResult.RetentionSeverity.CRITICAL,
                 null,
                 List.of());
 
