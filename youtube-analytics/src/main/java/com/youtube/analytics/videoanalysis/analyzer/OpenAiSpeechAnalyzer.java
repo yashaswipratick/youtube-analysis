@@ -5,6 +5,7 @@ import com.youtube.analytics.config.OpenAiApiKeyProvider;
 import com.youtube.analytics.config.OpenAiConfig;
 import com.youtube.analytics.videoanalysis.model.SpeechSegment;
 import com.youtube.analytics.videoanalysis.service.FfprobeMediaMetadataService;
+import com.youtube.analytics.videoanalysis.service.MediaToolResolver;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class OpenAiSpeechAnalyzer implements SpeechAnalyzer {
         try {
             Path output = java.nio.file.Files.createTempFile("youtube-analysis-", ".mp3");
             ProcessBuilder processBuilder = new ProcessBuilder(
-                    "ffmpeg", "-y", "-i", sourceFile.toAbsolutePath().toString(),
+                    MediaToolResolver.resolve("ffmpeg"), "-y", "-i", sourceFile.toAbsolutePath().toString(),
                     "-vn", "-ac", "1", "-ar", "16000", "-codec:a", "libmp3lame", "-b:a", "64k",
                     output.toAbsolutePath().toString());
             processBuilder.redirectErrorStream(true);

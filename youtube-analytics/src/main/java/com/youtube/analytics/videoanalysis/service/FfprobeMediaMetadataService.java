@@ -21,7 +21,7 @@ public class FfprobeMediaMetadataService {
 
     public VideoMetadata probe(Path sourceFile) {
         ProcessBuilder processBuilder = new ProcessBuilder(List.of(
-                "ffprobe", "-v", "error", "-print_format", "json",
+                MediaToolResolver.resolve("ffprobe"), "-v", "error", "-print_format", "json",
                 "-show_entries", "format=duration:stream=codec_type,width,height,r_frame_rate",
                 sourceFile.toAbsolutePath().toString()));
         processBuilder.redirectErrorStream(true);
