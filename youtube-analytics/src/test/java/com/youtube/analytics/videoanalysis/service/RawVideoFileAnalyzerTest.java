@@ -34,7 +34,7 @@ class RawVideoFileAnalyzerTest {
         List<SpeechSegment> speech = List.of(new SpeechSegment(0, 5_000, "We are driving", 0.9));
         AudioProfile audio = new AudioProfile(true, 0.9, 0.1, false);
 
-        when(approvalService.getApprovedPath("clip.mp4")).thenReturn(approvedPath);
+        when(approvalService.getPath("clip.mp4")).thenReturn(approvedPath);
         when(videoAnalyzer.analyze(approvedPath)).thenReturn(visual);
         when(audioAnalyzer.analyze(approvedPath)).thenReturn(audio);
         when(speechAnalyzer.transcribe(approvedPath)).thenReturn(speech);
@@ -47,7 +47,7 @@ class RawVideoFileAnalyzerTest {
         assertEquals(visual.scenes(), result.scenes());
         assertEquals(speech, result.speechSegments());
         assertEquals(audio, result.audio());
-        verify(approvalService).getApprovedPath("clip.mp4");
+        verify(approvalService).getPath("clip.mp4");
         verify(videoAnalyzer).analyze(approvedPath);
         verify(audioAnalyzer).analyze(approvedPath);
         verify(speechAnalyzer).transcribe(approvedPath);

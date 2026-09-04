@@ -46,6 +46,10 @@ public class MediaApprovalService {
         return file;
     }
 
+    public synchronized Path getPath(String relativePath) {
+        return resolveApprovedPath(relativePath);
+    }
+
     public synchronized Set<String> getApprovedRelativePaths() {
         return approvedFiles.stream()
                 .map(inputDirectory::relativize)

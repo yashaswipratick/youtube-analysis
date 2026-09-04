@@ -31,7 +31,7 @@ public class RawVideoFileAnalyzer {
     }
 
     public RawVideoClipAnalysis analyze(String relativePath) {
-        Path sourceFile = approvalService.getApprovedPath(relativePath);
+        Path sourceFile = approvalService.getPath(relativePath);
         RawVideoClipAnalysis visualAnalysis = videoAnalyzer.analyze(sourceFile);
         AudioProfile audio = audioAnalyzer.analyze(sourceFile);
         List<SpeechSegment> speech = speechAnalyzer.transcribe(sourceFile);

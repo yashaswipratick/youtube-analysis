@@ -49,6 +49,7 @@ class RawVideoAnalysisServiceTest {
         when(discoveryService.discover()).thenReturn(List.of(approvedVideo, unapprovedVideo, image));
         when(approvalService.isApproved("nested/clip.mp4")).thenReturn(true);
         when(approvalService.isApproved("other.mp4")).thenReturn(false);
+        when(approvalService.getApprovedPath("nested/clip.mp4")).thenReturn(java.nio.file.Path.of("/tmp/nested/clip.mp4"));
         when(fileAnalyzer.analyze("nested/clip.mp4")).thenReturn(analysis);
         when(scoringService.score("weekend getaway from Bangalore", analysis)).thenReturn(List.of());
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
@@ -102,6 +103,7 @@ class RawVideoAnalysisServiceTest {
         EditPlan expected = new EditPlan("project", "story", List.of(), 0, List.of());
 
         when(discoveryService.discover()).thenReturn(List.of(video));
+        when(approvalService.getPath("clip.mp4")).thenReturn(java.nio.file.Path.of("/tmp/clip.mp4"));
         when(fileAnalyzer.analyze("clip.mp4")).thenReturn(analysis);
         when(scoringService.score("story", analysis)).thenReturn(List.of());
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
