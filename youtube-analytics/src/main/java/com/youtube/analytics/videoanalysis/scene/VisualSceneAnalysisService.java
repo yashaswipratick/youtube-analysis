@@ -55,7 +55,17 @@ public class VisualSceneAnalysisService {
         long first = boundary.startMs() + duration / 4;
         long middle = boundary.startMs() + duration / 2;
         long last = boundary.startMs() + (duration * 3) / 4;
-        return List.of(first, middle, last);
+        return java.util.stream.Stream.of(first, middle, last).distinct().toList();
+    }
+
+    private double temporalStability(List<VisualObservation> observations) {
+        if (observations.size() < 2) return 1.0;
+        double mean = observations.stream().mapToDouble(VisualObservation::qualityScore).average().orElse(0);
+        double variance = observations.stream()
+                .mapToDouble(observation -> Math.pow(observation.qualityScore() - mean, 2))
+                .average()
+                .orElse(0);
+        return Math.max(0.8, 1.0 - Math.sqrt(variance));
     }
 
     private SceneSegment toSceneSegment(SceneDetector.SceneBoundary boundary, List<VisualObservation> observations) {
@@ -79,6 +89,8 @@ public class VisualSceneAnalysisService {
         if (!environment.isBlank()) summary += ", environment: " + environment;
         if (!objects.isEmpty()) summary += ", visible objects: " + String.join(", ", objects);
         double quality = observations.stream().mapToDouble(VisualObservation::qualityScore).average().orElse(0);
+        double stability = temporalStability(observations);
+        quality = Math.max(0, Math.min(1, quality * stability));
         return new SceneSegment(boundary.startMs(), boundary.endMs(), summary, quality);
     }
 }

@@ -46,6 +46,6 @@ class VisualSceneAnalysisServiceTest {
                 .contains("mountain view")
                 .contains("environment: mountain, outdoor")
                 .contains("visible objects: car, mountains, trees");
-        assertThat(scenes.get(0).visualScore()).isCloseTo(0.8, org.assertj.core.data.Offset.offset(0.000001));
+        assertThat(scenes.get(0).visualScore()).isCloseTo(0.7346802735, org.assertj.core.data.Offset.offset(0.000001));
     }
 }
