@@ -6,6 +6,8 @@ import com.youtube.analytics.videoanalysis.ingestion.MediaApprovalService;
 import com.youtube.analytics.videoanalysis.ingestion.MediaDiscoveryService;
 import com.youtube.analytics.videoanalysis.model.MediaReadAnalysis;
 import com.youtube.analytics.videoanalysis.service.ApprovedMediaReadService;
+import com.youtube.analytics.videoanalysis.service.RawVideoFileAnalyzer;
+import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,7 @@ public class MediaIngestionController {
     private final MediaDiscoveryService discoveryService;
     private final MediaApprovalService approvalService;
     private final ApprovedMediaReadService mediaReadService;
+    private final RawVideoFileAnalyzer rawVideoFileAnalyzer;
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<LocalMediaFile>>> discoverMedia() {
@@ -38,5 +41,10 @@ public class MediaIngestionController {
     @PostMapping("/read/{relativePath:.+}")
     public ResponseEntity<ApiResponse<MediaReadAnalysis>> readApprovedMedia(@PathVariable String relativePath) {
         return ResponseEntity.ok(ApiResponse.success(mediaReadService.readAndAnalyze(relativePath)));
+    }
+
+    @PostMapping("/analyze/{relativePath:.+}")
+    public ResponseEntity<ApiResponse<RawVideoClipAnalysis>> analyzeApprovedMedia(@PathVariable String relativePath) {
+        return ResponseEntity.ok(ApiResponse.success(rawVideoFileAnalyzer.analyzeApproved(relativePath)));
     }
 }
