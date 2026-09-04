@@ -4,6 +4,7 @@ import com.youtube.analytics.videoanalysis.model.AudioProfile;
 import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.model.SceneSegment;
 import com.youtube.analytics.videoanalysis.service.FfprobeMediaMetadataService;
+import com.youtube.analytics.videoanalysis.scene.VisualSceneAnalysisService;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
@@ -13,18 +14,20 @@ import java.util.List;
 public class FfprobeVideoAnalyzer implements VideoAnalyzer {
 
     private final FfprobeMediaMetadataService metadataService;
+    private final VisualSceneAnalysisService visualSceneAnalysisService;
 
-    public FfprobeVideoAnalyzer(FfprobeMediaMetadataService metadataService) {
+    public FfprobeVideoAnalyzer(FfprobeMediaMetadataService metadataService,
+                                VisualSceneAnalysisService visualSceneAnalysisService) {
         this.metadataService = metadataService;
+        this.visualSceneAnalysisService = visualSceneAnalysisService;
     }
 
     @Override
     public RawVideoClipAnalysis analyze(Path sourceFile) {
         FfprobeMediaMetadataService.VideoMetadata metadata = metadataService.probe(sourceFile);
         String summary = buildSummary(metadata);
-        List<SceneSegment> scenes = metadata.durationMs() == 0
-                ? List.of()
-                : List.of(new SceneSegment(0, metadata.durationMs(), summary, visualQuality(metadata)));
+        List<SceneSegment> scenes = metadata.durationMs() == 0 ? List.of()
+                : visualSceneAnalysisService.analyze(sourceFile, metadata.durationMs());
         return new RawVideoClipAnalysis(sourceFile.getFileName().toString(), metadata.durationMs(), scenes,
                 List.of(), new AudioProfile(false, 0.0, 0.0, false), visualQuality(metadata));
     }

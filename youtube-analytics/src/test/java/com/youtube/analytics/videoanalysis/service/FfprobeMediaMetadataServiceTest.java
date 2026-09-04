@@ -16,7 +16,7 @@ class FfprobeMediaMetadataServiceTest {
         Path file = Files.createTempFile("youtube-analysis-test-", ".mp4");
         try {
             Process process = new ProcessBuilder(
-                    "ffmpeg", "-y", "-f", "lavfi", "-i", "color=size=320x240:rate=25:duration=1",
+                    MediaToolResolver.resolve("ffmpeg"), "-y", "-f", "lavfi", "-i", "color=size=320x240:rate=25:duration=1",
                     "-f", "lavfi", "-i", "anullsrc=r=16000:cl=mono",
                     "-shortest", "-c:v", "libx264", "-c:a", "aac", file.toString())
                     .redirectErrorStream(true)
