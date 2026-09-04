@@ -17,6 +17,12 @@ import java.util.Locale;
 @Service
 public class ClipCandidateScoringService {
 
+    private static final double VISUAL_WEIGHT = 0.30;
+    private static final double SPEECH_WEIGHT = 0.20;
+    private static final double RELEVANCE_WEIGHT = 0.25;
+    private static final double QUALITY_WEIGHT = 0.10;
+    private static final double ROLE_FIT_WEIGHT = 0.15;
+
     private final SemanticAnalyzer semanticAnalyzer;
 
     public ClipCandidateScoringService(SemanticAnalyzer semanticAnalyzer) {
@@ -27,21 +33,32 @@ public class ClipCandidateScoringService {
         List<ClipCandidate> candidates = new ArrayList<>();
         for (SceneSegment scene : clip.scenes() == null ? List.<SceneSegment>of() : clip.scenes()) {
             if (scene.endMs() <= scene.startMs()) continue;
+
             String spokenText = speechOverlapping(scene.startMs(), scene.endMs(), clip.speechSegments());
             CandidateRole role = semanticAnalyzer.classifyRole(storyIntent, scene.visualSummary(), spokenText);
             double speechScore = speechScore(scene.startMs(), scene.endMs(), clip.speechSegments(), clip.audio());
             double relevance = keywordRelevance(storyIntent, scene.visualSummary(), spokenText);
-            double score = round((scene.visualScore() * 0.45) + (speechScore * 0.25)
-                    + (relevance * 0.20) + (clip.visualQualityScore() * 0.10));
+            double roleFit = roleFit(role, storyIntent, scene.visualSummary(), spokenText);
+            double score = round((clamp(scene.visualScore()) * VISUAL_WEIGHT)
+                    + (clamp(speechScore) * SPEECH_WEIGHT)
+                    + (relevance * RELEVANCE_WEIGHT)
+                    + (clamp(clip.visualQualityScore()) * QUALITY_WEIGHT)
+                    + (roleFit * ROLE_FIT_WEIGHT));
+
             List<String> reasons = new ArrayList<>();
             if (scene.visualScore() >= 0.7) reasons.add("strong visual quality");
             if (speechScore >= 0.7) reasons.add("clear spoken-audio content");
             if (relevance >= 0.5) reasons.add("relevant to story intent");
+            if (roleFit >= 0.7) reasons.add("strong fit for " + role.name().toLowerCase(Locale.ROOT) + " role");
             if (reasons.isEmpty()) reasons.add("candidate retained for structural coverage");
+
             candidates.add(new ClipCandidate(clip.sourceFileName(), scene.startMs(), scene.endMs(), role,
                     score, spokenText, scene.visualSummary(), List.copyOf(reasons)));
         }
-        return candidates.stream().sorted(Comparator.comparingDouble(ClipCandidate::score).reversed()).toList();
+        return candidates.stream()
+                .sorted(Comparator.comparingDouble(ClipCandidate::score).reversed()
+                        .thenComparingLong(ClipCandidate::sourceStartMs))
+                .toList();
     }
 
     private String speechOverlapping(long startMs, long endMs, List<SpeechSegment> segments) {
@@ -54,21 +71,52 @@ public class ClipCandidateScoringService {
     }
 
     private double speechScore(long startMs, long endMs, List<SpeechSegment> segments, AudioProfile audio) {
-        if (segments == null || segments.isEmpty()) return audio == null ? 0.0 : audio.speechClarityScore() * 0.5;
+        if (segments == null || segments.isEmpty()) return audio == null ? 0.0 : clamp(audio.speechClarityScore()) * 0.5;
         return segments.stream()
                 .filter(s -> s.endMs() > startMs && s.startMs() < endMs)
                 .mapToDouble(SpeechSegment::clarityScore)
+                .map(this::clamp)
                 .average()
-                .orElse(audio == null ? 0.0 : audio.speechClarityScore());
+                .orElse(audio == null ? 0.0 : clamp(audio.speechClarityScore()));
     }
 
     private double keywordRelevance(String storyIntent, String visualSummary, String spokenText) {
         if (storyIntent == null || storyIntent.isBlank()) return 0.0;
-        String evidence = ((visualSummary == null ? "" : visualSummary) + " " + (spokenText == null ? "" : spokenText)).toLowerCase(Locale.ROOT);
+        String evidence = ((visualSummary == null ? "" : visualSummary) + " " + (spokenText == null ? "" : spokenText))
+                .toLowerCase(Locale.ROOT);
         String[] terms = storyIntent.toLowerCase(Locale.ROOT).split("\\W+");
-        long useful = java.util.Arrays.stream(terms).filter(t -> t.length() > 2 && evidence.contains(t)).count();
+        long useful = java.util.Arrays.stream(terms)
+                .filter(t -> t.length() > 2 && evidence.contains(t))
+                .count();
         long total = java.util.Arrays.stream(terms).filter(t -> t.length() > 2).count();
         return total == 0 ? 0.0 : Math.min(1.0, (double) useful / total);
+    }
+
+    private double roleFit(CandidateRole role, String storyIntent, String visualSummary, String spokenText) {
+        String evidence = ((visualSummary == null ? "" : visualSummary) + " " + (spokenText == null ? "" : spokenText))
+                .toLowerCase(Locale.ROOT);
+        double fit = switch (role) {
+            case HOOK -> phrasePresence(evidence, "welcome", "today", "let's go", "let us go", "journey begins") ? 1.0 : 0.45;
+            case SETUP -> phrasePresence(evidence, "because", "plan", "heading", "going to", "on the way") ? 1.0 : 0.45;
+            case JOURNEY -> phrasePresence(evidence, "drive", "driving", "road", "travel", "walking", "journey") ? 1.0 : 0.45;
+            case EXPERIENCE -> phrasePresence(evidence, "food", "explore", "experience", "inside", "activity") ? 1.0 : 0.45;
+            case PAYOFF -> phrasePresence(evidence, "finally", "arrived", "destination", "view", "sunset", "best part") ? 1.0 : 0.45;
+            case VOICE_BRIDGE -> spokenText != null && !spokenText.isBlank() ? 1.0 : 0.25;
+            case B_ROLL -> visualSummary != null && !visualSummary.isBlank() ? 1.0 : 0.25;
+            case ENDING -> phrasePresence(evidence, "bye", "goodbye", "that's it", "that is it", "see you") ? 1.0 : 0.45;
+            case UNKNOWN -> 0.20;
+        };
+        if (storyIntent == null || storyIntent.isBlank()) return fit;
+        return Math.min(1.0, fit + keywordRelevance(storyIntent, visualSummary, spokenText) * 0.20);
+    }
+
+    private boolean phrasePresence(String evidence, String... terms) {
+        for (String term : terms) if (evidence.contains(term)) return true;
+        return false;
+    }
+
+    private double clamp(double value) {
+        return Math.max(0.0, Math.min(1.0, value));
     }
 
     private double round(double value) {
