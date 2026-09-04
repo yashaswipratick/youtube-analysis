@@ -3,6 +3,7 @@ package com.youtube.analytics.videoanalysis.timeline;
 import com.youtube.analytics.videoanalysis.model.CandidateRole;
 import com.youtube.analytics.videoanalysis.model.ClipCandidate;
 import com.youtube.analytics.videoanalysis.model.EditPlan;
+import com.youtube.analytics.videoanalysis.sequencing.NarrativeArcEvaluator;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class TimelineOptimizerTest {
 
-    private final TimelineOptimizer optimizer = new TimelineOptimizer();
+    private final TimelineOptimizer optimizer = new TimelineOptimizer(new NarrativeArcEvaluator());
 
     @Test
     void warnsWhenNarrativeAnchorsAreMissing() {
@@ -36,7 +37,8 @@ class TimelineOptimizerTest {
 
         EditPlan plan = optimizer.buildPlan("trip", "weekend mountain trip", candidates);
 
-        assertThat(plan.warnings()).isEmpty();
+        assertThat(plan.warnings()).containsExactly(
+                "Narrative arc has no clear development beat between opening and payoff");
         assertThat(plan.totalDurationMs()).isEqualTo(7000);
         assertThat(plan.sequence()).extracting(EditPlan.EditSequenceItem::timelineStartMs)
                 .containsExactly(0L, 2000L, 5000L);
@@ -53,6 +55,7 @@ class TimelineOptimizerTest {
 
         assertThat(plan.totalDurationMs()).isEqualTo(120_000);
         assertThat(plan.warnings()).containsExactly(
+                "Narrative arc has no clear development beat between opening and payoff",
                 "Selected edit exceeds the target duration of 1 minutes; narrative anchors were preserved");
     }
 
@@ -65,7 +68,8 @@ class TimelineOptimizerTest {
 
         EditPlan plan = optimizer.buildPlan("trip", "weekend mountain trip", candidates, 1L);
 
-        assertThat(plan.warnings()).isEmpty();
+        assertThat(plan.warnings()).containsExactly(
+                "Narrative arc has no clear development beat between opening and payoff");
     }
 
     @Test

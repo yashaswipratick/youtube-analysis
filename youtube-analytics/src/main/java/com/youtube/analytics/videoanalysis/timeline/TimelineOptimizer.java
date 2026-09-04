@@ -3,6 +3,7 @@ package com.youtube.analytics.videoanalysis.timeline;
 import com.youtube.analytics.videoanalysis.model.CandidateRole;
 import com.youtube.analytics.videoanalysis.model.ClipCandidate;
 import com.youtube.analytics.videoanalysis.model.EditPlan;
+import com.youtube.analytics.videoanalysis.sequencing.NarrativeArcEvaluator;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -12,6 +13,12 @@ import java.util.Set;
 
 @Service
 public class TimelineOptimizer {
+
+    private final NarrativeArcEvaluator narrativeArcEvaluator;
+
+    public TimelineOptimizer(NarrativeArcEvaluator narrativeArcEvaluator) {
+        this.narrativeArcEvaluator = narrativeArcEvaluator;
+    }
 
     public EditPlan buildPlan(String projectId, String storyIntent, List<ClipCandidate> orderedCandidates) {
         return buildPlan(projectId, storyIntent, orderedCandidates, null);
@@ -31,6 +38,7 @@ public class TimelineOptimizer {
             cursor = end;
         }
         List<String> warnings = new ArrayList<>(narrativeWarnings(orderedCandidates));
+        warnings.addAll(narrativeArcEvaluator.evaluate(storyIntent, orderedCandidates));
         addDurationWarning(warnings, cursor, targetDurationMinutes);
 
         return new EditPlan(projectId, storyIntent, List.copyOf(sequence), cursor, List.copyOf(warnings));
