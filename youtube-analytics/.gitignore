@@ -12,3 +12,5 @@ src/main/resources/application-local/application.yml
 .idea/
 *.iml
 .DS_Store
+*.MP4
+*.mp3

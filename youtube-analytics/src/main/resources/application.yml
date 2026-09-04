@@ -28,11 +28,11 @@ server:
   port: 8080
 
 video-analysis:
-  input-directory: /Users/yashaswipratick/Documents/short-drive/Kailashagiri-hills/
+  input-directory: /Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills
   approval-required: false
-  output-directory: /Users/yashaswipratick/Documents/short-drive/Kailashagiri-hills/renders
+  output-directory: /Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/renders
   audio:
-    music-directory: ${VIDEO_ANALYSIS_MUSIC_DIRECTORY:/Users/yashaswipratick/Documents/short-drive/Kailashagiri-hills/music}
+    music-directory: ${VIDEO_ANALYSIS_MUSIC_DIRECTORY:/Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/music}
     music-file-name: ${VIDEO_ANALYSIS_MUSIC_FILE_NAME:Warriyo-Laura Brehm-Mortals.mp3}
     music-volume: ${VIDEO_ANALYSIS_MUSIC_VOLUME:0.12}
     duck-speech: ${VIDEO_ANALYSIS_DUCK_SPEECH:true}
