@@ -1,7 +1,10 @@
 package com.youtube.analytics.controller;
 
 import com.youtube.analytics.exception.GlobalExceptionHandler;
+import com.youtube.analytics.model.AnalyticsDecisionResult;
+import com.youtube.analytics.model.DiscoveryOptimizationResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
+import com.youtube.analytics.service.AnalyticsDecisionService;
 import com.youtube.analytics.service.DiscoveryOptimizationService;
 import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.RecommendationEngineService;
@@ -27,6 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 class YouTubeAnalyticsControllerTest {
     private MockMvc mockMvc;
+    private DiscoveryOptimizationService discoveryOptimizationService;
+    private AnalyticsDecisionService analyticsDecisionService;
 
     @BeforeEach
     void setUp() {
@@ -37,7 +42,8 @@ class YouTubeAnalyticsControllerTest {
         OpenAiAnalysisService openAiAnalysisService = mock(OpenAiAnalysisService.class);
         RecommendationEngineService recommendationEngineService = mock(RecommendationEngineService.class);
         RetentionAnalysisService retentionAnalysisService = mock(RetentionAnalysisService.class);
-        DiscoveryOptimizationService discoveryOptimizationService = mock(DiscoveryOptimizationService.class);
+        discoveryOptimizationService = mock(DiscoveryOptimizationService.class);
+        analyticsDecisionService = mock(AnalyticsDecisionService.class);
 
         when(service.getSingleVideoAnalytics(any(), any(), any(), any())).thenReturn(VideoAnalyticsResult.builder()
                 .videoId("laQbWAoa3NI")
@@ -55,7 +61,8 @@ class YouTubeAnalyticsControllerTest {
                         openAiAnalysisService,
                         recommendationEngineService,
                         retentionAnalysisService,
-                        discoveryOptimizationService))
+                        discoveryOptimizationService,
+                        analyticsDecisionService))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }
@@ -69,6 +76,63 @@ class YouTubeAnalyticsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.metrics.views").value(57));
+    }
+
+    @Test
+    void returnsAnalyticsDecisionForValidRequest() throws Exception {
+        DiscoveryOptimizationResult discovery = DiscoveryOptimizationResult.builder()
+                .videoId("laQbWAoa3NI")
+                .primaryDiagnosis(DiscoveryOptimizationResult.DiscoveryDiagnosis.HEALTHY_DISCOVERY)
+                .build();
+        AnalyticsDecisionResult decision = new AnalyticsDecisionResult(
+                "laQbWAoa3NI",
+                AnalyticsDecisionResult.DecisionAction.CONTINUE_OBSERVING,
+                "Continue observing.",
+                java.util.List.of("Discovery and retention signals are healthy."),
+                java.util.List.of());
+        when(discoveryOptimizationService.analyze("laQbWAoa3NI", "2026-07-27", "2026-08-29"))
+                .thenReturn(discovery);
+        when(analyticsDecisionService.decide(discovery)).thenReturn(decision);
+
+        mockMvc.perform(get("/api/youtube/analytics/video/laQbWAoa3NI/decision")
+                        .param("startDate", "2026-07-27")
+                        .param("endDate", "2026-08-29"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.videoId").value("laQbWAoa3NI"))
+                .andExpect(jsonPath("$.data.action").value("CONTINUE_OBSERVING"));
+    }
+
+    @Test
+    void rejectsInvalidDecisionStartDate() throws Exception {
+        mockMvc.perform(get("/api/youtube/analytics/video/laQbWAoa3NI/decision")
+                        .param("startDate", "2026-02-30"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void rejectsInvalidDecisionEndDate() throws Exception {
+        mockMvc.perform(get("/api/youtube/analytics/video/laQbWAoa3NI/decision")
+                        .param("endDate", "not-a-date"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false));
+    }
+
+    @Test
+    void rejectsDecisionDateRangeWithStartAfterEnd() throws Exception {
+        mockMvc.perform(get("/api/youtube/analytics/video/laQbWAoa3NI/decision")
+                        .param("startDate", "2026-08-29")
+                        .param("endDate", "2026-07-27"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("startDate must be on or before endDate"));
+    }
+
+    @Test
+    void rejectsBlankDecisionVideoId() throws Exception {
+        mockMvc.perform(get("/api/youtube/analytics/video/{videoId}/decision", " "))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false));
     }
 
     @Test
