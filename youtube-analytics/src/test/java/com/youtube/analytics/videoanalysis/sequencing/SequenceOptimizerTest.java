@@ -62,6 +62,31 @@ class SequenceOptimizerTest {
     }
 
     @Test
+    void limitsRepeatedSourceWithinRoleWhenAlternativeSourceExists() {
+        List<ClipCandidate> candidates = List.of(
+                candidate("camera-a.mp4", CandidateRole.JOURNEY, 1000, 1500, 0.95),
+                candidate("camera-a.mp4", CandidateRole.JOURNEY, 2000, 2500, 0.90),
+                candidate("camera-a.mp4", CandidateRole.JOURNEY, 3000, 3500, 0.85),
+                candidate("camera-b.mp4", CandidateRole.JOURNEY, 4000, 4500, 0.80));
+
+        List<ClipCandidate> ordered = optimizer.optimize(candidates);
+
+        assertThat(ordered).hasSize(3);
+        assertThat(ordered).extracting(ClipCandidate::sourceFileName)
+                .containsExactly("camera-a.mp4", "camera-a.mp4", "camera-b.mp4");
+    }
+
+    @Test
+    void doesNotLimitSourceWhenItIsTheOnlySourceForRole() {
+        List<ClipCandidate> candidates = List.of(
+                candidate("camera-a.mp4", CandidateRole.JOURNEY, 1000, 1500, 0.95),
+                candidate("camera-a.mp4", CandidateRole.JOURNEY, 2000, 2500, 0.90),
+                candidate("camera-a.mp4", CandidateRole.JOURNEY, 3000, 3500, 0.85));
+
+        assertThat(optimizer.optimize(candidates)).hasSize(3);
+    }
+
+    @Test
     void returnsEmptyListForNullOrEmptyInput() {
         assertThat(optimizer.optimize(List.of())).isEmpty();
         assertThat(optimizer.optimize(null)).isEmpty();

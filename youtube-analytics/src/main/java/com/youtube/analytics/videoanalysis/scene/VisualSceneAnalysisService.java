@@ -27,19 +27,19 @@ public class VisualSceneAnalysisService {
     public List<SceneSegment> analyze(Path sourceFile, long durationMs) {
         List<SceneDetector.SceneBoundary> boundaries = sceneDetector.detect(sourceFile, durationMs);
         if (boundaries.isEmpty() && durationMs > 0) boundaries = List.of(new SceneDetector.SceneBoundary(0, durationMs));
-        List<Long> timestamps = boundaries.stream().map(b -> b.startMs() + Math.max(0, (b.endMs() - b.startMs()) / 2)).toList();
+        List<Long> timestamps = boundaries.stream()
+                .flatMap(boundary -> representativeTimestamps(boundary).stream())
+                .toList();
         List<FrameExtractor.ExtractedFrame> frames = frameExtractor.extract(sourceFile, timestamps);
         List<SceneSegment> scenes = new ArrayList<>();
         try {
-            for (int i = 0; i < boundaries.size(); i++) {
-                SceneDetector.SceneBoundary boundary = boundaries.get(i);
-                VisualObservation observation = visualSemanticAnalyzer.analyze(frames.get(i).imageFile());
-                String summary = observation.summary()
-                        + (observation.environment() == null || observation.environment().isBlank()
-                        || "unknown".equals(observation.environment()) ? "" : ", environment: " + observation.environment())
-                        + (observation.objects() == null || observation.objects().isEmpty() ? ""
-                        : ", visible objects: " + String.join(", ", observation.objects()));
-                scenes.add(new SceneSegment(boundary.startMs(), boundary.endMs(), summary, observation.qualityScore()));
+            int frameIndex = 0;
+            for (SceneDetector.SceneBoundary boundary : boundaries) {
+                List<VisualObservation> observations = new ArrayList<>();
+                for (int i = 0; i < representativeTimestamps(boundary).size(); i++) {
+                    observations.add(visualSemanticAnalyzer.analyze(frames.get(frameIndex++).imageFile()));
+                }
+                scenes.add(toSceneSegment(boundary, observations));
             }
             return scenes;
         } finally {
@@ -47,5 +47,38 @@ public class VisualSceneAnalysisService {
                 try { Files.deleteIfExists(frame.imageFile()); } catch (Exception ignored) { }
             }
         }
+    }
+
+    private List<Long> representativeTimestamps(SceneDetector.SceneBoundary boundary) {
+        long duration = boundary.endMs() - boundary.startMs();
+        if (duration <= 0) return List.of(boundary.startMs());
+        long first = boundary.startMs() + duration / 4;
+        long middle = boundary.startMs() + duration / 2;
+        long last = boundary.startMs() + (duration * 3) / 4;
+        return List.of(first, middle, last);
+    }
+
+    private SceneSegment toSceneSegment(SceneDetector.SceneBoundary boundary, List<VisualObservation> observations) {
+        String summary = observations.stream()
+                .map(VisualObservation::summary)
+                .filter(value -> value != null && !value.isBlank())
+                .distinct()
+                .reduce((first, second) -> first + "; " + second)
+                .orElse("No visual observation available");
+        String environment = observations.stream()
+                .map(VisualObservation::environment)
+                .filter(value -> value != null && !value.isBlank() && !"unknown".equals(value))
+                .distinct()
+                .reduce((first, second) -> first.equals(second) ? first : first + ", " + second)
+                .orElse("");
+        List<String> objects = observations.stream()
+                .flatMap(observation -> observation.objects().stream())
+                .filter(value -> value != null && !value.isBlank())
+                .distinct()
+                .toList();
+        if (!environment.isBlank()) summary += ", environment: " + environment;
+        if (!objects.isEmpty()) summary += ", visible objects: " + String.join(", ", objects);
+        double quality = observations.stream().mapToDouble(VisualObservation::qualityScore).average().orElse(0);
+        return new SceneSegment(boundary.startMs(), boundary.endMs(), summary, quality);
     }
 }

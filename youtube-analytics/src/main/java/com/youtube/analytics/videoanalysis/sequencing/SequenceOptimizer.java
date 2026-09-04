@@ -8,8 +8,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Service
 public class SequenceOptimizer {
@@ -20,6 +22,7 @@ public class SequenceOptimizer {
         if (candidates == null || candidates.isEmpty()) return List.of();
 
         List<ClipCandidate> ordered = deduplicateOverlaps(candidates);
+        ordered = limitRepeatedSourceRoles(ordered);
         ordered.sort(Comparator.comparingInt((ClipCandidate c) -> ROLE_ORDER.getOrDefault(c.role(), 99))
                 .thenComparing(Comparator.comparingDouble(ClipCandidate::score).reversed())
                 .thenComparingLong(ClipCandidate::sourceStartMs));
@@ -50,6 +53,29 @@ public class SequenceOptimizer {
     private boolean overlaps(ClipCandidate first, ClipCandidate second) {
         return first.sourceStartMs() < second.sourceEndMs()
                 && second.sourceStartMs() < first.sourceEndMs();
+    }
+
+    private List<ClipCandidate> limitRepeatedSourceRoles(List<ClipCandidate> candidates) {
+        Map<CandidateRole, Set<String>> sourcesByRole = new EnumMap<>(CandidateRole.class);
+        candidates.forEach(candidate -> sourcesByRole
+                .computeIfAbsent(candidate.role(), ignored -> new HashSet<>())
+                .add(candidate.sourceFileName()));
+
+        Map<String, Integer> sourceRoleCounts = new HashMap<>();
+        List<ClipCandidate> selected = new ArrayList<>();
+        List<ClipCandidate> ranked = new ArrayList<>(candidates);
+        ranked.sort(Comparator.comparingDouble(ClipCandidate::score).reversed()
+                .thenComparingLong(ClipCandidate::sourceStartMs));
+
+        for (ClipCandidate candidate : ranked) {
+            int sourceCount = sourcesByRole.getOrDefault(candidate.role(), Set.of()).size();
+            String key = candidate.role().name() + "\\u0000" + candidate.sourceFileName();
+            int currentCount = sourceRoleCounts.getOrDefault(key, 0);
+            if (sourceCount > 1 && currentCount >= 2) continue;
+            sourceRoleCounts.put(key, currentCount + 1);
+            selected.add(candidate);
+        }
+        return selected;
     }
 
     private void moveStrongestEndingToEnd(List<ClipCandidate> candidates) {
