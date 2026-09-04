@@ -23,7 +23,7 @@ class MediaDiscoveryServiceTest {
         Files.writeString(inputDirectory.resolve("photo.JPG"), "image-bytes");
         Files.writeString(inputDirectory.resolve("notes.txt"), "ignore");
 
-        MediaDiscoveryService service = new MediaDiscoveryService(new LocalMediaInputProperties(inputDirectory.toString()));
+        MediaDiscoveryService service = new MediaDiscoveryService(new LocalMediaInputProperties(inputDirectory.toString(), true));
 
         List<LocalMediaFile> files = service.discover();
 
@@ -39,7 +39,7 @@ class MediaDiscoveryServiceTest {
     @Test
     void rejectsMissingInputDirectory() {
         Path missingDirectory = inputDirectory.resolve("missing");
-        MediaDiscoveryService service = new MediaDiscoveryService(new LocalMediaInputProperties(missingDirectory.toString()));
+        MediaDiscoveryService service = new MediaDiscoveryService(new LocalMediaInputProperties(missingDirectory.toString(), true));
 
         assertThrows(IllegalStateException.class, service::discover);
     }

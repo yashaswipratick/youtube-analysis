@@ -26,7 +26,7 @@ class ApprovedMediaReadServiceTest {
         Path file = inputDirectory.resolve("photo.jpg");
         ImageIO.write(image, "jpg", file.toFile());
 
-        MediaApprovalService approvalService = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString()));
+        MediaApprovalService approvalService = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true));
         approvalService.approve("photo.jpg");
 
         MediaReadAnalysis result = new ApprovedMediaReadService(approvalService).readAndAnalyze("photo.jpg");
@@ -43,7 +43,7 @@ class ApprovedMediaReadServiceTest {
     void refusesToReadUnapprovedMedia() throws IOException {
         Files.writeString(inputDirectory.resolve("clip.mp4"), "video");
 
-        MediaApprovalService approvalService = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString()));
+        MediaApprovalService approvalService = new MediaApprovalService(new LocalMediaInputProperties(inputDirectory.toString(), true));
 
         assertThrows(IllegalStateException.class,
                 () -> new ApprovedMediaReadService(approvalService).readAndAnalyze("clip.mp4"));
