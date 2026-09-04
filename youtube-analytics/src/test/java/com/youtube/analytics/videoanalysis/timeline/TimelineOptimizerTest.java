@@ -43,6 +43,32 @@ class TimelineOptimizerTest {
     }
 
     @Test
+    void warnsWhenTargetDurationIsExceededButNarrativeAnchorsArePreserved() {
+        List<ClipCandidate> candidates = List.of(
+                candidate(CandidateRole.HOOK, 0, 40_000),
+                candidate(CandidateRole.PAYOFF, 40_000, 80_000),
+                candidate(CandidateRole.ENDING, 80_000, 120_000));
+
+        EditPlan plan = optimizer.buildPlan("trip", "weekend mountain trip", candidates, 1L);
+
+        assertThat(plan.totalDurationMs()).isEqualTo(120_000);
+        assertThat(plan.warnings()).containsExactly(
+                "Selected edit exceeds the target duration of 1 minutes; narrative anchors were preserved");
+    }
+
+    @Test
+    void doesNotWarnWhenTargetDurationIsMet() {
+        List<ClipCandidate> candidates = List.of(
+                candidate(CandidateRole.HOOK, 0, 20_000),
+                candidate(CandidateRole.PAYOFF, 20_000, 40_000),
+                candidate(CandidateRole.ENDING, 40_000, 60_000));
+
+        EditPlan plan = optimizer.buildPlan("trip", "weekend mountain trip", candidates, 1L);
+
+        assertThat(plan.warnings()).isEmpty();
+    }
+
+    @Test
     void warnsWhenThereAreNoUsableCandidates() {
         EditPlan plan = optimizer.buildPlan("trip", "weekend mountain trip", List.of());
 

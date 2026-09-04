@@ -14,6 +14,11 @@ import java.util.Set;
 public class TimelineOptimizer {
 
     public EditPlan buildPlan(String projectId, String storyIntent, List<ClipCandidate> orderedCandidates) {
+        return buildPlan(projectId, storyIntent, orderedCandidates, null);
+    }
+
+    public EditPlan buildPlan(String projectId, String storyIntent,
+                              List<ClipCandidate> orderedCandidates, Long targetDurationMinutes) {
         long cursor = 0;
         List<EditPlan.EditSequenceItem> sequence = new ArrayList<>();
         for (int i = 0; i < orderedCandidates.size(); i++) {
@@ -25,9 +30,20 @@ public class TimelineOptimizer {
                     placementReason(i, clip)));
             cursor = end;
         }
-        List<String> warnings = narrativeWarnings(orderedCandidates);
+        List<String> warnings = new ArrayList<>(narrativeWarnings(orderedCandidates));
+        addDurationWarning(warnings, cursor, targetDurationMinutes);
 
-        return new EditPlan(projectId, storyIntent, List.copyOf(sequence), cursor, warnings);
+        return new EditPlan(projectId, storyIntent, List.copyOf(sequence), cursor, List.copyOf(warnings));
+    }
+
+    private void addDurationWarning(List<String> warnings, long actualDurationMs, Long targetDurationMinutes) {
+        if (targetDurationMinutes == null) return;
+
+        long targetDurationMs = Math.multiplyExact(targetDurationMinutes, 60_000L);
+        if (actualDurationMs > targetDurationMs) {
+            warnings.add("Selected edit exceeds the target duration of " + targetDurationMinutes
+                    + " minutes; narrative anchors were preserved");
+        }
     }
 
     private String placementReason(int index, ClipCandidate clip) {
