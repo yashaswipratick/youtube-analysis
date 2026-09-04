@@ -12,6 +12,7 @@ import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.sequencing.ClipCandidateScoringService;
 import com.youtube.analytics.videoanalysis.sequencing.DurationAwareCandidateSelector;
 import com.youtube.analytics.videoanalysis.sequencing.PacingOptimizer;
+import com.youtube.analytics.videoanalysis.sequencing.NarrativeRepairOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SequenceOptimizer;
 import com.youtube.analytics.videoanalysis.timeline.TimelineOptimizer;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class RawVideoAnalysisService {
     private final SequenceOptimizer sequenceOptimizer;
     private final DurationAwareCandidateSelector durationAwareCandidateSelector;
     private final PacingOptimizer pacingOptimizer;
+    private final NarrativeRepairOptimizer narrativeRepairOptimizer;
     private final TimelineOptimizer timelineOptimizer;
     private final RawVideoFileAnalyzer rawVideoFileAnalyzer;
 
@@ -39,6 +41,7 @@ public class RawVideoAnalysisService {
                                    SequenceOptimizer sequenceOptimizer,
                                    DurationAwareCandidateSelector durationAwareCandidateSelector,
                                    PacingOptimizer pacingOptimizer,
+                                   NarrativeRepairOptimizer narrativeRepairOptimizer,
                                    TimelineOptimizer timelineOptimizer,
                                    RawVideoFileAnalyzer rawVideoFileAnalyzer) {
         this.approvalService = approvalService;
@@ -48,6 +51,7 @@ public class RawVideoAnalysisService {
         this.sequenceOptimizer = sequenceOptimizer;
         this.durationAwareCandidateSelector = durationAwareCandidateSelector;
         this.pacingOptimizer = pacingOptimizer;
+        this.narrativeRepairOptimizer = narrativeRepairOptimizer;
         this.timelineOptimizer = timelineOptimizer;
         this.rawVideoFileAnalyzer = rawVideoFileAnalyzer;
     }
@@ -61,8 +65,11 @@ public class RawVideoAnalysisService {
         List<ClipCandidate> candidates = new ArrayList<>();
         approvedVideos.forEach(clip -> candidates.addAll(scoringService.score(request.storyIntent(), clip)));
         List<ClipCandidate> orderedCandidates = sequenceOptimizer.optimize(candidates);
+        List<ClipCandidate> repairedCandidates = narrativeRepairOptimizer.repair(
+                request.storyIntent(), orderedCandidates, candidates);
         List<ClipCandidate> selectedCandidates = durationAwareCandidateSelector.select(
-                orderedCandidates, request.targetDurationMinutes());
+
+                repairedCandidates, request.targetDurationMinutes());
         List<ClipCandidate> pacedCandidates = pacingOptimizer.optimize(selectedCandidates);
         return timelineOptimizer.buildPlan(request.projectId(), request.storyIntent(),
                 pacedCandidates, request.targetDurationMinutes());
