@@ -12,6 +12,7 @@ import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.model.SceneSegment;
 import com.youtube.analytics.videoanalysis.sequencing.ClipCandidateScoringService;
 import com.youtube.analytics.videoanalysis.sequencing.DurationAwareCandidateSelector;
+import com.youtube.analytics.videoanalysis.sequencing.PacingOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SequenceOptimizer;
 import com.youtube.analytics.videoanalysis.timeline.TimelineOptimizer;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,7 @@ class RawVideoAnalysisServiceTest {
         ClipCandidateScoringService scoringService = mock(ClipCandidateScoringService.class);
         SequenceOptimizer sequenceOptimizer = mock(SequenceOptimizer.class);
         DurationAwareCandidateSelector durationSelector = mock(DurationAwareCandidateSelector.class);
+        PacingOptimizer pacingOptimizer = mock(PacingOptimizer.class);
         TimelineOptimizer timelineOptimizer = mock(TimelineOptimizer.class);
         RawVideoFileAnalyzer fileAnalyzer = mock(RawVideoFileAnalyzer.class);
 
@@ -54,12 +56,13 @@ class RawVideoAnalysisServiceTest {
         when(scoringService.score("weekend getaway from Bangalore", analysis)).thenReturn(List.of());
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
         when(durationSelector.select(List.of(), 8L)).thenReturn(List.of());
+        when(pacingOptimizer.optimize(List.of())).thenReturn(List.of());
         when(timelineOptimizer.buildPlan("bangalore-trip", "weekend getaway from Bangalore", List.of(), 8L))
                 .thenReturn(expected);
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService, discoveryService, new LocalMediaInputProperties("/tmp", true),
-                scoringService, sequenceOptimizer, durationSelector, timelineOptimizer, fileAnalyzer);
+                scoringService, sequenceOptimizer, durationSelector, pacingOptimizer, timelineOptimizer, fileAnalyzer);
 
         EditPlan result = service.buildEditPlan(
                 new RawVideoAnalysisRequest("bangalore-trip", "weekend getaway from Bangalore", 8L));
@@ -81,6 +84,7 @@ class RawVideoAnalysisServiceTest {
                 mock(ClipCandidateScoringService.class),
                 mock(SequenceOptimizer.class),
                 mock(DurationAwareCandidateSelector.class),
+                mock(PacingOptimizer.class),
                 mock(TimelineOptimizer.class),
                 mock(RawVideoFileAnalyzer.class));
 
@@ -95,6 +99,7 @@ class RawVideoAnalysisServiceTest {
         ClipCandidateScoringService scoringService = mock(ClipCandidateScoringService.class);
         SequenceOptimizer sequenceOptimizer = mock(SequenceOptimizer.class);
         DurationAwareCandidateSelector durationSelector = mock(DurationAwareCandidateSelector.class);
+        PacingOptimizer pacingOptimizer = mock(PacingOptimizer.class);
         TimelineOptimizer timelineOptimizer = mock(TimelineOptimizer.class);
         RawVideoFileAnalyzer fileAnalyzer = mock(RawVideoFileAnalyzer.class);
 
@@ -108,11 +113,12 @@ class RawVideoAnalysisServiceTest {
         when(scoringService.score("story", analysis)).thenReturn(List.of());
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
         when(durationSelector.select(List.of(), 8L)).thenReturn(List.of());
+        when(pacingOptimizer.optimize(List.of())).thenReturn(List.of());
         when(timelineOptimizer.buildPlan("project", "story", List.of(), 8L)).thenReturn(expected);
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService, discoveryService, new LocalMediaInputProperties("/tmp", false),
-                scoringService, sequenceOptimizer, durationSelector, timelineOptimizer, fileAnalyzer);
+                scoringService, sequenceOptimizer, durationSelector, pacingOptimizer, timelineOptimizer, fileAnalyzer);
 
         assertEquals(expected, service.buildEditPlan(new RawVideoAnalysisRequest("project", "story", 8L)));
         verify(fileAnalyzer).analyze("clip.mp4");

@@ -11,6 +11,7 @@ import com.youtube.analytics.videoanalysis.model.RawVideoAnalysisRequest;
 import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.sequencing.ClipCandidateScoringService;
 import com.youtube.analytics.videoanalysis.sequencing.DurationAwareCandidateSelector;
+import com.youtube.analytics.videoanalysis.sequencing.PacingOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SequenceOptimizer;
 import com.youtube.analytics.videoanalysis.timeline.TimelineOptimizer;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class RawVideoAnalysisService {
     private final ClipCandidateScoringService scoringService;
     private final SequenceOptimizer sequenceOptimizer;
     private final DurationAwareCandidateSelector durationAwareCandidateSelector;
+    private final PacingOptimizer pacingOptimizer;
     private final TimelineOptimizer timelineOptimizer;
     private final RawVideoFileAnalyzer rawVideoFileAnalyzer;
 
@@ -36,6 +38,7 @@ public class RawVideoAnalysisService {
                                    ClipCandidateScoringService scoringService,
                                    SequenceOptimizer sequenceOptimizer,
                                    DurationAwareCandidateSelector durationAwareCandidateSelector,
+                                   PacingOptimizer pacingOptimizer,
                                    TimelineOptimizer timelineOptimizer,
                                    RawVideoFileAnalyzer rawVideoFileAnalyzer) {
         this.approvalService = approvalService;
@@ -44,6 +47,7 @@ public class RawVideoAnalysisService {
         this.scoringService = scoringService;
         this.sequenceOptimizer = sequenceOptimizer;
         this.durationAwareCandidateSelector = durationAwareCandidateSelector;
+        this.pacingOptimizer = pacingOptimizer;
         this.timelineOptimizer = timelineOptimizer;
         this.rawVideoFileAnalyzer = rawVideoFileAnalyzer;
     }
@@ -59,8 +63,9 @@ public class RawVideoAnalysisService {
         List<ClipCandidate> orderedCandidates = sequenceOptimizer.optimize(candidates);
         List<ClipCandidate> selectedCandidates = durationAwareCandidateSelector.select(
                 orderedCandidates, request.targetDurationMinutes());
+        List<ClipCandidate> pacedCandidates = pacingOptimizer.optimize(selectedCandidates);
         return timelineOptimizer.buildPlan(request.projectId(), request.storyIntent(),
-                selectedCandidates, request.targetDurationMinutes());
+                pacedCandidates, request.targetDurationMinutes());
     }
 
     private List<RawVideoClipAnalysis> approvedVideoAnalyses() {
