@@ -50,6 +50,19 @@ class ClipCandidateScoringServiceTest {
     }
 
     @Test
+    void semanticConceptMatchRecognizesRelatedIntentWords() {
+        RawVideoClipAnalysis analysis = new RawVideoClipAnalysis(
+                "trip.mp4", 5000,
+                List.of(new SceneSegment(0, 5000, "Driving through scenic hills at sunrise", 0.80)),
+                List.of(), new AudioProfile(false, 0.0, 0.0, false), 0.80);
+
+        ClipCandidate candidate = scoringService.score("weekend getaway mountain sunrise", analysis).get(0);
+
+        assertThat(candidate.score()).isGreaterThan(0.45);
+        assertThat(candidate.reasons()).contains("relevant to story intent");
+    }
+
+    @Test
     void temporallyStableVisualScoreInfluencesCandidateRanking() {
         RawVideoClipAnalysis analysis = new RawVideoClipAnalysis(
                 "drive.mp4", 10000,

@@ -7,6 +7,7 @@ import com.youtube.analytics.videoanalysis.model.ClipCandidate;
 import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.model.SceneSegment;
 import com.youtube.analytics.videoanalysis.model.SpeechSegment;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,9 +25,16 @@ public class ClipCandidateScoringService {
     private static final double ROLE_FIT_WEIGHT = 0.15;
 
     private final SemanticAnalyzer semanticAnalyzer;
+    private final StoryIntentMatcher storyIntentMatcher;
 
     public ClipCandidateScoringService(SemanticAnalyzer semanticAnalyzer) {
+        this(semanticAnalyzer, new StoryIntentMatcher());
+    }
+
+    @Autowired
+    public ClipCandidateScoringService(SemanticAnalyzer semanticAnalyzer, StoryIntentMatcher storyIntentMatcher) {
         this.semanticAnalyzer = semanticAnalyzer;
+        this.storyIntentMatcher = storyIntentMatcher;
     }
 
     public List<ClipCandidate> score(String storyIntent, RawVideoClipAnalysis clip) {
@@ -37,7 +45,7 @@ public class ClipCandidateScoringService {
             String spokenText = speechOverlapping(scene.startMs(), scene.endMs(), clip.speechSegments());
             CandidateRole role = semanticAnalyzer.classifyRole(storyIntent, scene.visualSummary(), spokenText);
             double speechScore = speechScore(scene.startMs(), scene.endMs(), clip.speechSegments(), clip.audio());
-            double relevance = keywordRelevance(storyIntent, scene.visualSummary(), spokenText);
+            double relevance = storyIntentMatcher.relevance(storyIntent, scene.visualSummary(), spokenText);
             double roleFit = roleFit(role, storyIntent, scene.visualSummary(), spokenText);
             double score = round((clamp(scene.visualScore()) * VISUAL_WEIGHT)
                     + (clamp(speechScore) * SPEECH_WEIGHT)
@@ -80,18 +88,6 @@ public class ClipCandidateScoringService {
                 .orElse(audio == null ? 0.0 : clamp(audio.speechClarityScore()));
     }
 
-    private double keywordRelevance(String storyIntent, String visualSummary, String spokenText) {
-        if (storyIntent == null || storyIntent.isBlank()) return 0.0;
-        String evidence = ((visualSummary == null ? "" : visualSummary) + " " + (spokenText == null ? "" : spokenText))
-                .toLowerCase(Locale.ROOT);
-        String[] terms = storyIntent.toLowerCase(Locale.ROOT).split("\\W+");
-        long useful = java.util.Arrays.stream(terms)
-                .filter(t -> t.length() > 2 && evidence.contains(t))
-                .count();
-        long total = java.util.Arrays.stream(terms).filter(t -> t.length() > 2).count();
-        return total == 0 ? 0.0 : Math.min(1.0, (double) useful / total);
-    }
-
     private double roleFit(CandidateRole role, String storyIntent, String visualSummary, String spokenText) {
         String evidence = ((visualSummary == null ? "" : visualSummary) + " " + (spokenText == null ? "" : spokenText))
                 .toLowerCase(Locale.ROOT);
@@ -107,7 +103,7 @@ public class ClipCandidateScoringService {
             case UNKNOWN -> 0.20;
         };
         if (storyIntent == null || storyIntent.isBlank()) return fit;
-        return Math.min(1.0, fit + keywordRelevance(storyIntent, visualSummary, spokenText) * 0.20);
+        return Math.min(1.0, fit + storyIntentMatcher.relevance(storyIntent, visualSummary, spokenText) * 0.20);
     }
 
     private boolean phrasePresence(String evidence, String... terms) {

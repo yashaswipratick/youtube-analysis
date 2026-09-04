@@ -27,6 +27,15 @@ class PacingOptimizerTest {
     }
 
     @Test
+    void preservesLongSpokenCandidateToAvoidCuttingSpeech() {
+        ClipCandidate candidate = new ClipCandidate(
+                "trip.mp4", 0, 20_000, CandidateRole.JOURNEY, 0.8,
+                "We are driving to the destination", "mountain road", List.of());
+
+        assertThat(optimizer.optimize(List.of(candidate))).containsExactly(candidate);
+    }
+
+    @Test
     void preservesShortCandidatesAndCandidateMetadata() {
         ClipCandidate candidate = new ClipCandidate(
                 "trip.mp4", 1_000, 5_000, CandidateRole.B_ROLL, 0.82,
@@ -42,6 +51,6 @@ class PacingOptimizerTest {
     }
 
     private ClipCandidate candidate(CandidateRole role, long startMs, long endMs, double score) {
-        return new ClipCandidate("trip.mp4", startMs, endMs, role, score, "spoken", "visual", List.of());
+        return new ClipCandidate("trip.mp4", startMs, endMs, role, score, "", "visual", List.of());
     }
 }

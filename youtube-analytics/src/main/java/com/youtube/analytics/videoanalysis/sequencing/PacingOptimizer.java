@@ -26,7 +26,7 @@ public class PacingOptimizer {
     private ClipCandidate trimForRole(ClipCandidate candidate) {
         long maxDurationMs = MAX_DURATION_MS.getOrDefault(candidate.role(), 8_000L);
         long durationMs = candidate.durationMs();
-        if (durationMs <= maxDurationMs) {
+        if (durationMs <= maxDurationMs || hasSpokenContent(candidate)) {
             return candidate;
         }
 
@@ -40,6 +40,10 @@ public class PacingOptimizer {
                 candidate.spokenText(),
                 candidate.visualSummary(),
                 candidate.reasons());
+    }
+
+    private boolean hasSpokenContent(ClipCandidate candidate) {
+        return candidate.spokenText() != null && !candidate.spokenText().isBlank();
     }
 
     private static Map<CandidateRole, Long> maxDurations() {
