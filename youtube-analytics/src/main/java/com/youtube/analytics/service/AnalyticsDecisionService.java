@@ -30,6 +30,10 @@ public class AnalyticsDecisionService {
                 ? RetentionAnalysisResult.RetentionSeverity.UNKNOWN
                 : discovery.getRetentionAnalysis().overallSeverity();
 
+        if (retentionSeverity == RetentionAnalysisResult.RetentionSeverity.UNKNOWN) {
+            return insufficient(discovery.getVideoId(), missingDataWithRetention(missingData));
+        }
+
         if (retentionSeverity == RetentionAnalysisResult.RetentionSeverity.CRITICAL
                 || retentionSeverity == RetentionAnalysisResult.RetentionSeverity.WEAK) {
             List<String> evidence = new ArrayList<>();
@@ -89,8 +93,17 @@ public class AnalyticsDecisionService {
         return evidence;
     }
 
+    private List<String> missingDataWithRetention(List<String> missingData) {
+        if (missingData.contains("retention")) {
+            return missingData;
+        }
+        List<String> updated = new ArrayList<>(missingData);
+        updated.add("retention");
+        return List.copyOf(updated);
+    }
+
     private AnalyticsDecisionResult insufficient(String videoId, List<String> missingData) {
-        return result(null, AnalyticsDecisionResult.DecisionAction.INSUFFICIENT_DATA,
+        return new AnalyticsDecisionResult(videoId, AnalyticsDecisionResult.DecisionAction.INSUFFICIENT_DATA,
                 "There is not enough analytics data to make a reliable primary decision.",
                 List.of("Required discovery data is incomplete; do not infer a performance problem yet."), missingData);
     }
