@@ -76,6 +76,6 @@ public class RawVideoAnalysisService {
     }
 
     private RawVideoClipAnalysis approvedVideo(String relativePath) {
-        return rawVideoFileAnalyzer.analyzeApproved(relativePath);
+        return rawVideoFileAnalyzer.analyze(relativePath);
     }
 }

@@ -49,7 +49,7 @@ class RawVideoAnalysisServiceTest {
         when(discoveryService.discover()).thenReturn(List.of(approvedVideo, unapprovedVideo, image));
         when(approvalService.isApproved("nested/clip.mp4")).thenReturn(true);
         when(approvalService.isApproved("other.mp4")).thenReturn(false);
-        when(fileAnalyzer.analyzeApproved("nested/clip.mp4")).thenReturn(analysis);
+        when(fileAnalyzer.analyze("nested/clip.mp4")).thenReturn(analysis);
         when(scoringService.score("weekend getaway from Bangalore", analysis)).thenReturn(List.of());
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
         when(durationSelector.select(List.of(), 8L)).thenReturn(List.of());
@@ -64,7 +64,7 @@ class RawVideoAnalysisServiceTest {
                 new RawVideoAnalysisRequest("bangalore-trip", "weekend getaway from Bangalore", 8L));
 
         assertEquals(expected, result);
-        verify(fileAnalyzer).analyzeApproved("nested/clip.mp4");
+        verify(fileAnalyzer).analyze("nested/clip.mp4");
     }
 
     @Test
@@ -102,7 +102,7 @@ class RawVideoAnalysisServiceTest {
         EditPlan expected = new EditPlan("project", "story", List.of(), 0, List.of());
 
         when(discoveryService.discover()).thenReturn(List.of(video));
-        when(fileAnalyzer.analyzeApproved("clip.mp4")).thenReturn(analysis);
+        when(fileAnalyzer.analyze("clip.mp4")).thenReturn(analysis);
         when(scoringService.score("story", analysis)).thenReturn(List.of());
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
         when(durationSelector.select(List.of(), 8L)).thenReturn(List.of());
@@ -113,7 +113,7 @@ class RawVideoAnalysisServiceTest {
                 scoringService, sequenceOptimizer, durationSelector, timelineOptimizer, fileAnalyzer);
 
         assertEquals(expected, service.buildEditPlan(new RawVideoAnalysisRequest("project", "story", 8L)));
-        verify(fileAnalyzer).analyzeApproved("clip.mp4");
+        verify(fileAnalyzer).analyze("clip.mp4");
     }
 
     private RawVideoClipAnalysis clip(String name, long durationMs) {

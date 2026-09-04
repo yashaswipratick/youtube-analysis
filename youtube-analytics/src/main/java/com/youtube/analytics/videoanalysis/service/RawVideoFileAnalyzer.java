@@ -30,7 +30,7 @@ public class RawVideoFileAnalyzer {
         this.speechAnalyzer = speechAnalyzer;
     }
 
-    public RawVideoClipAnalysis analyzeApproved(String relativePath) {
+    public RawVideoClipAnalysis analyze(String relativePath) {
         Path sourceFile = approvalService.getApprovedPath(relativePath);
         RawVideoClipAnalysis visualAnalysis = videoAnalyzer.analyze(sourceFile);
         AudioProfile audio = audioAnalyzer.analyze(sourceFile);

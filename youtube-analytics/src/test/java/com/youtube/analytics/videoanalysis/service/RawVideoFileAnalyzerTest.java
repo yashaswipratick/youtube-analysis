@@ -40,7 +40,7 @@ class RawVideoFileAnalyzerTest {
         when(speechAnalyzer.transcribe(approvedPath)).thenReturn(speech);
 
         RawVideoClipAnalysis result = new RawVideoFileAnalyzer(
-                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer).analyzeApproved("clip.mp4");
+                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer).analyze("clip.mp4");
 
         assertEquals("clip.mp4", result.sourceFileName());
         assertEquals(5_000, result.durationMs());
