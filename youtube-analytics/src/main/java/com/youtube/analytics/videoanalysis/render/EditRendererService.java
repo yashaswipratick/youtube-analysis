@@ -6,6 +6,7 @@ import com.youtube.analytics.videoanalysis.model.ClipCandidate;
 import com.youtube.analytics.videoanalysis.model.EditPlan;
 import com.youtube.analytics.videoanalysis.service.FfprobeMediaMetadataService;
 import com.youtube.analytics.videoanalysis.service.MediaToolResolver;
+import com.youtube.analytics.videoanalysis.config.VisualEffectProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -23,15 +24,21 @@ public class EditRendererService {
     private final LocalMediaInputProperties inputProperties;
     private final FfprobeMediaMetadataService metadataService;
     private final AudioMixService audioMixService;
+    private final CaptionService captionService;
+    private final VisualEffectProperties effectProperties;
 
     public EditRendererService(MediaApprovalService approvalService,
                                LocalMediaInputProperties inputProperties,
                                FfprobeMediaMetadataService metadataService,
-                               AudioMixService audioMixService) {
+                               AudioMixService audioMixService,
+                               CaptionService captionService,
+                               VisualEffectProperties effectProperties) {
         this.approvalService = approvalService;
         this.inputProperties = inputProperties;
         this.metadataService = metadataService;
         this.audioMixService = audioMixService;
+        this.captionService = captionService;
+        this.effectProperties = effectProperties;
     }
 
     public Path render(EditPlan plan) {
@@ -54,7 +61,9 @@ public class EditRendererService {
                 run(List.of(MediaToolResolver.resolve("ffmpeg"), "-y", "-f", "concat", "-safe", "0",
                         "-i", concatFile.toString(), "-c", "copy", "-movflags", "+faststart", output.toString()),
                         "ffmpeg failed while assembling the edit");
-                return audioMixService.mix(output);
+                Path mixedOutput = audioMixService.mix(output);
+                captionService.writeSrt(plan, outputDirectory);
+                return mixedOutput;
             } finally {
                 deleteRecursively(workDirectory);
             }
@@ -88,7 +97,12 @@ public class EditRendererService {
         } else {
             command.addAll(List.of("-map", "1:a:0"));
         }
-        command.addAll(List.of("-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p",
+        String videoFilter = effectProperties.fadeEnabled() && effectProperties.fadeDurationMs() > 0
+                ? "fade=t=in:st=0:d=" + formatTimestamp(effectProperties.fadeDurationMs())
+                    + ",fade=t=out:st=" + formatTimestamp(Math.max(0, durationMs - effectProperties.fadeDurationMs()))
+                    + ":d=" + formatTimestamp(effectProperties.fadeDurationMs())
+                : "null";
+        command.addAll(List.of("-vf", videoFilter, "-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p",
                 "-r", "30", "-c:a", "aac", "-ar", "48000", "-ac", "2", "-shortest", segment.toString()));
         run(command, "ffmpeg failed while rendering clip " + clip.sourceFileName());
         return segment;

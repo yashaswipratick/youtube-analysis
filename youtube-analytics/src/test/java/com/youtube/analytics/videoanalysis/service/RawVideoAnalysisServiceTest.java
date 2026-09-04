@@ -17,6 +17,7 @@ import com.youtube.analytics.videoanalysis.sequencing.NarrativeRepairOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.PacingOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SequenceOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SpeechAwareClipOptimizer;
+import com.youtube.analytics.videoanalysis.sequencing.YouTubeEditorialOptimizer;
 import com.youtube.analytics.videoanalysis.timeline.TimelineOptimizer;
 import org.junit.jupiter.api.Test;
 
@@ -39,18 +40,16 @@ class RawVideoAnalysisServiceTest {
         SequenceOptimizer sequenceOptimizer = mock(SequenceOptimizer.class);
         GlobalCandidateOptimizer globalOptimizer = mock(GlobalCandidateOptimizer.class);
         SpeechAwareClipOptimizer speechOptimizer = mock(SpeechAwareClipOptimizer.class);
+        YouTubeEditorialOptimizer youtubeEditorialOptimizer = mock(YouTubeEditorialOptimizer.class);
         DurationAwareCandidateSelector durationSelector = mock(DurationAwareCandidateSelector.class);
         PacingOptimizer pacingOptimizer = mock(PacingOptimizer.class);
         NarrativeRepairOptimizer narrativeRepairOptimizer = mock(NarrativeRepairOptimizer.class);
         TimelineOptimizer timelineOptimizer = mock(TimelineOptimizer.class);
         RawVideoFileAnalyzer fileAnalyzer = mock(RawVideoFileAnalyzer.class);
 
-        LocalMediaFile approvedVideo = new LocalMediaFile(
-                "clip.mp4", "nested/clip.mp4", MediaFileType.VIDEO, 100L, Instant.now());
-        LocalMediaFile unapprovedVideo = new LocalMediaFile(
-                "other.mp4", "other.mp4", MediaFileType.VIDEO, 100L, Instant.now());
-        LocalMediaFile image = new LocalMediaFile(
-                "cover.jpg", "cover.jpg", MediaFileType.IMAGE, 100L, Instant.now());
+        LocalMediaFile approvedVideo = new LocalMediaFile("clip.mp4", "nested/clip.mp4", MediaFileType.VIDEO, 100L, Instant.now());
+        LocalMediaFile unapprovedVideo = new LocalMediaFile("other.mp4", "other.mp4", MediaFileType.VIDEO, 100L, Instant.now());
+        LocalMediaFile image = new LocalMediaFile("cover.jpg", "cover.jpg", MediaFileType.IMAGE, 100L, Instant.now());
         RawVideoClipAnalysis analysis = clip("clip.mp4", 5_000);
         EditPlan expected = new EditPlan("bangalore-trip", "weekend getaway from Bangalore", List.of(), 0, List.of());
 
@@ -63,21 +62,18 @@ class RawVideoAnalysisServiceTest {
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
         when(globalOptimizer.optimize("weekend getaway from Bangalore", List.of(), List.of())).thenReturn(List.of());
         when(narrativeRepairOptimizer.repair("weekend getaway from Bangalore", List.of(), List.of())).thenReturn(List.of());
+        when(youtubeEditorialOptimizer.optimize(List.of())).thenReturn(List.of());
         when(speechOptimizer.optimize(List.of(), List.of(analysis))).thenReturn(List.of());
         when(durationSelector.select(List.of(), 8L)).thenReturn(List.of());
         when(pacingOptimizer.optimize(List.of())).thenReturn(List.of());
-        when(timelineOptimizer.buildPlan("bangalore-trip", "weekend getaway from Bangalore", List.of(), 8L))
-                .thenReturn(expected);
+        when(timelineOptimizer.buildPlan("bangalore-trip", "weekend getaway from Bangalore", List.of(), 8L)).thenReturn(expected);
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService, discoveryService, new LocalMediaInputProperties("/tmp", true, "renders"),
-                scoringService, sequenceOptimizer, globalOptimizer, speechOptimizer, durationSelector,
-                pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
+                scoringService, sequenceOptimizer, globalOptimizer, speechOptimizer, youtubeEditorialOptimizer,
+                durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
 
-        EditPlan result = service.buildEditPlan(
-                new RawVideoAnalysisRequest("bangalore-trip", "weekend getaway from Bangalore", 8L));
-
-        assertEquals(expected, result);
+        assertEquals(expected, service.buildEditPlan(new RawVideoAnalysisRequest("bangalore-trip", "weekend getaway from Bangalore", 8L)));
         verify(fileAnalyzer).analyze("nested/clip.mp4");
     }
 
@@ -88,21 +84,13 @@ class RawVideoAnalysisServiceTest {
         when(discoveryService.discover()).thenReturn(List.of());
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
-                approvalService,
-                discoveryService,
-                new LocalMediaInputProperties("/tmp", true, "renders"),
-                mock(ClipCandidateScoringService.class),
-                mock(SequenceOptimizer.class),
-                mock(GlobalCandidateOptimizer.class),
-                mock(SpeechAwareClipOptimizer.class),
-                mock(DurationAwareCandidateSelector.class),
-                mock(PacingOptimizer.class),
-                mock(NarrativeRepairOptimizer.class),
-                mock(TimelineOptimizer.class),
-                mock(RawVideoFileAnalyzer.class));
+                approvalService, discoveryService, new LocalMediaInputProperties("/tmp", true, "renders"),
+                mock(ClipCandidateScoringService.class), mock(SequenceOptimizer.class), mock(GlobalCandidateOptimizer.class),
+                mock(SpeechAwareClipOptimizer.class), mock(YouTubeEditorialOptimizer.class),
+                mock(DurationAwareCandidateSelector.class), mock(PacingOptimizer.class), mock(NarrativeRepairOptimizer.class),
+                mock(TimelineOptimizer.class), mock(RawVideoFileAnalyzer.class));
 
-        assertThrows(IllegalStateException.class, () -> service.buildEditPlan(
-                new RawVideoAnalysisRequest("project", "story", 8L)));
+        assertThrows(IllegalStateException.class, () -> service.buildEditPlan(new RawVideoAnalysisRequest("project", "story", 8L)));
     }
 
     @Test
@@ -113,6 +101,7 @@ class RawVideoAnalysisServiceTest {
         SequenceOptimizer sequenceOptimizer = mock(SequenceOptimizer.class);
         GlobalCandidateOptimizer globalOptimizer = mock(GlobalCandidateOptimizer.class);
         SpeechAwareClipOptimizer speechOptimizer = mock(SpeechAwareClipOptimizer.class);
+        YouTubeEditorialOptimizer youtubeEditorialOptimizer = mock(YouTubeEditorialOptimizer.class);
         DurationAwareCandidateSelector durationSelector = mock(DurationAwareCandidateSelector.class);
         PacingOptimizer pacingOptimizer = mock(PacingOptimizer.class);
         NarrativeRepairOptimizer narrativeRepairOptimizer = mock(NarrativeRepairOptimizer.class);
@@ -130,6 +119,7 @@ class RawVideoAnalysisServiceTest {
         when(sequenceOptimizer.optimize(List.of())).thenReturn(List.of());
         when(globalOptimizer.optimize("story", List.of(), List.of())).thenReturn(List.of());
         when(narrativeRepairOptimizer.repair("story", List.of(), List.of())).thenReturn(List.of());
+        when(youtubeEditorialOptimizer.optimize(List.of())).thenReturn(List.of());
         when(speechOptimizer.optimize(List.of(), List.of(analysis))).thenReturn(List.of());
         when(durationSelector.select(List.of(), 8L)).thenReturn(List.of());
         when(pacingOptimizer.optimize(List.of())).thenReturn(List.of());
@@ -137,19 +127,16 @@ class RawVideoAnalysisServiceTest {
 
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService, discoveryService, new LocalMediaInputProperties("/tmp", false, "renders"),
-                scoringService, sequenceOptimizer, globalOptimizer, speechOptimizer, durationSelector,
-                pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
+                scoringService, sequenceOptimizer, globalOptimizer, speechOptimizer, youtubeEditorialOptimizer,
+                durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
 
         assertEquals(expected, service.buildEditPlan(new RawVideoAnalysisRequest("project", "story", 8L)));
         verify(fileAnalyzer).analyze("clip.mp4");
     }
 
     private RawVideoClipAnalysis clip(String name, long durationMs) {
-        return new RawVideoClipAnalysis(
-                name, durationMs,
-                List.of(new SceneSegment(0, durationMs, "road", 0.8)),
-                List.of(),
-                new AudioProfile(false, 0.0, 0.0, false),
-                0.8);
+        return new RawVideoClipAnalysis(name, durationMs,
+                List.of(new SceneSegment(0, durationMs, "road", 0.8)), List.of(),
+                new AudioProfile(false, 0.0, 0.0, false), 0.8);
     }
 }

@@ -14,6 +14,7 @@ import com.youtube.analytics.videoanalysis.sequencing.GlobalCandidateOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.DurationAwareCandidateSelector;
 import com.youtube.analytics.videoanalysis.sequencing.PacingOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SpeechAwareClipOptimizer;
+import com.youtube.analytics.videoanalysis.sequencing.YouTubeEditorialOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.NarrativeRepairOptimizer;
 import com.youtube.analytics.videoanalysis.sequencing.SequenceOptimizer;
 import com.youtube.analytics.videoanalysis.timeline.TimelineOptimizer;
@@ -32,6 +33,7 @@ public class RawVideoAnalysisService {
     private final SequenceOptimizer sequenceOptimizer;
     private final GlobalCandidateOptimizer globalCandidateOptimizer;
     private final SpeechAwareClipOptimizer speechAwareClipOptimizer;
+    private final YouTubeEditorialOptimizer youtubeEditorialOptimizer;
     private final DurationAwareCandidateSelector durationAwareCandidateSelector;
     private final PacingOptimizer pacingOptimizer;
     private final NarrativeRepairOptimizer narrativeRepairOptimizer;
@@ -45,6 +47,7 @@ public class RawVideoAnalysisService {
                                    SequenceOptimizer sequenceOptimizer,
                                    GlobalCandidateOptimizer globalCandidateOptimizer,
                                    SpeechAwareClipOptimizer speechAwareClipOptimizer,
+                                   YouTubeEditorialOptimizer youtubeEditorialOptimizer,
                                    DurationAwareCandidateSelector durationAwareCandidateSelector,
                                    PacingOptimizer pacingOptimizer,
                                    NarrativeRepairOptimizer narrativeRepairOptimizer,
@@ -57,6 +60,7 @@ public class RawVideoAnalysisService {
         this.sequenceOptimizer = sequenceOptimizer;
         this.globalCandidateOptimizer = globalCandidateOptimizer;
         this.speechAwareClipOptimizer = speechAwareClipOptimizer;
+        this.youtubeEditorialOptimizer = youtubeEditorialOptimizer;
         this.durationAwareCandidateSelector = durationAwareCandidateSelector;
         this.pacingOptimizer = pacingOptimizer;
         this.narrativeRepairOptimizer = narrativeRepairOptimizer;
@@ -77,7 +81,8 @@ public class RawVideoAnalysisService {
                 request.storyIntent(), orderedCandidates, candidates);
         List<ClipCandidate> repairedCandidates = narrativeRepairOptimizer.repair(
                 request.storyIntent(), globallyOptimizedCandidates, candidates);
-        List<ClipCandidate> speechSafeCandidates = speechAwareClipOptimizer.optimize(repairedCandidates, approvedVideos);
+        List<ClipCandidate> editorialCandidates = youtubeEditorialOptimizer.optimize(repairedCandidates);
+        List<ClipCandidate> speechSafeCandidates = speechAwareClipOptimizer.optimize(editorialCandidates, approvedVideos);
         List<ClipCandidate> selectedCandidates = durationAwareCandidateSelector.select(
 
                 speechSafeCandidates, request.targetDurationMinutes());

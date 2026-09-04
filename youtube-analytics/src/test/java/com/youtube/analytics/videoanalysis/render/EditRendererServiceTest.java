@@ -6,6 +6,7 @@ import com.youtube.analytics.videoanalysis.model.CandidateRole;
 import com.youtube.analytics.videoanalysis.model.ClipCandidate;
 import com.youtube.analytics.videoanalysis.model.EditPlan;
 import com.youtube.analytics.videoanalysis.service.FfprobeMediaMetadataService;
+import com.youtube.analytics.videoanalysis.config.VisualEffectProperties;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -23,12 +24,17 @@ class EditRendererServiceTest {
     @TempDir
     Path tempDirectory;
 
+    private EditRendererService renderer(MediaApprovalService approval, LocalMediaInputProperties properties) {
+        return new EditRendererService(approval, properties, mock(FfprobeMediaMetadataService.class),
+                new AudioMixService(new com.youtube.analytics.videoanalysis.config.AudioMixProperties(null, null, 0.12, true)),
+                new CaptionService(), new VisualEffectProperties(false, 0));
+    }
+
     @Test
     void rejectsEmptyPlanBeforeTouchingMedia() {
         MediaApprovalService approval = mock(MediaApprovalService.class);
-        LocalMediaInputProperties properties = new LocalMediaInputProperties(tempDirectory.toString(), false, tempDirectory.toString());
-        EditRendererService renderer = new EditRendererService(approval, properties, mock(FfprobeMediaMetadataService.class),
-                new AudioMixService(new com.youtube.analytics.videoanalysis.config.AudioMixProperties(null, null, 0.12, true)));
+        EditRendererService renderer = renderer(approval,
+                new LocalMediaInputProperties(tempDirectory.toString(), false, tempDirectory.toString()));
 
         assertThrows(IllegalArgumentException.class,
                 () -> renderer.render(new EditPlan("project", "story", List.of(), 0, List.of())));
@@ -41,8 +47,7 @@ class EditRendererServiceTest {
         MediaApprovalService approval = mock(MediaApprovalService.class);
         Path missing = tempDirectory.resolve("clip.mp4");
         when(approval.getPath("clip.mp4")).thenReturn(missing);
-        EditRendererService renderer = new EditRendererService(approval, properties, mock(FfprobeMediaMetadataService.class),
-                new AudioMixService(new com.youtube.analytics.videoanalysis.config.AudioMixProperties(null, null, 0.12, true)));
+        EditRendererService renderer = renderer(approval, properties);
         ClipCandidate clip = new ClipCandidate("clip.mp4", 0, 1000, CandidateRole.B_ROLL, 0.8, "", "", List.of());
 
         assertThrows(IllegalArgumentException.class,

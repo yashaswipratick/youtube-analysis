@@ -36,6 +36,9 @@ video-analysis:
     music-file-name: ${VIDEO_ANALYSIS_MUSIC_FILE_NAME:music.mp3}
     music-volume: ${VIDEO_ANALYSIS_MUSIC_VOLUME:0.12}
     duck-speech: ${VIDEO_ANALYSIS_DUCK_SPEECH:true}
+  effects:
+    fade-enabled: ${VIDEO_ANALYSIS_FADE_ENABLED:true}
+    fade-duration-ms: ${VIDEO_ANALYSIS_FADE_DURATION_MS:250}
 
 youtube:
   oauth:

@@ -7,7 +7,7 @@ import com.youtube.analytics.videoanalysis.ingestion.LocalMediaInputProperties;
 import com.youtube.analytics.videoanalysis.config.AudioMixProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties({LocalMediaInputProperties.class, AudioMixProperties.class})
+@EnableConfigurationProperties({LocalMediaInputProperties.class, AudioMixProperties.class, com.youtube.analytics.videoanalysis.config.VisualEffectProperties.class})
 public class YoutubeAnalyticsApplication {
 
     public static void main(String[] args) {
