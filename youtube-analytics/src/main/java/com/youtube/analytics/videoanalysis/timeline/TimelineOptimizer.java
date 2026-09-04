@@ -1,11 +1,14 @@
 package com.youtube.analytics.videoanalysis.timeline;
 
+import com.youtube.analytics.videoanalysis.model.CandidateRole;
 import com.youtube.analytics.videoanalysis.model.ClipCandidate;
 import com.youtube.analytics.videoanalysis.model.EditPlan;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class TimelineOptimizer {
@@ -22,9 +25,8 @@ public class TimelineOptimizer {
                     placementReason(i, clip)));
             cursor = end;
         }
-        List<String> warnings = orderedCandidates.isEmpty()
-                ? List.of("No usable scene candidates were supplied")
-                : List.of();
+        List<String> warnings = narrativeWarnings(orderedCandidates);
+
         return new EditPlan(projectId, storyIntent, List.copyOf(sequence), cursor, warnings);
     }
 
@@ -32,5 +34,28 @@ public class TimelineOptimizer {
         return index == 0
                 ? "Placed first as the strongest opening candidate for its assigned role"
                 : "Placed according to structural role order, then candidate score";
+    }
+
+    private List<String> narrativeWarnings(List<ClipCandidate> candidates) {
+        if (candidates.isEmpty()) {
+            return List.of("No usable scene candidates were supplied");
+        }
+
+        Set<CandidateRole> roles = EnumSet.noneOf(CandidateRole.class);
+        candidates.stream()
+                .map(ClipCandidate::role)
+                .forEach(roles::add);
+
+        List<String> warnings = new ArrayList<>();
+        if (!roles.contains(CandidateRole.HOOK)) {
+            warnings.add("No hook candidate was identified; the edit may lack a strong opening");
+        }
+        if (!roles.contains(CandidateRole.PAYOFF)) {
+            warnings.add("No payoff candidate was identified; the edit may lack a clear destination or conclusion");
+        }
+        if (!roles.contains(CandidateRole.ENDING)) {
+            warnings.add("No ending candidate was identified; the edit may need an explicit close");
+        }
+        return List.copyOf(warnings);
     }
 }
