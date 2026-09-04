@@ -39,6 +39,7 @@ public class RawVideoAnalysisService {
     private final NarrativeRepairOptimizer narrativeRepairOptimizer;
     private final TimelineOptimizer timelineOptimizer;
     private final RawVideoFileAnalyzer rawVideoFileAnalyzer;
+    private final EditingProgressReporter progressReporter;
 
     public RawVideoAnalysisService(MediaApprovalService approvalService,
                                    MediaDiscoveryService discoveryService,
@@ -52,7 +53,8 @@ public class RawVideoAnalysisService {
                                    PacingOptimizer pacingOptimizer,
                                    NarrativeRepairOptimizer narrativeRepairOptimizer,
                                    TimelineOptimizer timelineOptimizer,
-                                   RawVideoFileAnalyzer rawVideoFileAnalyzer) {
+                                   RawVideoFileAnalyzer rawVideoFileAnalyzer,
+                                   EditingProgressReporter progressReporter) {
         this.approvalService = approvalService;
         this.discoveryService = discoveryService;
         this.approvalRequired = inputProperties.approvalRequired();
@@ -66,29 +68,45 @@ public class RawVideoAnalysisService {
         this.narrativeRepairOptimizer = narrativeRepairOptimizer;
         this.timelineOptimizer = timelineOptimizer;
         this.rawVideoFileAnalyzer = rawVideoFileAnalyzer;
+        this.progressReporter = progressReporter;
     }
 
     public EditPlan buildEditPlan(RawVideoAnalysisRequest request) {
+        progressReporter.report(0, "Starting intelligent video editing");
+        progressReporter.report(5, "Discovering videos and checking approval");
         List<RawVideoClipAnalysis> approvedVideos = approvedVideoAnalyses();
         if (approvedVideos.isEmpty()) {
             throw new IllegalStateException("No approved videos are available in the configured video-analysis.input-directory");
         }
 
         List<ClipCandidate> candidates = new ArrayList<>();
-        approvedVideos.forEach(clip -> candidates.addAll(scoringService.score(request.storyIntent(), clip)));
+        int totalVideos = approvedVideos.size();
+        for (int index = 0; index < totalVideos; index++) {
+            RawVideoClipAnalysis clip = approvedVideos.get(index);
+            progressReporter.report(10 + ((index * 25) / totalVideos), "Analyzing video " + (index + 1) + "/" + totalVideos);
+            candidates.addAll(scoringService.score(request.storyIntent(), clip));
+        }
+        progressReporter.report(35, "Video analysis completed; scoring edit candidates");
         List<ClipCandidate> orderedCandidates = sequenceOptimizer.optimize(candidates);
+        progressReporter.report(45, "Optimizing sequence and transition coherence");
         List<ClipCandidate> globallyOptimizedCandidates = globalCandidateOptimizer.optimize(
                 request.storyIntent(), orderedCandidates, candidates);
+        progressReporter.report(55, "Applying global candidate optimization");
         List<ClipCandidate> repairedCandidates = narrativeRepairOptimizer.repair(
                 request.storyIntent(), globallyOptimizedCandidates, candidates);
+        progressReporter.report(62, "Repairing narrative arc and story continuity");
         List<ClipCandidate> editorialCandidates = youtubeEditorialOptimizer.optimize(repairedCandidates);
+        progressReporter.report(68, "Applying YouTube editorial structure");
         List<ClipCandidate> speechSafeCandidates = speechAwareClipOptimizer.optimize(editorialCandidates, approvedVideos);
+        progressReporter.report(74, "Making speech-safe cuts and selecting target duration");
         List<ClipCandidate> selectedCandidates = durationAwareCandidateSelector.select(
-
                 speechSafeCandidates, request.targetDurationMinutes());
         List<ClipCandidate> pacedCandidates = pacingOptimizer.optimize(selectedCandidates);
-        return timelineOptimizer.buildPlan(request.projectId(), request.storyIntent(),
+        progressReporter.report(82, "Optimizing shot pacing and building final timeline");
+        EditPlan plan = timelineOptimizer.buildPlan(request.projectId(), request.storyIntent(),
                 pacedCandidates, request.targetDurationMinutes());
+        progressReporter.report(88, "Edit plan ready; rendering can now begin");
+        return plan;
     }
 
     private List<RawVideoClipAnalysis> approvedVideoAnalyses() {

@@ -29,11 +29,11 @@ server:
 
 video-analysis:
   input-directory: /Users/yashaswipratick/Documents/short-drive/Kailashagiri-hills/
-  approval-required: true
-  output-directory: renders
+  approval-required: false
+  output-directory: /Users/yashaswipratick/Documents/short-drive/Kailashagiri-hills/renders
   audio:
-    music-directory: ${VIDEO_ANALYSIS_MUSIC_DIRECTORY:/Users/yashaswipratick/Documents}
-    music-file-name: ${VIDEO_ANALYSIS_MUSIC_FILE_NAME:music.mp3}
+    music-directory: ${VIDEO_ANALYSIS_MUSIC_DIRECTORY:/Users/yashaswipratick/Documents/short-drive/Kailashagiri-hills/music}
+    music-file-name: ${VIDEO_ANALYSIS_MUSIC_FILE_NAME:Warriyo-Laura Brehm-Mortals.mp3}
     music-volume: ${VIDEO_ANALYSIS_MUSIC_VOLUME:0.12}
     duck-speech: ${VIDEO_ANALYSIS_DUCK_SPEECH:true}
   effects:

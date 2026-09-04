@@ -3,6 +3,7 @@ package com.youtube.analytics.videoanalysis.render;
 import com.youtube.analytics.videoanalysis.config.RenderJobProperties;
 import com.youtube.analytics.videoanalysis.model.EditPlan;
 import com.youtube.analytics.videoanalysis.model.RenderJob;
+import com.youtube.analytics.videoanalysis.service.EditingProgressReporter;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -19,7 +20,7 @@ class RenderJobServiceTest {
     void queuesAndCompletesRenderJob() throws Exception {
         EditRendererService renderer = mock(EditRendererService.class);
         when(renderer.render(any())).thenReturn(Path.of("renders/project-edit.mp4"));
-        RenderJobService service = new RenderJobService(renderer, new RenderJobProperties(1));
+        RenderJobService service = new RenderJobService(renderer, new RenderJobProperties(1), new EditingProgressReporter());
         RenderJob queued = service.submit(new EditPlan("project", "story", List.of(
                 new EditPlan.EditSequenceItem(1, null, 0, 1000, "test")), 1000, List.of()));
         for (int i = 0; i < 50; i++) {
@@ -33,7 +34,7 @@ class RenderJobServiceTest {
 
     @Test
     void rejectsUnknownJob() {
-        RenderJobService service = new RenderJobService(mock(EditRendererService.class), new RenderJobProperties(1));
+        RenderJobService service = new RenderJobService(mock(EditRendererService.class), new RenderJobProperties(1), new EditingProgressReporter());
         assertThatThrownBy(() -> service.get("missing")).isInstanceOf(IllegalArgumentException.class);
     }
 }

@@ -46,7 +46,7 @@ class RawVideoAnalysisServiceTest {
         NarrativeRepairOptimizer narrativeRepairOptimizer = mock(NarrativeRepairOptimizer.class);
         TimelineOptimizer timelineOptimizer = mock(TimelineOptimizer.class);
         RawVideoFileAnalyzer fileAnalyzer = mock(RawVideoFileAnalyzer.class);
-
+        EditingProgressReporter progressReporter = mock(EditingProgressReporter.class);
         LocalMediaFile approvedVideo = new LocalMediaFile("clip.mp4", "nested/clip.mp4", MediaFileType.VIDEO, 100L, Instant.now());
         LocalMediaFile unapprovedVideo = new LocalMediaFile("other.mp4", "other.mp4", MediaFileType.VIDEO, 100L, Instant.now());
         LocalMediaFile image = new LocalMediaFile("cover.jpg", "cover.jpg", MediaFileType.IMAGE, 100L, Instant.now());
@@ -71,8 +71,7 @@ class RawVideoAnalysisServiceTest {
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService, discoveryService, new LocalMediaInputProperties("/tmp", true, "renders"),
                 scoringService, sequenceOptimizer, globalOptimizer, speechOptimizer, youtubeEditorialOptimizer,
-                durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
-
+                durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer, progressReporter);
         assertEquals(expected, service.buildEditPlan(new RawVideoAnalysisRequest("bangalore-trip", "weekend getaway from Bangalore", 8L)));
         verify(fileAnalyzer).analyze("nested/clip.mp4");
     }
@@ -88,8 +87,7 @@ class RawVideoAnalysisServiceTest {
                 mock(ClipCandidateScoringService.class), mock(SequenceOptimizer.class), mock(GlobalCandidateOptimizer.class),
                 mock(SpeechAwareClipOptimizer.class), mock(YouTubeEditorialOptimizer.class),
                 mock(DurationAwareCandidateSelector.class), mock(PacingOptimizer.class), mock(NarrativeRepairOptimizer.class),
-                mock(TimelineOptimizer.class), mock(RawVideoFileAnalyzer.class));
-
+                mock(TimelineOptimizer.class), mock(RawVideoFileAnalyzer.class), mock(EditingProgressReporter.class));
         assertThrows(IllegalStateException.class, () -> service.buildEditPlan(new RawVideoAnalysisRequest("project", "story", 8L)));
     }
 
@@ -107,7 +105,7 @@ class RawVideoAnalysisServiceTest {
         NarrativeRepairOptimizer narrativeRepairOptimizer = mock(NarrativeRepairOptimizer.class);
         TimelineOptimizer timelineOptimizer = mock(TimelineOptimizer.class);
         RawVideoFileAnalyzer fileAnalyzer = mock(RawVideoFileAnalyzer.class);
-
+        EditingProgressReporter progressReporter = mock(EditingProgressReporter.class);
         LocalMediaFile video = new LocalMediaFile("clip.mp4", "clip.mp4", MediaFileType.VIDEO, 100L, Instant.now());
         RawVideoClipAnalysis analysis = clip("clip.mp4", 5_000);
         EditPlan expected = new EditPlan("project", "story", List.of(), 0, List.of());
@@ -128,8 +126,7 @@ class RawVideoAnalysisServiceTest {
         RawVideoAnalysisService service = new RawVideoAnalysisService(
                 approvalService, discoveryService, new LocalMediaInputProperties("/tmp", false, "renders"),
                 scoringService, sequenceOptimizer, globalOptimizer, speechOptimizer, youtubeEditorialOptimizer,
-                durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer);
-
+                durationSelector, pacingOptimizer, narrativeRepairOptimizer, timelineOptimizer, fileAnalyzer, progressReporter);
         assertEquals(expected, service.buildEditPlan(new RawVideoAnalysisRequest("project", "story", 8L)));
         verify(fileAnalyzer).analyze("clip.mp4");
     }

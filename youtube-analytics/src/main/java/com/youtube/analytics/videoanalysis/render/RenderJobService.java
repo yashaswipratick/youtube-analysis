@@ -3,6 +3,7 @@ package com.youtube.analytics.videoanalysis.render;
 import com.youtube.analytics.videoanalysis.model.EditPlan;
 import com.youtube.analytics.videoanalysis.model.RenderJob;
 import com.youtube.analytics.videoanalysis.config.RenderJobProperties;
+import com.youtube.analytics.videoanalysis.service.EditingProgressReporter;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -17,9 +18,11 @@ public class RenderJobService {
     private final EditRendererService renderer;
     private final Map<String, RenderJob> jobs = new ConcurrentHashMap<>();
     private final ExecutorService executor;
+    private final EditingProgressReporter progressReporter;
 
-    public RenderJobService(EditRendererService renderer, RenderJobProperties properties) {
+    public RenderJobService(EditRendererService renderer, RenderJobProperties properties, EditingProgressReporter progressReporter) {
         this.renderer = renderer;
+        this.progressReporter = progressReporter;
         this.executor = Executors.newFixedThreadPool(properties.maxConcurrentJobs(), runnable -> {
             Thread thread = new Thread(runnable, "video-render-job");
             thread.setDaemon(true);
@@ -42,13 +45,18 @@ public class RenderJobService {
     }
 
     private void run(String id, EditPlan plan) {
+        progressReporter.report(90, "Rendering edit " + id);
         jobs.computeIfPresent(id, (key, job) -> new RenderJob(job.jobId(), job.projectId(), RenderJob.Status.RUNNING,
                 null, null, job.createdAt(), null));
         try {
+            progressReporter.report(93, "Rendering video clips with FFmpeg");
             var output = renderer.render(plan);
+            progressReporter.report(97, "Finalizing audio, effects and captions");
+            progressReporter.complete("Editing completed successfully: " + output.getFileName());
             jobs.computeIfPresent(id, (key, job) -> new RenderJob(job.jobId(), job.projectId(), RenderJob.Status.COMPLETED,
                     output.toString(), null, job.createdAt(), Instant.now()));
         } catch (RuntimeException ex) {
+            progressReporter.report(100, "Editing failed: " + ex.getMessage());
             jobs.computeIfPresent(id, (key, job) -> new RenderJob(job.jobId(), job.projectId(), RenderJob.Status.FAILED,
                     null, "Render failed", job.createdAt(), Instant.now()));
         }
