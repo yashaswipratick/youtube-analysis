@@ -8,9 +8,16 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 public record LocalMediaInputProperties(
         String inputDirectory,
         @DefaultValue("true") boolean approvalRequired,
-        @DefaultValue("renders") String outputDirectory) {
+        @DefaultValue("renders") String outputDirectory,
+        @DefaultValue("analysis-cache") String analysisCacheDirectory,
+        @DefaultValue("true") boolean analysisCacheEnabled,
+        @DefaultValue("4") int maxConcurrentVideos) {
 
     @ConstructorBinding
     public LocalMediaInputProperties {
+    }
+
+    public LocalMediaInputProperties(String inputDirectory, boolean approvalRequired, String outputDirectory) {
+        this(inputDirectory, approvalRequired, outputDirectory, "analysis-cache", true, 4);
     }
 }

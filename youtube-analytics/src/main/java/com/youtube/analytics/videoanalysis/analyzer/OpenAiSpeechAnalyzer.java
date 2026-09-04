@@ -37,6 +37,9 @@ public class OpenAiSpeechAnalyzer implements SpeechAnalyzer {
 
     @Override
     public List<SpeechSegment> transcribe(Path sourceFile) {
+        if (!metadataService.probe(sourceFile).audioPresent()) {
+            return List.of();
+        }
         Path audioFile = extractAudio(sourceFile);
         try {
             MultiValueMap<String, Object> form = new LinkedMultiValueMap<>();

@@ -37,10 +37,12 @@ class RawVideoFileAnalyzerTest {
         when(approvalService.getPath("clip.mp4")).thenReturn(approvedPath);
         when(videoAnalyzer.analyze(approvedPath)).thenReturn(visual);
         when(audioAnalyzer.analyze(approvedPath)).thenReturn(audio);
+        AnalysisCacheService cacheService = mock(AnalysisCacheService.class);
+        when(cacheService.load(approvedPath)).thenReturn(null);
         when(speechAnalyzer.transcribe(approvedPath)).thenReturn(speech);
 
         RawVideoClipAnalysis result = new RawVideoFileAnalyzer(
-                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer).analyze("clip.mp4");
+                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService).analyze("clip.mp4");
 
         assertEquals("clip.mp4", result.sourceFileName());
         assertEquals(5_000, result.durationMs());
@@ -51,5 +53,6 @@ class RawVideoFileAnalyzerTest {
         verify(videoAnalyzer).analyze(approvedPath);
         verify(audioAnalyzer).analyze(approvedPath);
         verify(speechAnalyzer).transcribe(approvedPath);
+        verify(cacheService).save(approvedPath, result);
     }
 }

@@ -21,13 +21,19 @@ import com.youtube.analytics.videoanalysis.timeline.TimelineOptimizer;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Service
 public class RawVideoAnalysisService {
 
     private final MediaApprovalService approvalService;
     private final MediaDiscoveryService discoveryService;
+    private final LocalMediaInputProperties inputProperties;
     private final boolean approvalRequired;
     private final ClipCandidateScoringService scoringService;
     private final SequenceOptimizer sequenceOptimizer;
@@ -57,6 +63,7 @@ public class RawVideoAnalysisService {
                                    EditingProgressReporter progressReporter) {
         this.approvalService = approvalService;
         this.discoveryService = discoveryService;
+        this.inputProperties = inputProperties;
         this.approvalRequired = inputProperties.approvalRequired();
         this.scoringService = scoringService;
         this.sequenceOptimizer = sequenceOptimizer;
@@ -95,12 +102,32 @@ public class RawVideoAnalysisService {
         List<RawVideoClipAnalysis> approvedVideos = new ArrayList<>();
         List<ClipCandidate> candidates = new ArrayList<>();
         int totalVideos = eligibleVideos.size();
-        for (int index = 0; index < totalVideos; index++) {
-            LocalMediaFile media = eligibleVideos.get(index);
-            progressReporter.report(jobId, 10 + ((index * 25) / totalVideos), "Analyzing video " + (index + 1) + "/" + totalVideos);
-            RawVideoClipAnalysis clip = approvedVideo(media.relativePath());
-            approvedVideos.add(clip);
-            candidates.addAll(scoringService.score(request.storyIntent(), clip));
+        int maxConcurrentVideos = Math.max(1, inputProperties.maxConcurrentVideos());
+        ExecutorService executor = Executors.newFixedThreadPool(Math.min(maxConcurrentVideos, totalVideos));
+        try {
+            List<Future<RawVideoClipAnalysis>> futures = new ArrayList<>();
+            for (LocalMediaFile media : eligibleVideos) {
+                futures.add(executor.submit(() -> approvedVideo(media.relativePath())));
+            }
+            for (int index = 0; index < futures.size(); index++) {
+                try {
+                    RawVideoClipAnalysis clip = futures.get(index).get();
+                    approvedVideos.add(clip);
+                    candidates.addAll(scoringService.score(request.storyIntent(), clip));
+                    int completed = index + 1;
+                    progressReporter.report(jobId, 10 + ((completed * 25) / totalVideos),
+                            String.format("Analyzed %d/%d videos (%d workers)", completed, totalVideos, Math.min(maxConcurrentVideos, totalVideos)));
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                    throw new IllegalStateException("Video analysis was interrupted", ex);
+                } catch (ExecutionException ex) {
+                    Throwable cause = ex.getCause() == null ? ex : ex.getCause();
+                    if (cause instanceof RuntimeException runtimeException) throw runtimeException;
+                    throw new IllegalStateException("Video analysis failed", cause);
+                }
+            }
+        } finally {
+            executor.shutdownNow();
         }
         progressReporter.report(jobId, 35, "Video analysis completed; scoring edit candidates");
         List<ClipCandidate> orderedCandidates = sequenceOptimizer.optimize(candidates);
