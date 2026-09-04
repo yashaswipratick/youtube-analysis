@@ -27,6 +27,9 @@ spring:
 server:
   port: 8080
 
+video-analysis:
+  input-directory: /Users/yashaswipratick/Documents/short-drive/Kailashagiri-hills/
+
 youtube:
   oauth:
     credentials-file: /Users/yashaswipratick/Documents/youtube-analytics/screts.json
