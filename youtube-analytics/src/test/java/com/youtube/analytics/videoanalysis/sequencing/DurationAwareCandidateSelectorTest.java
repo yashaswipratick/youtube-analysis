@@ -32,6 +32,21 @@ class DurationAwareCandidateSelectorTest {
     }
 
     @Test
+    void preservesDevelopmentBeatBeforeEfficiencyBasedFill() {
+        List<ClipCandidate> candidates = List.of(
+                candidate(CandidateRole.HOOK, 0, 10_000, 0.80),
+                candidate(CandidateRole.SETUP, 10_000, 20_000, 0.60),
+                candidate(CandidateRole.B_ROLL, 20_000, 30_000, 0.99),
+                candidate(CandidateRole.PAYOFF, 30_000, 40_000, 0.90),
+                candidate(CandidateRole.ENDING, 40_000, 50_000, 0.85));
+
+        List<ClipCandidate> selected = selector.select(candidates, 2L);
+
+        assertThat(selected).extracting(ClipCandidate::role)
+                .contains(CandidateRole.SETUP);
+    }
+
+    @Test
     void preservesAllCandidatesWhenTargetIsNotProvided() {
         List<ClipCandidate> candidates = List.of(
                 candidate(CandidateRole.JOURNEY, 0, 30_000, 0.8),

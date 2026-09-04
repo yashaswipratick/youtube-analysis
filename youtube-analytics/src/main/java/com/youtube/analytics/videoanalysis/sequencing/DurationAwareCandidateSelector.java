@@ -16,6 +16,8 @@ public class DurationAwareCandidateSelector {
 
     private static final Set<CandidateRole> NARRATIVE_ANCHORS = EnumSet.of(
             CandidateRole.HOOK, CandidateRole.PAYOFF, CandidateRole.ENDING);
+    private static final Set<CandidateRole> DEVELOPMENT_ROLES = EnumSet.of(
+            CandidateRole.SETUP, CandidateRole.JOURNEY, CandidateRole.EXPERIENCE, CandidateRole.VOICE_BRIDGE);
 
     public List<ClipCandidate> select(List<ClipCandidate> candidates, Long targetDurationMinutes) {
         if (candidates == null || candidates.isEmpty() || targetDurationMinutes == null) {
@@ -40,6 +42,18 @@ public class DurationAwareCandidateSelector {
                 selected.add(strongest);
                 selectedDurationMs += strongest.durationMs();
             }
+        }
+
+        ClipCandidate strongestDevelopment = ranked.stream()
+                .filter(candidate -> DEVELOPMENT_ROLES.contains(candidate.role()))
+                .findFirst()
+                .orElse(null);
+        if (strongestDevelopment != null
+                && selectedDurationMs <= targetDurationMs
+                && selectedDurationMs + strongestDevelopment.durationMs() <= targetDurationMs
+                && selectedSet.add(strongestDevelopment)) {
+            selected.add(strongestDevelopment);
+            selectedDurationMs += strongestDevelopment.durationMs();
         }
 
         List<ClipCandidate> fillCandidates = ranked.stream()
