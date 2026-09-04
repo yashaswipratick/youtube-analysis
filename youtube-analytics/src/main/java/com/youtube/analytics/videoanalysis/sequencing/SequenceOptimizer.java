@@ -18,6 +18,12 @@ public class SequenceOptimizer {
 
     private static final Map<CandidateRole, Integer> ROLE_ORDER = roleOrder();
 
+    private final TransitionCoherenceOptimizer transitionCoherenceOptimizer;
+
+    public SequenceOptimizer(TransitionCoherenceOptimizer transitionCoherenceOptimizer) {
+        this.transitionCoherenceOptimizer = transitionCoherenceOptimizer;
+    }
+
     public List<ClipCandidate> optimize(List<ClipCandidate> candidates) {
         if (candidates == null || candidates.isEmpty()) return List.of();
 
@@ -27,6 +33,7 @@ public class SequenceOptimizer {
                 .thenComparing(Comparator.comparingDouble(ClipCandidate::score).reversed())
                 .thenComparingLong(ClipCandidate::sourceStartMs));
 
+        ordered = optimizeTransitionsWithinRoles(ordered);
         moveStrongestEndingToEnd(ordered);
         return List.copyOf(ordered);
     }
@@ -76,6 +83,20 @@ public class SequenceOptimizer {
             selected.add(candidate);
         }
         return selected;
+    }
+
+    private List<ClipCandidate> optimizeTransitionsWithinRoles(List<ClipCandidate> candidates) {
+        List<ClipCandidate> optimized = new ArrayList<>();
+        int index = 0;
+        while (index < candidates.size()) {
+            CandidateRole role = candidates.get(index).role();
+            int end = index + 1;
+            while (end < candidates.size() && candidates.get(end).role() == role) end++;
+            List<ClipCandidate> group = new ArrayList<>(candidates.subList(index, end));
+            optimized.addAll(transitionCoherenceOptimizer.optimize(group));
+            index = end;
+        }
+        return optimized;
     }
 
     private void moveStrongestEndingToEnd(List<ClipCandidate> candidates) {

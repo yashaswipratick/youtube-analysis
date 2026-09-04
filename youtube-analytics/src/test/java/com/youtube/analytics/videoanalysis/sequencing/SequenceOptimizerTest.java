@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class SequenceOptimizerTest {
 
-    private final SequenceOptimizer optimizer = new SequenceOptimizer();
+    private final SequenceOptimizer optimizer = new SequenceOptimizer(new TransitionCoherenceOptimizer());
 
     @Test
     void keepsNarrativeRoleOrderButAlwaysClosesWithEnding() {
