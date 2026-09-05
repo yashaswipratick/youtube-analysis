@@ -33,7 +33,7 @@ video-analysis:
   output-directory: /Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/renders
   analysis-cache-directory: /Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/analysis-cache
   analysis-cache-enabled: ${VIDEO_ANALYSIS_CACHE_ENABLED:true}
-  max-concurrent-videos: ${VIDEO_ANALYSIS_MAX_CONCURRENT_VIDEOS:4}
+  max-concurrent-videos: ${VIDEO_ANALYSIS_MAX_CONCURRENT_VIDEOS:1}
   audio:
     music-directory: ${VIDEO_ANALYSIS_MUSIC_DIRECTORY:/Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/music}
     music-file-name: ${VIDEO_ANALYSIS_MUSIC_FILE_NAME:Warriyo-Laura Brehm-Mortals.mp3}
