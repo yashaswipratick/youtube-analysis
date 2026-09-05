@@ -25,18 +25,21 @@ public class RawVideoFileAnalyzer {
     private final AudioAnalyzer audioAnalyzer;
     private final SpeechAnalyzer speechAnalyzer;
     private final AnalysisCacheService analysisCacheService;
+    private final AnalysisHandoffManifestService analysisHandoffManifestService;
 
     @Autowired
     public RawVideoFileAnalyzer(MediaApprovalService approvalService,
                                 VideoAnalyzer videoAnalyzer,
                                 AudioAnalyzer audioAnalyzer,
                                 SpeechAnalyzer speechAnalyzer,
-                                AnalysisCacheService analysisCacheService) {
+                                AnalysisCacheService analysisCacheService,
+                                AnalysisHandoffManifestService analysisHandoffManifestService) {
         this.approvalService = approvalService;
         this.videoAnalyzer = videoAnalyzer;
         this.audioAnalyzer = audioAnalyzer;
         this.speechAnalyzer = speechAnalyzer;
         this.analysisCacheService = analysisCacheService;
+        this.analysisHandoffManifestService = analysisHandoffManifestService;
     }
 
 
@@ -46,6 +49,7 @@ public class RawVideoFileAnalyzer {
         Path sourceFile = approvalService.getPath(relativePath);
         RawVideoClipAnalysis cached = analysisCacheService.load(sourceFile);
         if (cached != null) {
+            analysisHandoffManifestService.save(sourceFile);
             log.info("[ANALYSIS] Cache hit: {}. No media extraction required.", relativePath);
             return cached;
         }
@@ -72,7 +76,9 @@ public class RawVideoFileAnalyzer {
         // Step 1: persist the deterministic cache placeholder. Bridge/ChatGPT will later replace this
         // same hash file with the AI-enriched result after reading the persisted analysis JSON directly.
         analysisCacheService.savePending(sourceFile, preparedAnalysis);
+        analysisHandoffManifestService.save(sourceFile);
         log.info("[ANALYSIS] Pending result cache created: {}", relativePath);
+        log.info("[ANALYSIS] Handoff manifest created in analysis-manifest/: {}", relativePath);
         log.info("[ANALYSIS] AI request exchange ready as a persisted file in analysis/: {}", relativePath);
         log.info("[ANALYSIS] Completed local preparation: {} ({} ms)", relativePath, System.currentTimeMillis() - startedAt);
         return preparedAnalysis;

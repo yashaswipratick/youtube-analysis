@@ -39,13 +39,14 @@ class RawVideoFileAnalyzerTest {
         when(videoAnalyzer.analyze(approvedPath)).thenReturn(visual);
         when(audioAnalyzer.analyze(approvedPath)).thenReturn(audio);
         AnalysisCacheService cacheService = mock(AnalysisCacheService.class);
+        AnalysisHandoffManifestService manifestService = mock(AnalysisHandoffManifestService.class);
         when(cacheService.load(approvedPath)).thenReturn(null);
         when(speechAnalyzer.transcribe(approvedPath)).thenReturn(speech);
         RawVideoClipAnalysis prepared = new RawVideoClipAnalysis(
                 "clip.mp4", 5_000, visual.scenes(), speech, audio, visual.visualQualityScore());
 
         RawVideoClipAnalysis result = new RawVideoFileAnalyzer(
-                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService).analyze("clip.mp4");
+                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService, manifestService).analyze("clip.mp4");
 
         assertEquals("clip.mp4", result.sourceFileName());
         assertEquals(5_000, result.durationMs());
@@ -57,6 +58,7 @@ class RawVideoFileAnalyzerTest {
         verify(audioAnalyzer).analyze(approvedPath);
         verify(speechAnalyzer).transcribe(approvedPath);
         verify(cacheService).savePending(approvedPath, result);
+        verify(manifestService).save(approvedPath);
     }
 
     @Test
@@ -66,6 +68,7 @@ class RawVideoFileAnalyzerTest {
         AudioAnalyzer audioAnalyzer = mock(AudioAnalyzer.class);
         SpeechAnalyzer speechAnalyzer = mock(SpeechAnalyzer.class);
         AnalysisCacheService cacheService = mock(AnalysisCacheService.class);
+        AnalysisHandoffManifestService manifestService = mock(AnalysisHandoffManifestService.class);
         Path approvedPath = Path.of("/tmp/clip.mp4");
         RawVideoClipAnalysis cached = new RawVideoClipAnalysis(
                 "clip.mp4", 5_000, List.of(), List.of(),
@@ -75,9 +78,10 @@ class RawVideoFileAnalyzerTest {
         when(cacheService.load(approvedPath)).thenReturn(cached);
 
         RawVideoClipAnalysis result = new RawVideoFileAnalyzer(
-                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService).analyze("clip.mp4");
+                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService, manifestService).analyze("clip.mp4");
 
         assertEquals(cached, result);
         verifyNoInteractions(videoAnalyzer, audioAnalyzer, speechAnalyzer);
+        verify(manifestService).save(approvedPath);
     }
 }

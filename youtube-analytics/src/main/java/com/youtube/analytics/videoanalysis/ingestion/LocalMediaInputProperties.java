@@ -11,6 +11,7 @@ public record LocalMediaInputProperties(
         @DefaultValue("renders") String outputDirectory,
         @DefaultValue("analysis-cache") String analysisCacheDirectory,
         @DefaultValue("analysis") String analysisDirectory,
+        @DefaultValue("analysis-manifest") String analysisManifestDirectory,
         @DefaultValue("true") boolean analysisCacheEnabled,
         @DefaultValue("4") int maxConcurrentVideos) {
 
@@ -19,13 +20,20 @@ public record LocalMediaInputProperties(
     }
 
     public LocalMediaInputProperties(String inputDirectory, boolean approvalRequired, String outputDirectory) {
-        this(inputDirectory, approvalRequired, outputDirectory, "analysis-cache", "analysis", true, 4);
+        this(inputDirectory, approvalRequired, outputDirectory, "analysis-cache", "analysis", "analysis-manifest", true, 4);
     }
 
     public LocalMediaInputProperties(String inputDirectory, boolean approvalRequired, String outputDirectory,
                                      String analysisCacheDirectory, boolean analysisCacheEnabled,
                                      int maxConcurrentVideos) {
-        this(inputDirectory, approvalRequired, outputDirectory, analysisCacheDirectory, "analysis",
+        this(inputDirectory, approvalRequired, outputDirectory, analysisCacheDirectory, "analysis", "analysis-manifest",
+                analysisCacheEnabled, maxConcurrentVideos);
+    }
+
+    public LocalMediaInputProperties(String inputDirectory, boolean approvalRequired, String outputDirectory,
+                                     String analysisCacheDirectory, String analysisDirectory,
+                                     boolean analysisCacheEnabled, int maxConcurrentVideos) {
+        this(inputDirectory, approvalRequired, outputDirectory, analysisCacheDirectory, analysisDirectory, "analysis-manifest",
                 analysisCacheEnabled, maxConcurrentVideos);
     }
 }
