@@ -16,6 +16,16 @@ public class OpenAiApiKeyProvider {
         this.config = config;
     }
 
+    public boolean isConfigured() {
+        if (config.apiKeyFile() == null || config.apiKeyFile().isBlank()) return false;
+        try {
+            return Files.isRegularFile(Path.of(config.apiKeyFile()))
+                    && !Files.readString(Path.of(config.apiKeyFile())).trim().isBlank();
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
     public String getApiKey() {
         if (config.apiKeyFile() == null || config.apiKeyFile().isBlank()) {
             throw new IllegalStateException("OpenAI API key file is not configured");

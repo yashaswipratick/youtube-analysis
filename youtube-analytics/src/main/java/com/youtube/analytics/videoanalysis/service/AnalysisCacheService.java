@@ -16,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
 @Service
 public class AnalysisCacheService {
 
-    private static final int SCHEMA_VERSION = 1;
+    private static final int SCHEMA_VERSION = 2;
 
     private final ObjectMapper objectMapper;
     private final Path cacheDirectory;

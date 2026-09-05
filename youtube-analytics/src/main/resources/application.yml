@@ -34,6 +34,14 @@ video-analysis:
   analysis-cache-directory: /Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/analysis-cache
   analysis-cache-enabled: ${VIDEO_ANALYSIS_CACHE_ENABLED:true}
   max-concurrent-videos: ${VIDEO_ANALYSIS_MAX_CONCURRENT_VIDEOS:1}
+  ai:
+    # Supported values: openai, bridge, auto. Auto uses OpenAI only when a usable key file exists.
+    provider: ${VIDEO_ANALYSIS_AI_PROVIDER:bridge}
+    bridge:
+      base-url: ${VIDEO_ANALYSIS_BRIDGE_BASE_URL:http://127.0.0.1:3319/mcp}
+      visual-path: ${VIDEO_ANALYSIS_BRIDGE_VISUAL_PATH:/analysis/visual}
+      transcription-path: ${VIDEO_ANALYSIS_BRIDGE_TRANSCRIPTION_PATH:/analysis/transcription}
+      timeout-seconds: ${VIDEO_ANALYSIS_BRIDGE_TIMEOUT_SECONDS:3000}
   audio:
     music-directory: ${VIDEO_ANALYSIS_MUSIC_DIRECTORY:/Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/music}
     music-file-name: ${VIDEO_ANALYSIS_MUSIC_FILE_NAME:Warriyo-Laura Brehm-Mortals.mp3}

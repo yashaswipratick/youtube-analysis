@@ -26,7 +26,7 @@ public class ApprovedMediaReadService {
     }
 
     public MediaReadAnalysis readAndAnalyze(String relativePath) {
-        Path file = approvalService.getApprovedPath(relativePath);
+        Path file = approvalService.getPathForRead(relativePath);
         try {
             if (!Files.isRegularFile(file)) {
                 throw new IllegalArgumentException("Approved media file does not exist: " + relativePath);

@@ -1,8 +1,7 @@
 package com.youtube.analytics.videoanalysis.scene;
 
-import com.youtube.analytics.videoanalysis.analyzer.VisualSemanticAnalyzer;
 import com.youtube.analytics.videoanalysis.frame.FrameExtractor;
-import com.youtube.analytics.videoanalysis.model.VisualObservation;
+import com.youtube.analytics.videoanalysis.service.AnalysisRequestExchangeService;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
@@ -10,11 +9,12 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 class VisualSceneAnalysisServiceTest {
 
     @Test
-    void analyzesThreeRepresentativeFramesPerSceneAndAggregatesEvidence() {
+    void persistsThreeRepresentativeFramesPerSceneWithoutAiAnalysis() {
         SceneDetector detector = (sourceFile, durationMs) -> List.of(new SceneDetector.SceneBoundary(0, 4000));
         AtomicInteger extractedCount = new AtomicInteger();
         FrameExtractor extractor = (sourceFile, timestamps) -> {
@@ -24,28 +24,16 @@ class VisualSceneAnalysisServiceTest {
                     .map(timestamp -> new FrameExtractor.ExtractedFrame(timestamp, Path.of("frame-" + timestamp + ".jpg")))
                     .toList();
         };
-        AtomicInteger analyzedCount = new AtomicInteger();
-        VisualSemanticAnalyzer analyzer = imageFile -> {
-            analyzedCount.incrementAndGet();
-            long timestamp = Long.parseLong(imageFile.getFileName().toString().replace("frame-", "").replace(".jpg", ""));
-            return switch ((int) timestamp) {
-                case 1000 -> new VisualObservation("road", List.of("car"), "mountain", 0.8);
-                case 2000 -> new VisualObservation("mountain view", List.of("mountains"), "mountain", 0.9);
-                default -> new VisualObservation("road", List.of("car", "trees"), "outdoor", 0.7);
-            };
-        };
+        AnalysisRequestExchangeService exchange = mock(AnalysisRequestExchangeService.class);
+        Path source = Path.of("trip.mp4");
 
-        VisualSceneAnalysisService service = new VisualSceneAnalysisService(detector, extractor, analyzer);
-        var scenes = service.analyze(Path.of("trip.mp4"), 4000);
+        VisualSceneAnalysisService service = new VisualSceneAnalysisService(detector, extractor, exchange);
+        var scenes = service.analyze(source, 4000);
 
         assertThat(extractedCount).hasValue(3);
-        assertThat(analyzedCount).hasValue(3);
         assertThat(scenes).hasSize(1);
-        assertThat(scenes.get(0).visualSummary())
-                .contains("road")
-                .contains("mountain view")
-                .contains("environment: mountain, outdoor")
-                .contains("visible objects: car, mountains, trees");
-        assertThat(scenes.get(0).visualScore()).isCloseTo(0.7346802735, org.assertj.core.data.Offset.offset(0.000001));
+        assertThat(scenes.get(0).visualSummary()).isEqualTo("Pending ChatGPT visual analysis");
+        assertThat(scenes.get(0).visualScore()).isZero();
+        verify(exchange, times(3)).saveVisualRequest(eq(source), anyLong(), any());
     }
 }

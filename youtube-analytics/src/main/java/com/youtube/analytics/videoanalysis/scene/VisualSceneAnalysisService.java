@@ -1,9 +1,8 @@
 package com.youtube.analytics.videoanalysis.scene;
 
-import com.youtube.analytics.videoanalysis.analyzer.VisualSemanticAnalyzer;
 import com.youtube.analytics.videoanalysis.frame.FrameExtractor;
 import com.youtube.analytics.videoanalysis.model.SceneSegment;
-import com.youtube.analytics.videoanalysis.model.VisualObservation;
+import com.youtube.analytics.videoanalysis.service.AnalysisRequestExchangeService;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
@@ -15,13 +14,13 @@ import java.util.List;
 public class VisualSceneAnalysisService {
     private final SceneDetector sceneDetector;
     private final FrameExtractor frameExtractor;
-    private final VisualSemanticAnalyzer visualSemanticAnalyzer;
+    private final AnalysisRequestExchangeService requestExchangeService;
 
     public VisualSceneAnalysisService(SceneDetector sceneDetector, FrameExtractor frameExtractor,
-                                      VisualSemanticAnalyzer visualSemanticAnalyzer) {
+                                      AnalysisRequestExchangeService requestExchangeService) {
         this.sceneDetector = sceneDetector;
         this.frameExtractor = frameExtractor;
-        this.visualSemanticAnalyzer = visualSemanticAnalyzer;
+        this.requestExchangeService = requestExchangeService;
     }
 
     public List<SceneSegment> analyze(Path sourceFile, long durationMs) {
@@ -35,11 +34,13 @@ public class VisualSceneAnalysisService {
         try {
             int frameIndex = 0;
             for (SceneDetector.SceneBoundary boundary : boundaries) {
-                List<VisualObservation> observations = new ArrayList<>();
-                for (int i = 0; i < representativeTimestamps(boundary).size(); i++) {
-                    observations.add(visualSemanticAnalyzer.analyze(frames.get(frameIndex++).imageFile()));
+                List<Long> representativeTimestamps = representativeTimestamps(boundary);
+                for (int i = 0; i < representativeTimestamps.size(); i++) {
+                    FrameExtractor.ExtractedFrame frame = frames.get(frameIndex++);
+                    requestExchangeService.saveVisualRequest(sourceFile, frame.timestampMs(), frame.imageFile());
                 }
-                scenes.add(toSceneSegment(boundary, observations));
+                scenes.add(new SceneSegment(boundary.startMs(), boundary.endMs(),
+                        "Pending ChatGPT visual analysis", 0.0));
             }
             return scenes;
         } finally {
@@ -56,41 +57,5 @@ public class VisualSceneAnalysisService {
         long middle = boundary.startMs() + duration / 2;
         long last = boundary.startMs() + (duration * 3) / 4;
         return java.util.stream.Stream.of(first, middle, last).distinct().toList();
-    }
-
-    private double temporalStability(List<VisualObservation> observations) {
-        if (observations.size() < 2) return 1.0;
-        double mean = observations.stream().mapToDouble(VisualObservation::qualityScore).average().orElse(0);
-        double variance = observations.stream()
-                .mapToDouble(observation -> Math.pow(observation.qualityScore() - mean, 2))
-                .average()
-                .orElse(0);
-        return Math.max(0.8, 1.0 - Math.sqrt(variance));
-    }
-
-    private SceneSegment toSceneSegment(SceneDetector.SceneBoundary boundary, List<VisualObservation> observations) {
-        String summary = observations.stream()
-                .map(VisualObservation::summary)
-                .filter(value -> value != null && !value.isBlank())
-                .distinct()
-                .reduce((first, second) -> first + "; " + second)
-                .orElse("No visual observation available");
-        String environment = observations.stream()
-                .map(VisualObservation::environment)
-                .filter(value -> value != null && !value.isBlank() && !"unknown".equals(value))
-                .distinct()
-                .reduce((first, second) -> first.equals(second) ? first : first + ", " + second)
-                .orElse("");
-        List<String> objects = observations.stream()
-                .flatMap(observation -> observation.objects().stream())
-                .filter(value -> value != null && !value.isBlank())
-                .distinct()
-                .toList();
-        if (!environment.isBlank()) summary += ", environment: " + environment;
-        if (!objects.isEmpty()) summary += ", visible objects: " + String.join(", ", objects);
-        double quality = observations.stream().mapToDouble(VisualObservation::qualityScore).average().orElse(0);
-        double stability = temporalStability(observations);
-        quality = Math.max(0, Math.min(1, quality * stability));
-        return new SceneSegment(boundary.startMs(), boundary.endMs(), summary, quality);
     }
 }

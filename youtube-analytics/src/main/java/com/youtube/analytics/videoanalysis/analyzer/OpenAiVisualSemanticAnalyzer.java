@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youtube.analytics.config.OpenAiApiKeyProvider;
 import com.youtube.analytics.config.OpenAiConfig;
 import com.youtube.analytics.videoanalysis.model.VisualObservation;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,7 +19,6 @@ import java.util.Map;
 
 /** Uses an OpenAI vision-capable model to describe representative video frames. */
 @Service
-@ConditionalOnProperty(prefix = "openai", name = "visual-analysis-enabled", havingValue = "true", matchIfMissing = true)
 public class OpenAiVisualSemanticAnalyzer implements VisualSemanticAnalyzer {
 
     private final WebClient webClient;

@@ -12,6 +12,7 @@ import java.util.Set;
 public class MediaApprovalService {
 
     private final Path inputDirectory;
+    private final boolean approvalRequired;
     private final Set<Path> approvedFiles = new HashSet<>();
 
     public MediaApprovalService(LocalMediaInputProperties properties) {
@@ -19,6 +20,7 @@ public class MediaApprovalService {
             throw new IllegalArgumentException("video-analysis.input-directory must not be blank");
         }
         this.inputDirectory = Path.of(properties.inputDirectory()).toAbsolutePath().normalize();
+        this.approvalRequired = properties.approvalRequired();
     }
 
     public synchronized LocalMediaFile approve(String relativePath) {
@@ -40,10 +42,14 @@ public class MediaApprovalService {
 
     public synchronized Path getApprovedPath(String relativePath) {
         Path file = resolveApprovedPath(relativePath);
-        if (!approvedFiles.contains(file)) {
+        if (approvalRequired && !approvedFiles.contains(file)) {
             throw new IllegalStateException("Media file has not been approved for reading: " + relativePath);
         }
         return file;
+    }
+
+    public synchronized Path getPathForRead(String relativePath) {
+        return getApprovedPath(relativePath);
     }
 
     public synchronized Path getPath(String relativePath) {

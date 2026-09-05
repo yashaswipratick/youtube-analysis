@@ -45,7 +45,6 @@ public class MediaIngestionController {
 
     @PostMapping("/analyze/{relativePath:.+}")
     public ResponseEntity<ApiResponse<RawVideoClipAnalysis>> analyzeApprovedMedia(@PathVariable String relativePath) {
-        approvalService.getApprovedPath(relativePath);
         return ResponseEntity.ok(ApiResponse.success(rawVideoFileAnalyzer.analyze(relativePath)));
     }
 }
