@@ -36,6 +36,7 @@ public class AnalysisCacheService {
             if (!Files.isRegularFile(cacheFile)) return null;
             CacheEntry entry = objectMapper.readValue(cacheFile.toFile(), CacheEntry.class);
             if (entry.schemaVersion() != SCHEMA_VERSION || !hash.equals(entry.sha256())) return null;
+            if (!"AI_COMPLETE".equals(entry.status())) return null;
             if (!sourceFile.getFileName().toString().equals(entry.sourceFileName())) return null;
             return entry.analysis();
         } catch (Exception ex) {
@@ -44,26 +45,29 @@ public class AnalysisCacheService {
     }
 
     public void save(Path sourceFile, RawVideoClipAnalysis analysis) {
+        saveEntry(sourceFile, "AI_COMPLETE", analysis);
+    }
+
+    public void savePending(Path sourceFile, RawVideoClipAnalysis analysis) {
+        saveEntry(sourceFile, "AI_PENDING", analysis);
+    }
+
+    private void saveEntry(Path sourceFile, String status, RawVideoClipAnalysis analysis) {
         if (!enabled) return;
         try {
             Files.createDirectories(cacheDirectory);
             String hash = sha256(sourceFile);
-            CacheEntry entry = new CacheEntry(SCHEMA_VERSION, sourceFile.getFileName().toString(), hash,
+            CacheEntry entry = new CacheEntry(SCHEMA_VERSION, status, sourceFile.getFileName().toString(), hash,
                     Files.size(sourceFile), analysis.durationMs(), analysis);
             Path target = cacheDirectory.resolve(hash + ".json");
             Path temporary = Files.createTempFile(cacheDirectory, hash + "-", ".tmp");
             try {
                 objectMapper.writerWithDefaultPrettyPrinter().writeValue(temporary.toFile(), entry);
-                try {
-                    Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
-                } catch (java.nio.file.AtomicMoveNotSupportedException ex) {
-                    Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING);
-                }
-            } finally {
-                Files.deleteIfExists(temporary);
-            }
+                try { Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE); }
+                catch (java.nio.file.AtomicMoveNotSupportedException ex) { Files.move(temporary, target, StandardCopyOption.REPLACE_EXISTING); }
+            } finally { Files.deleteIfExists(temporary); }
         } catch (IOException | NoSuchAlgorithmException ex) {
-            // Cache failures must never fail an otherwise valid video analysis.
+            throw new IllegalStateException("Unable to persist analysis result cache", ex);
         }
     }
 
@@ -79,7 +83,7 @@ public class AnalysisCacheService {
         return result.toString();
     }
 
-    public record CacheEntry(int schemaVersion, String sourceFileName, String sha256,
+    public record CacheEntry(int schemaVersion, String status, String sourceFileName, String sha256,
                              long sizeBytes, long durationMs, RawVideoClipAnalysis analysis) {
     }
 }

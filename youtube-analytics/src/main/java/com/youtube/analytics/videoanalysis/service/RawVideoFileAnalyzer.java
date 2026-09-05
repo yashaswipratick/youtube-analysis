@@ -25,21 +25,18 @@ public class RawVideoFileAnalyzer {
     private final AudioAnalyzer audioAnalyzer;
     private final SpeechAnalyzer speechAnalyzer;
     private final AnalysisCacheService analysisCacheService;
-    private final AiAnalysisService aiAnalysisService;
 
     @Autowired
     public RawVideoFileAnalyzer(MediaApprovalService approvalService,
                                 VideoAnalyzer videoAnalyzer,
                                 AudioAnalyzer audioAnalyzer,
                                 SpeechAnalyzer speechAnalyzer,
-                                AnalysisCacheService analysisCacheService,
-                                AiAnalysisService aiAnalysisService) {
+                                AnalysisCacheService analysisCacheService) {
         this.approvalService = approvalService;
         this.videoAnalyzer = videoAnalyzer;
         this.audioAnalyzer = audioAnalyzer;
         this.speechAnalyzer = speechAnalyzer;
         this.analysisCacheService = analysisCacheService;
-        this.aiAnalysisService = aiAnalysisService;
     }
 
 
@@ -72,12 +69,12 @@ public class RawVideoFileAnalyzer {
                 speech,
                 audio,
                 visualAnalysis.visualQualityScore());
-        log.info("[AI] Starting persisted-request analysis: {}", relativePath);
-        RawVideoClipAnalysis analysis = aiAnalysisService.analyze(sourceFile, preparedAnalysis);
-        log.info("[AI] AI analysis finished: {}", relativePath);
-        analysisCacheService.save(sourceFile, analysis);
-        log.info("[ANALYSIS] Result cache saved: {}", relativePath);
-        log.info("[ANALYSIS] Completed: {} ({} ms)", relativePath, System.currentTimeMillis() - startedAt);
-        return analysis;
+        // Step 1: persist the deterministic cache placeholder. Bridge/ChatGPT will later replace this
+        // same hash file with the AI-enriched result after reading the persisted analysis JSON directly.
+        analysisCacheService.savePending(sourceFile, preparedAnalysis);
+        log.info("[ANALYSIS] Pending result cache created: {}", relativePath);
+        log.info("[ANALYSIS] AI request exchange ready as a persisted file in analysis/: {}", relativePath);
+        log.info("[ANALYSIS] Completed local preparation: {} ({} ms)", relativePath, System.currentTimeMillis() - startedAt);
+        return preparedAnalysis;
     }
 }
