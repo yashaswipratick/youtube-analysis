@@ -24,6 +24,10 @@ spring:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
             user-name-attribute: sub
 
+analysis:
+  visual:
+    include-ai: ${ANALYSIS_VISUAL_INCLUDE_AI:false}
+
 server:
   port: 8080
 
