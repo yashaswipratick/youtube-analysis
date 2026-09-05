@@ -4,6 +4,8 @@ import com.youtube.analytics.videoanalysis.analyzer.AudioAnalyzer;
 import com.youtube.analytics.videoanalysis.analyzer.SpeechAnalyzer;
 import com.youtube.analytics.videoanalysis.analyzer.VideoAnalyzer;
 import com.youtube.analytics.videoanalysis.ingestion.MediaApprovalService;
+import com.youtube.analytics.videoanalysis.ingestion.MediaDiscoveryService;
+import com.youtube.analytics.videoanalysis.ingestion.MediaFileType;
 import com.youtube.analytics.videoanalysis.model.AudioProfile;
 import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.model.SpeechSegment;
@@ -26,6 +28,7 @@ public class RawVideoFileAnalyzer {
     private final SpeechAnalyzer speechAnalyzer;
     private final AnalysisCacheService analysisCacheService;
     private final AnalysisHandoffManifestService analysisHandoffManifestService;
+    private final MediaDiscoveryService mediaDiscoveryService;
 
     @Autowired
     public RawVideoFileAnalyzer(MediaApprovalService approvalService,
@@ -33,13 +36,22 @@ public class RawVideoFileAnalyzer {
                                 AudioAnalyzer audioAnalyzer,
                                 SpeechAnalyzer speechAnalyzer,
                                 AnalysisCacheService analysisCacheService,
-                                AnalysisHandoffManifestService analysisHandoffManifestService) {
+                                AnalysisHandoffManifestService analysisHandoffManifestService,
+                                MediaDiscoveryService mediaDiscoveryService) {
         this.approvalService = approvalService;
         this.videoAnalyzer = videoAnalyzer;
         this.audioAnalyzer = audioAnalyzer;
         this.speechAnalyzer = speechAnalyzer;
         this.analysisCacheService = analysisCacheService;
         this.analysisHandoffManifestService = analysisHandoffManifestService;
+        this.mediaDiscoveryService = mediaDiscoveryService;
+    }
+
+    public List<RawVideoClipAnalysis> analyzeAll() {
+        return mediaDiscoveryService.discover().stream()
+                .filter(file -> file.type() == MediaFileType.VIDEO)
+                .map(file -> analyze(file.relativePath()))
+                .toList();
     }
 
 

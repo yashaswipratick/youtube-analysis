@@ -4,6 +4,9 @@ import com.youtube.analytics.videoanalysis.analyzer.AudioAnalyzer;
 import com.youtube.analytics.videoanalysis.analyzer.SpeechAnalyzer;
 import com.youtube.analytics.videoanalysis.analyzer.VideoAnalyzer;
 import com.youtube.analytics.videoanalysis.ingestion.MediaApprovalService;
+import com.youtube.analytics.videoanalysis.ingestion.MediaDiscoveryService;
+import com.youtube.analytics.videoanalysis.ingestion.LocalMediaFile;
+import com.youtube.analytics.videoanalysis.ingestion.MediaFileType;
 import com.youtube.analytics.videoanalysis.model.AudioProfile;
 import com.youtube.analytics.videoanalysis.model.RawVideoClipAnalysis;
 import com.youtube.analytics.videoanalysis.model.SceneSegment;
@@ -40,13 +43,14 @@ class RawVideoFileAnalyzerTest {
         when(audioAnalyzer.analyze(approvedPath)).thenReturn(audio);
         AnalysisCacheService cacheService = mock(AnalysisCacheService.class);
         AnalysisHandoffManifestService manifestService = mock(AnalysisHandoffManifestService.class);
+        MediaDiscoveryService discoveryService = mock(MediaDiscoveryService.class);
         when(cacheService.load(approvedPath)).thenReturn(null);
         when(speechAnalyzer.transcribe(approvedPath)).thenReturn(speech);
         RawVideoClipAnalysis prepared = new RawVideoClipAnalysis(
                 "clip.mp4", 5_000, visual.scenes(), speech, audio, visual.visualQualityScore());
 
         RawVideoClipAnalysis result = new RawVideoFileAnalyzer(
-                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService, manifestService).analyze("clip.mp4");
+                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService, manifestService, discoveryService).analyze("clip.mp4");
 
         assertEquals("clip.mp4", result.sourceFileName());
         assertEquals(5_000, result.durationMs());
@@ -69,6 +73,7 @@ class RawVideoFileAnalyzerTest {
         SpeechAnalyzer speechAnalyzer = mock(SpeechAnalyzer.class);
         AnalysisCacheService cacheService = mock(AnalysisCacheService.class);
         AnalysisHandoffManifestService manifestService = mock(AnalysisHandoffManifestService.class);
+        MediaDiscoveryService discoveryService = mock(MediaDiscoveryService.class);
         Path approvedPath = Path.of("/tmp/clip.mp4");
         RawVideoClipAnalysis cached = new RawVideoClipAnalysis(
                 "clip.mp4", 5_000, List.of(), List.of(),
@@ -78,10 +83,41 @@ class RawVideoFileAnalyzerTest {
         when(cacheService.load(approvedPath)).thenReturn(cached);
 
         RawVideoClipAnalysis result = new RawVideoFileAnalyzer(
-                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService, manifestService).analyze("clip.mp4");
+                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService, manifestService, discoveryService).analyze("clip.mp4");
 
         assertEquals(cached, result);
         verifyNoInteractions(videoAnalyzer, audioAnalyzer, speechAnalyzer);
         verify(manifestService).save(approvedPath);
+    }
+
+    @Test
+    void analyzesAllDiscoveredVideosAndIgnoresNonVideos() {
+        MediaApprovalService approvalService = mock(MediaApprovalService.class);
+        VideoAnalyzer videoAnalyzer = mock(VideoAnalyzer.class);
+        AudioAnalyzer audioAnalyzer = mock(AudioAnalyzer.class);
+        SpeechAnalyzer speechAnalyzer = mock(SpeechAnalyzer.class);
+        AnalysisCacheService cacheService = mock(AnalysisCacheService.class);
+        AnalysisHandoffManifestService manifestService = mock(AnalysisHandoffManifestService.class);
+        MediaDiscoveryService discoveryService = mock(MediaDiscoveryService.class);
+        RawVideoClipAnalysis first = new RawVideoClipAnalysis("one.mp4", 1_000, List.of(), List.of(),
+                new AudioProfile(false, 0, 0, false), 0.8);
+        RawVideoClipAnalysis second = new RawVideoClipAnalysis("two.mov", 2_000, List.of(), List.of(),
+                new AudioProfile(false, 0, 0, false), 0.7);
+        when(discoveryService.discover()).thenReturn(List.of(
+                new LocalMediaFile("one.mp4", "one.mp4", MediaFileType.VIDEO, 10, java.time.Instant.now()),
+                new LocalMediaFile("cover.jpg", "cover.jpg", MediaFileType.IMAGE, 10, java.time.Instant.now()),
+                new LocalMediaFile("two.mov", "two.mov", MediaFileType.VIDEO, 20, java.time.Instant.now())));
+        when(approvalService.getPath("one.mp4")).thenReturn(Path.of("/tmp/one.mp4"));
+        when(approvalService.getPath("two.mov")).thenReturn(Path.of("/tmp/two.mov"));
+        when(cacheService.load(Path.of("/tmp/one.mp4"))).thenReturn(first);
+        when(cacheService.load(Path.of("/tmp/two.mov"))).thenReturn(second);
+
+        RawVideoFileAnalyzer analyzer = new RawVideoFileAnalyzer(
+                approvalService, videoAnalyzer, audioAnalyzer, speechAnalyzer, cacheService, manifestService, discoveryService);
+
+        assertEquals(List.of(first, second), analyzer.analyzeAll());
+        verify(manifestService).save(Path.of("/tmp/one.mp4"));
+        verify(manifestService).save(Path.of("/tmp/two.mov"));
+        verifyNoInteractions(videoAnalyzer, audioAnalyzer, speechAnalyzer);
     }
 }
