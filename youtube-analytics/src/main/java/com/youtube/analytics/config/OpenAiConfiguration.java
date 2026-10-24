@@ -4,6 +4,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties({OpenAiConfig.class, AiAnalysisProperties.class, BridgeConfig.class, AnalysisVisualProperties.class})
+@EnableConfigurationProperties(OpenAiConfig.class)
 public class OpenAiConfiguration {
 }

@@ -25,8 +25,8 @@ public final class AnalyticsRequestValidator {
     }
 
     public static void validateVideoId(String videoId) {
-        if (videoId == null || !videoId.matches("[A-Za-z0-9_-]{6,128}")) {
-            throw new InvalidAnalyticsRequestException("videoId must be a non-blank YouTube video ID");
+        if (videoId == null || !videoId.matches("[A-Za-z0-9_-]{11}")) {
+            throw new InvalidAnalyticsRequestException("videoId must be a valid 11-character YouTube video ID");
         }
     }
 

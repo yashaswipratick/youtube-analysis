@@ -18,18 +18,30 @@ import java.util.Map;
  * client properties are bound. Credential values are deliberately never logged.
  */
 public class GoogleCredentialsEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
-    private static final String DEFAULT_CREDENTIALS_FILE =
-            "/Users/yashaswipratick/Documents/youtube-analytics/screts.json";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
-        String configuredPath = environment.getProperty(
-                "youtube.oauth.credentials-file", DEFAULT_CREDENTIALS_FILE);
+        String existingClientId = environment.getProperty("GOOGLE_CLIENT_ID");
+        String existingClientSecret = environment.getProperty("GOOGLE_CLIENT_SECRET");
+        if (existingClientId != null && !existingClientId.isBlank()
+                && existingClientSecret != null && !existingClientSecret.isBlank()) {
+            return;
+        }
+
+        String configuredPath = environment.getProperty("youtube.oauth.credentials-file", "").trim();
+        if (configuredPath.isBlank()) {
+            throw new IllegalStateException(
+                    "Google OAuth credentials are not configured. Set YOUTUBE_OAUTH_CREDENTIALS_FILE to a JSON "
+                            + "file containing client-id and client-secret, or set GOOGLE_CLIENT_ID and "
+                            + "GOOGLE_CLIENT_SECRET environment variables.");
+        }
         Path credentialsFile = Path.of(configuredPath);
 
         if (!Files.isRegularFile(credentialsFile)) {
-            throw new IllegalStateException("Google OAuth credentials file was not found: " + credentialsFile);
+            throw new IllegalStateException(
+                    "Google OAuth credentials file was not found: " + credentialsFile
+                            + ". Set YOUTUBE_OAUTH_CREDENTIALS_FILE to the actual file path.");
         }
 
         try {

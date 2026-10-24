@@ -24,37 +24,12 @@ spring:
             user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
             user-name-attribute: sub
 
-analysis:
-  visual:
-    include-ai: ${ANALYSIS_VISUAL_INCLUDE_AI:false}
-
 server:
   port: 8080
 
-video-analysis:
-  input-directory: /Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills
-  approval-required: false
-  output-directory: /Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/renders
-  analysis-cache-directory: /Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/analysis-cache
-  analysis-cache-enabled: ${VIDEO_ANALYSIS_CACHE_ENABLED:true}
-  max-concurrent-videos: ${VIDEO_ANALYSIS_MAX_CONCURRENT_VIDEOS:1}
-  ai:
-    # Speech provider selection remains independent of visual analysis.
-    provider: ${VIDEO_ANALYSIS_AI_PROVIDER:bridge}
-  audio:
-    music-directory: ${VIDEO_ANALYSIS_MUSIC_DIRECTORY:/Users/yashaswipratick/projects/youtube-analysis/youtube-analytics/video/Kailashagiri-hills/music}
-    music-file-name: ${VIDEO_ANALYSIS_MUSIC_FILE_NAME:Warriyo-Laura Brehm-Mortals.mp3}
-    music-volume: ${VIDEO_ANALYSIS_MUSIC_VOLUME:0.12}
-    duck-speech: ${VIDEO_ANALYSIS_DUCK_SPEECH:true}
-  effects:
-    fade-enabled: ${VIDEO_ANALYSIS_FADE_ENABLED:true}
-    fade-duration-ms: ${VIDEO_ANALYSIS_FADE_DURATION_MS:250}
-  render:
-    max-concurrent-jobs: ${VIDEO_ANALYSIS_MAX_CONCURRENT_JOBS:2}
-
 youtube:
   oauth:
-    credentials-file: /Users/yashaswipratick/Documents/youtube-analytics/screts.json
+    credentials-file: ${YOUTUBE_OAUTH_CREDENTIALS_FILE:/Users/yashaswipratick/Documents/youtube-analytics/secrets.json}
   analytics:
     default-metrics: views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,comments,shares,subscribersGained,subscribersLost
 
@@ -63,8 +38,6 @@ openai:
   api-key-file: ${OPENAI_API_KEY_FILE:/Users/yashaswipratick/Desktop/OPEN_API_KEY.txt}
   base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
   model: ${OPENAI_MODEL:gpt-5.6-luna}
-  transcription-model: ${OPENAI_TRANSCRIPTION_MODEL:gpt-4o-mini-transcribe}
-  visual-analysis-enabled: ${OPENAI_VISUAL_ANALYSIS_ENABLED:true}
 
 logging:
   level:
