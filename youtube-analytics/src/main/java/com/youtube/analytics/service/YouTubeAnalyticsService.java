@@ -1,6 +1,7 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import com.youtube.analytics.model.ChannelAnalyticsResult;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
@@ -11,7 +12,6 @@ import com.youtube.analytics.model.YouTubeAnalyticsApiResponse;
 import com.youtube.analytics.model.YouTubeAnalyticsColumnHeader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -37,11 +37,9 @@ public class YouTubeAnalyticsService {
     private static final String CHANNEL_IDS = "channel==MINE";
     private static final int ANALYTICS_BATCH_SIZE = 500;
 
-    @Value("${youtube.analytics.default-metrics:views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,comments,shares,subscribersGained,subscribersLost}")
-    private String defaultMetrics;
-
     private final WebClient youTubeWebClient;
     private final YouTubeDataService youTubeDataService;
+    private final YouTubeAnalyticsProperties analyticsProperties;
 
     public ChannelAnalyticsResult getChannelAnalytics(String startDate, String endDate, List<String> metrics) {
         String resolvedStart = resolveStartDate(startDate);
@@ -79,7 +77,7 @@ public class YouTubeAnalyticsService {
         Map<String, VideoMeta> meta = youTubeDataService.getVideoMeta(List.of(videoId));
         VideoMeta videoMeta = meta.getOrDefault(videoId, new VideoMeta(videoId, videoId, null));
 
-        boolean lifetimeWindow = coversVideoLifetime(resolvedStart, videoMeta.getPublishedAt());
+        boolean lifetimeWindow = coversVideoLifetime(resolvedStart, resolvedEnd, videoMeta.getPublishedAt());
         Map<String, Object> currentStatistics = null;
         Map<String, Object> dataFreshness = new LinkedHashMap<>();
         dataFreshness.put("analyticsSource", "YouTube Analytics API v2");
@@ -129,12 +127,16 @@ public class YouTubeAnalyticsService {
                 .dataFreshness(dataFreshness).build();
     }
 
-    private boolean coversVideoLifetime(String startDate, String publishedAt) {
-        if (startDate == null || publishedAt == null || publishedAt.isBlank()) return false;
+    private boolean coversVideoLifetime(String startDate, String endDate, String publishedAt) {
+        if (startDate == null || endDate == null || publishedAt == null || publishedAt.isBlank()) return false;
         try {
             LocalDate publishDay = Instant.parse(publishedAt)
                     .atZone(AnalyticsDateRangeResolver.REPORTING_ZONE).toLocalDate();
-            return !LocalDate.parse(startDate).isAfter(publishDay);
+            LocalDate requestedStart = LocalDate.parse(startDate);
+            LocalDate requestedEnd = LocalDate.parse(endDate);
+            // A range ending before the publish day cannot represent lifetime performance,
+            // even when the start is earlier than publication.
+            return !requestedStart.isAfter(publishDay) && !requestedEnd.isBefore(publishDay);
         } catch (RuntimeException ex) {
             log.debug("Cannot determine whether the requested analytics window covers the video's lifetime", ex);
             return false;
@@ -344,7 +346,7 @@ public class YouTubeAnalyticsService {
 
     private List<String> resolveMetrics(List<String> metrics) {
         List<String> requestedMetrics = (metrics == null || metrics.isEmpty())
-                ? Stream.of(defaultMetrics.split(",")).map(String::trim).toList()
+                ? analyticsProperties.getMetrics().getCore()
                 : metrics.stream().flatMap(metric -> metric == null ? Stream.of((String) null) : Stream.of(metric.split(",")))
                 .map(value -> value == null ? null : value.trim()).toList();
         return AnalyticsRequestValidator.validateVideoMetrics(requestedMetrics);

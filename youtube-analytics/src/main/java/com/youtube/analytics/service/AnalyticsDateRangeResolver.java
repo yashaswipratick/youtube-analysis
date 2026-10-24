@@ -1,7 +1,8 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.exception.InvalidAnalyticsRequestException;
-import lombok.RequiredArgsConstructor;
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -13,14 +14,28 @@ import java.time.ZoneId;
  * All windows are inclusive and use YouTube's America/Los_Angeles reporting day.
  */
 @Service
-@RequiredArgsConstructor
 public class AnalyticsDateRangeResolver {
 
     public static final int DEFAULT_LAST_N_DAYS = 28;
     public static final int MAX_LAST_N_DAYS = 3650;
+    public static final int DEFAULT_REPORTING_LAG_DAYS = 3;
     public static final ZoneId REPORTING_ZONE = ZoneId.of("America/Los_Angeles");
 
     private final YouTubePublicApiService youtubePublicApiService;
+    private final YouTubeAnalyticsProperties analyticsProperties;
+
+    @Autowired
+    public AnalyticsDateRangeResolver(
+            YouTubePublicApiService youtubePublicApiService,
+            YouTubeAnalyticsProperties analyticsProperties) {
+        this.youtubePublicApiService = youtubePublicApiService;
+        this.analyticsProperties = analyticsProperties;
+    }
+
+    /** Compatibility constructor retained for focused unit tests and standalone use. */
+    public AnalyticsDateRangeResolver(YouTubePublicApiService youtubePublicApiService) {
+        this(youtubePublicApiService, new YouTubeAnalyticsProperties());
+    }
 
     public DateRange resolve(Integer lastNDays) {
         int days = lastNDays == null ? DEFAULT_LAST_N_DAYS : lastNDays;
@@ -28,7 +43,7 @@ public class AnalyticsDateRangeResolver {
             throw new InvalidAnalyticsRequestException(
                     "lastNDays must be between 1 and " + MAX_LAST_N_DAYS);
         }
-        LocalDate end = LocalDate.now(REPORTING_ZONE);
+        LocalDate end = LocalDate.now(REPORTING_ZONE).minusDays(analyticsProperties.getReportingLagDays());
         return new DateRange(end.minusDays(days - 1L), end);
     }
 
@@ -53,8 +68,14 @@ public class AnalyticsDateRangeResolver {
                     "Video publish_date returned by YouTube is not a valid timestamp");
         }
 
-        if (publishDay.isAfter(requested.endDate())) {
+        LocalDate today = LocalDate.now(REPORTING_ZONE);
+        if (publishDay.isAfter(today)) {
             throw new InvalidAnalyticsRequestException("The video has not been published yet");
+        }
+        // Videos published during the reporting-lag period have no finalized Analytics dates yet.
+        // Return a valid, data-safe request range; report responses will correctly be empty.
+        if (publishDay.isAfter(requested.endDate())) {
+            return requested;
         }
 
         LocalDate start = requested.startDate().isBefore(publishDay)

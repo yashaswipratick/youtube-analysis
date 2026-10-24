@@ -25,6 +25,7 @@ import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.RecommendationEngineService;
 import com.youtube.analytics.service.RetentionAnalysisService;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
+import com.youtube.analytics.service.YouTubeAnalyticsReportAggregationService;
 import com.youtube.analytics.service.YouTubeChannelGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeTrafficSourceAnalyticsService;
@@ -56,6 +57,7 @@ import java.util.Map;
 public class YouTubeAnalyticsController {
 
     private final YouTubeAnalyticsService analyticsService;
+    private final YouTubeAnalyticsReportAggregationService reportAggregationService;
     private final YouTubeTrafficSourceAnalyticsService trafficSourceAnalyticsService;
     private final YouTubeGeographyAnalyticsService geographyAnalyticsService;
     private final YouTubeChannelGeographyAnalyticsService channelGeographyAnalyticsService;
@@ -108,8 +110,16 @@ public class YouTubeAnalyticsController {
             @RequestParam(required = false) List<String> metrics) {
         DateRange range = dateRangeResolver.resolveForVideo(videoId, lastNDays);
         log.info("GET /video/{} | {} → {}", videoId, range.startDate(), range.endDate());
-        return ResponseEntity.ok(ApiResponse.success(analyticsService.getSingleVideoAnalytics(
-                videoId, range.startDateText(), range.endDateText(), metrics)));
+        VideoAnalyticsResult result = analyticsService.getSingleVideoAnalytics(
+                videoId, range.startDateText(), range.endDateText(), metrics);
+        return ResponseEntity.ok(ApiResponse.success(reportAggregationService.enrich(result)));
+    }
+
+    @GetMapping("/video/{videoId}/reports/replay/{snapshotId}")
+    public ResponseEntity<ApiResponse<VideoAnalyticsResult>> replayVideoAnalyticsReports(
+            @PathVariable String videoId,
+            @PathVariable String snapshotId) {
+        return ResponseEntity.ok(ApiResponse.success(reportAggregationService.replay(videoId, snapshotId)));
     }
 
     @GetMapping("/video/{videoId}/retention")

@@ -11,6 +11,7 @@ import com.youtube.analytics.service.OpenAiAnalysisService;
 import com.youtube.analytics.service.RecommendationEngineService;
 import com.youtube.analytics.service.RetentionAnalysisService;
 import com.youtube.analytics.service.YouTubeAnalyticsService;
+import com.youtube.analytics.service.YouTubeAnalyticsReportAggregationService;
 import com.youtube.analytics.service.YouTubeChannelGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeGeographyAnalyticsService;
 import com.youtube.analytics.service.YouTubeTrafficSourceAnalyticsService;
@@ -45,6 +46,8 @@ class YouTubeAnalyticsControllerTest {
     @BeforeEach
     void setUp() {
         analyticsService = mock(YouTubeAnalyticsService.class);
+        YouTubeAnalyticsReportAggregationService reportAggregationService = mock(YouTubeAnalyticsReportAggregationService.class);
+        when(reportAggregationService.enrich(any())).thenAnswer(invocation -> invocation.getArgument(0));
         YouTubeTrafficSourceAnalyticsService trafficSourceService = mock(YouTubeTrafficSourceAnalyticsService.class);
         YouTubeGeographyAnalyticsService geographyService = mock(YouTubeGeographyAnalyticsService.class);
         YouTubeChannelGeographyAnalyticsService channelGeographyService = mock(YouTubeChannelGeographyAnalyticsService.class);
@@ -67,6 +70,7 @@ class YouTubeAnalyticsControllerTest {
 
         mockMvc = MockMvcBuilders.standaloneSetup(new YouTubeAnalyticsController(
                         analyticsService,
+                        reportAggregationService,
                         trafficSourceService,
                         geographyService,
                         channelGeographyService,
@@ -82,8 +86,9 @@ class YouTubeAnalyticsControllerTest {
     }
 
     @Test
-    void acceptsLastNDaysForVideoAnalyticsAndClampsToPublishDate() throws Exception {
+    void excludesTheMostRecentThreeDaysFromVideoAnalyticsWhenVideoWasPublishedRecently() throws Exception {
         LocalDate today = LocalDate.now(AnalyticsDateRangeResolver.REPORTING_ZONE);
+        LocalDate safeEnd = today.minusDays(AnalyticsDateRangeResolver.DEFAULT_REPORTING_LAG_DAYS);
         LocalDate publishDay = today.minusDays(2);
         String publishedAt = publishDay.atTime(17, 0)
                 .atZone(AnalyticsDateRangeResolver.REPORTING_ZONE).toInstant().toString();
@@ -97,7 +102,7 @@ class YouTubeAnalyticsControllerTest {
                 .andExpect(jsonPath("$.data.metrics.views").value(57));
 
         verify(analyticsService).getSingleVideoAnalytics(
-                eq("laQbWAoa3NI"), eq(publishDay.toString()), eq(today.toString()), any());
+                eq("laQbWAoa3NI"), eq(safeEnd.minusDays(29).toString()), eq(safeEnd.toString()), any());
     }
 
     @Test

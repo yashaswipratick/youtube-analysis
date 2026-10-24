@@ -18,10 +18,15 @@ public final class AnalyticsRequestValidator {
             .withResolverStyle(ResolverStyle.STRICT);
     private static final Set<String> VIDEO_METRICS = Set.of(
             "views", "engagedViews", "estimatedMinutesWatched", "averageViewDuration",
-            "averageViewPercentage", "likes", "comments", "shares", "subscribersGained",
+            "averageViewPercentage", "likes", "dislikes", "comments", "shares", "subscribersGained",
             "subscribersLost", "viewerPercentage", "uniques", "redViews", "estimatedRedMinutesWatched",
             "estimatedRevenue", "estimatedAdRevenue", "estimatedRedPartnerRevenue",
             "grossRevenue", "cpm", "adImpressions", "monetizedPlaybacks", "playbackBasedCpm",
+            "averageConcurrentViewers", "peakConcurrentViewers",
+            "audienceWatchRatio", "relativeRetentionPerformance", "startedWatching",
+            "stoppedWatching", "totalSegmentImpressions",
+            "averageTimeInPlaylist", "playlistAverageViewDuration", "playlistEstimatedMinutesWatched",
+            "playlistSaves", "playlistStarts", "playlistViews", "viewsPerPlaylistStart",
             "cardImpressions", "cardClicks", "cardClickRate", "cardTeaserImpressions",
             "cardTeaserClicks", "cardTeaserClickRate", "videosAddedToPlaylists",
             "videosRemovedFromPlaylists", "annotationImpressions", "annotationClicks",

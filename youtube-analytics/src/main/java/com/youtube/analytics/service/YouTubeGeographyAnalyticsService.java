@@ -1,13 +1,13 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import com.youtube.analytics.model.GeographyAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
 import com.youtube.analytics.model.YouTubeAnalyticsApiResponse;
 import com.youtube.analytics.model.YouTubeAnalyticsColumnHeader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,11 +31,9 @@ public class YouTubeGeographyAnalyticsService {
     private static final String CHANNEL_IDS = "channel==MINE";
     private static final String COUNTRY_DIMENSION = "country";
 
-    @Value("${youtube.analytics.geography.default-metrics:views}")
-    private String defaultMetrics;
-
     private final WebClient youTubeWebClient;
     private final YouTubeDataService youTubeDataService;
+    private final YouTubeAnalyticsProperties analyticsProperties;
 
     public GeographyAnalyticsResult getVideoGeography(
             String videoId,
@@ -115,7 +113,7 @@ public class YouTubeGeographyAnalyticsService {
 
     private List<String> resolveMetrics(List<String> metrics) {
         List<String> requested = (metrics == null || metrics.isEmpty())
-                ? Stream.of(defaultMetrics.split(",")).map(String::trim).toList()
+                ? analyticsProperties.getMetrics().getGeography()
                 : metrics.stream()
                 .flatMap(metric -> metric == null ? Stream.empty() : Stream.of(metric.split(",")))
                 .map(String::trim)

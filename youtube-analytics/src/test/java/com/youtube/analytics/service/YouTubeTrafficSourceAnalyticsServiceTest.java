@@ -1,6 +1,7 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.model.TrafficSourceAnalyticsResult;
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import com.youtube.analytics.model.VideoMeta;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -86,9 +87,9 @@ class YouTubeTrafficSourceAnalyticsServiceTest {
                     .body(body)
                     .build());
         };
-        YouTubeTrafficSourceAnalyticsService service = new YouTubeTrafficSourceAnalyticsService(
-                WebClient.builder().exchangeFunction(exchange).build(), dataService);
-        ReflectionTestUtils.setField(service, "defaultMetrics", "views");
-        return service;
+        YouTubeAnalyticsProperties properties = new YouTubeAnalyticsProperties();
+        properties.getMetrics().setTraffic(List.of("views", "estimatedMinutesWatched"));
+        return new YouTubeTrafficSourceAnalyticsService(
+                WebClient.builder().exchangeFunction(exchange).build(), dataService, properties);
     }
 }

@@ -1,6 +1,7 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.model.VideoRetentionAnalyticsResult;
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,7 +39,7 @@ class VideoRetentionAnalyticsServiceTest {
         };
 
         YouTubeAnalyticsService service = new YouTubeAnalyticsService(
-                WebClient.builder().exchangeFunction(exchange).build(), null);
+                WebClient.builder().exchangeFunction(exchange).build(), null, new YouTubeAnalyticsProperties());
 
         VideoRetentionAnalyticsResult result = service.getVideoRetentionAnalytics(
                 "laQbWAoa3NI", "2026-07-27", "2026-08-29");

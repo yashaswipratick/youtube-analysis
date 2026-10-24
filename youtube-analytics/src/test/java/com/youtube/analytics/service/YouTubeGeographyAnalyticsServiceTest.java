@@ -1,5 +1,6 @@
 package com.youtube.analytics.service;
 
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import com.youtube.analytics.model.GeographyAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
 import org.junit.jupiter.api.Test;
@@ -8,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -50,9 +50,10 @@ class YouTubeGeographyAnalyticsServiceTest {
                     .build());
         };
 
+        YouTubeAnalyticsProperties properties = new YouTubeAnalyticsProperties();
+        properties.getMetrics().setGeography(List.of("views"));
         YouTubeGeographyAnalyticsService service = new YouTubeGeographyAnalyticsService(
-                WebClient.builder().exchangeFunction(exchange).build(), dataService);
-        ReflectionTestUtils.setField(service, "defaultMetrics", "views");
+                WebClient.builder().exchangeFunction(exchange).build(), dataService, properties);
 
         GeographyAnalyticsResult result = service.getVideoGeography(
                 "laQbWAoa3NI", "2026-07-27", "2026-08-29", List.of("views", "likes"));
@@ -80,9 +81,10 @@ class YouTubeGeographyAnalyticsServiceTest {
                 .body("{\"columnHeaders\":[{\"name\":\"country\"},{\"name\":\"views\"}],\"rows\":[]}")
                 .build());
 
+        YouTubeAnalyticsProperties properties = new YouTubeAnalyticsProperties();
+        properties.getMetrics().setGeography(List.of("views"));
         YouTubeGeographyAnalyticsService service = new YouTubeGeographyAnalyticsService(
-                WebClient.builder().exchangeFunction(exchange).build(), dataService);
-        ReflectionTestUtils.setField(service, "defaultMetrics", "views");
+                WebClient.builder().exchangeFunction(exchange).build(), dataService, properties);
 
         GeographyAnalyticsResult result = service.getVideoGeography(
                 "laQbWAoa3NI", "2026-07-27", "2026-08-29", List.of("views"));

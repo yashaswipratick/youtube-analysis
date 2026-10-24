@@ -1,13 +1,13 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import com.youtube.analytics.model.TrafficSourceAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
 import com.youtube.analytics.model.YouTubeAnalyticsApiResponse;
 import com.youtube.analytics.model.YouTubeAnalyticsColumnHeader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,11 +31,9 @@ public class YouTubeTrafficSourceAnalyticsService {
     private static final String CHANNEL_IDS = "channel==MINE";
     private static final String TRAFFIC_SOURCE_DIMENSION = "insightTrafficSourceType";
 
-    @Value("${youtube.analytics.traffic-source.default-metrics:views}")
-    private String defaultMetrics;
-
     private final WebClient youTubeWebClient;
     private final YouTubeDataService youTubeDataService;
+    private final YouTubeAnalyticsProperties analyticsProperties;
 
     public TrafficSourceAnalyticsResult getVideoTrafficSources(
             String videoId,
@@ -126,7 +124,7 @@ public class YouTubeTrafficSourceAnalyticsService {
 
     private List<String> resolveMetrics(List<String> metrics) {
         List<String> requested = metrics == null || metrics.isEmpty()
-                ? List.of(defaultMetrics)
+                ? analyticsProperties.getMetrics().getTraffic()
                 : metrics.stream()
                 .flatMap(metric -> metric == null ? java.util.stream.Stream.empty()
                         : java.util.Arrays.stream(metric.split(",")))

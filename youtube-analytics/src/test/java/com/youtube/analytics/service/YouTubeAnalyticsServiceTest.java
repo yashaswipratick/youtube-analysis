@@ -1,6 +1,7 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
@@ -183,11 +184,8 @@ class YouTubeAnalyticsServiceTest {
                     .body(body)
                     .build());
         };
-        YouTubeAnalyticsService service = new YouTubeAnalyticsService(
-                WebClient.builder().exchangeFunction(exchange).build(), dataService);
-        ReflectionTestUtils.setField(service, "defaultMetrics",
-                "views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,comments,shares,subscribersGained,subscribersLost");
-        return service;
+        return new YouTubeAnalyticsService(
+                WebClient.builder().exchangeFunction(exchange).build(), dataService, new YouTubeAnalyticsProperties());
     }
 
     private String successfulResponse() {

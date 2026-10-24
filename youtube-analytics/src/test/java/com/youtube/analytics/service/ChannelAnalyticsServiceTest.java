@@ -1,6 +1,7 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.model.ChannelAnalyticsResult;
+import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -59,10 +60,7 @@ class ChannelAnalyticsServiceTest {
                     .body(body)
                     .build());
         };
-        YouTubeAnalyticsService service = new YouTubeAnalyticsService(
-                WebClient.builder().exchangeFunction(exchange).build(), null);
-        ReflectionTestUtils.setField(service, "defaultMetrics",
-                "views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,comments,shares,subscribersGained,subscribersLost");
-        return service;
+        return new YouTubeAnalyticsService(
+                WebClient.builder().exchangeFunction(exchange).build(), null, new YouTubeAnalyticsProperties());
     }
 }

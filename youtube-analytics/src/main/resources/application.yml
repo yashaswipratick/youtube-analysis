@@ -41,7 +41,27 @@ youtube:
   oauth:
     credentials-file: ${YOUTUBE_OAUTH_CREDENTIALS_FILE:/Users/yashaswipratick/Documents/youtube-analytics/secrets.json}
   analytics:
-    default-metrics: views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,comments,shares,subscribersGained,subscribersLost
+    reporting-lag-days: ${YOUTUBE_ANALYTICS_REPORTING_LAG_DAYS:3}
+    archive-directory: ${YOUTUBE_ANALYTICS_ARCHIVE_DIR:./data/youtube-analytics/reports}
+    metrics:
+      core: views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,dislikes,comments,shares,subscribersGained,subscribersLost,videosAddedToPlaylists,videosRemovedFromPlaylists
+      cards: cardImpressions,cardClicks,cardClickRate,cardTeaserImpressions,cardTeaserClicks,cardTeaserClickRate
+      premium: redViews,estimatedRedMinutesWatched
+      retention: audienceWatchRatio,relativeRetentionPerformance
+      demographics: viewerPercentage
+      traffic: engagedViews,views,estimatedMinutesWatched
+      trend: views,estimatedMinutesWatched,subscribersGained,shares,uniques
+      revenue: estimatedRevenue,estimatedAdRevenue,estimatedRedPartnerRevenue,grossRevenue,cpm,playbackBasedCpm,monetizedPlaybacks,adImpressions
+      optional: videoThumbnailImpressions,videoThumbnailImpressionsClickRate,endScreenElementImpressions,endScreenElementClicks,endScreenElementClickRate
+      retention-events: startedWatching,stoppedWatching,totalSegmentImpressions
+      livestream: averageConcurrentViewers,peakConcurrentViewers
+      format: views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage
+      playlist: averageTimeInPlaylist,playlistAverageViewDuration,playlistEstimatedMinutesWatched,playlistSaves,playlistStarts,playlistViews,viewsPerPlaylistStart
+      geography: engagedViews,views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage
+  reporting:
+    metrics:
+      reach: video_thumbnail_impressions,video_thumbnail_impressions_ctr
+      end-screens: end_screen_element_impressions,end_screen_element_clicks,end_screen_element_click_rate
 
 openai:
   # Local development only. Never commit the key file itself.
