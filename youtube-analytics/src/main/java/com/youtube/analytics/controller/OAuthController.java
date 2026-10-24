@@ -13,12 +13,12 @@ import java.util.Map;
 /**
  * OAuth helper endpoints.
  *
- *  GET /oauth/success  — shown after Google OAuth consent completes
- *  GET /oauth/me       — returns the currently authenticated Google user info
+ *  GET /api/youtube-analytics/v1/oauth/success — shown after Google OAuth consent completes
+ *  GET /api/youtube-analytics/v1/oauth/me      — returns the currently authenticated Google user info
  */
 @Slf4j
 @RestController
-@RequestMapping("/oauth")
+@RequestMapping("/api/youtube-analytics/v1/oauth")
 public class OAuthController {
 
     @GetMapping("/success")

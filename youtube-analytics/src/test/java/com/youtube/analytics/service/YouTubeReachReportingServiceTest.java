@@ -150,6 +150,27 @@ class YouTubeReachReportingServiceTest {
         assertThat(result.impressionsClickThroughRate()).isEqualTo(4.0);
     }
 
+    @Test
+    void distinguishesAReportedZeroImpressionsValueFromAMissingReport() {
+        ExchangeFunction exchangeFunction = request -> {
+            if (request.method() == HttpMethod.GET && request.url().getPath().equals("/v1/jobs")) {
+                return json("{\"jobs\":[{\"id\":\"job-1\",\"reportTypeId\":\"channel_reach_basic_a1\"}]}");
+            }
+            if (request.method() == HttpMethod.GET && request.url().getPath().equals("/v1/jobs/job-1/reports")) {
+                return json("{\"reports\":[{\"startTime\":\"2026-08-01T00:00:00Z\",\"endTime\":\"2026-08-01T23:59:59Z\",\"downloadUrl\":\"https://reports.test/zero.csv\"}]}");
+            }
+            return csv("date,video_id,video_thumbnail_impressions,video_thumbnail_impressions_ctr\n"
+                    + "2026-08-01,abc123,0,0.0\n");
+        };
+
+        YouTubeReachReportResult result = service(exchangeFunction).getVideoReach(
+                "abc123", "2026-08-01", "2026-08-10");
+
+        assertThat(result.available()).isTrue();
+        assertThat(result.impressions()).isEqualTo(0L);
+        assertThat(result.impressionsClickThroughRate()).isNull();
+    }
+
     private YouTubeReachReportingService service(ExchangeFunction exchangeFunction) {
         WebClient client = WebClient.builder().exchangeFunction(exchangeFunction).build();
         return new YouTubeReachReportingService(client, objectMapper);

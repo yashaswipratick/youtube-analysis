@@ -12,7 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {
         "youtube.tokens-directory=/tmp/youtube-test-tokens",
         "spring.security.oauth2.client.registration.google.client-id=test-client-id",
-        "spring.security.oauth2.client.registration.google.client-secret=test-client-secret"
+        "spring.security.oauth2.client.registration.google.client-secret=test-client-secret",
+        "app.oauth.auto-open-browser=false"
 })
 class YoutubeAnalyticsApplicationTests {
 

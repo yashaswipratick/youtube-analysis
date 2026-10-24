@@ -12,9 +12,12 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 /** Reads the asynchronous YouTube Reporting API reach report used for impressions and CTR. */
 @Service
@@ -32,22 +35,31 @@ public class YouTubeReachReportingService {
     private final ObjectMapper objectMapper;
 
     public YouTubeReachReportResult getVideoReach(String videoId, String startDate, String endDate) {
+        return getVideoReachForRanges(Map.of(videoId, new DateRange(
+                LocalDate.parse(startDate), LocalDate.parse(endDate))))
+                .getOrDefault(videoId, YouTubeReachReportResult.unavailable());
+    }
+
+    /**
+     * Fetches the reach CSVs once and calculates impressions/CTR for each video's own date window.
+     * This is used by the recent-video benchmark to avoid creating/report-fetching a separate
+     * Reporting API job for every video.
+     */
+    public Map<String, YouTubeReachReportResult> getVideoReachForRanges(Map<String, DateRange> ranges) {
+        if (ranges == null || ranges.isEmpty()) return Collections.emptyMap();
         String jobId = findOrCreateJob();
         if (jobId == null) {
-            return YouTubeReachReportResult.unavailable();
+            return unavailableFor(ranges.keySet());
         }
 
         JsonNode reports = listReports(jobId);
         if (reports == null || !reports.has("reports")) {
-            return YouTubeReachReportResult.unavailable();
+            return unavailableFor(ranges.keySet());
         }
 
-        LocalDate requestedStart = LocalDate.parse(startDate);
-        LocalDate requestedEnd = LocalDate.parse(endDate);
-        long totalImpressions = 0L;
-        double weightedCtr = 0.0;
-        long ctrImpressionWeight = 0L;
-        boolean found = false;
+        LocalDate requestedStart = ranges.values().stream().map(DateRange::startDate).min(LocalDate::compareTo).orElseThrow();
+        LocalDate requestedEnd = ranges.values().stream().map(DateRange::endDate).max(LocalDate::compareTo).orElseThrow();
+        Map<String, ReachAggregation> totals = new LinkedHashMap<>();
 
         for (JsonNode report : reports.get("reports")) {
             LocalDate reportStart = parseDate(report.path("startTime").asText(null));
@@ -67,21 +79,36 @@ public class YouTubeReachReportingService {
                 continue;
             }
 
-            ReachAggregation aggregation = parseCsv(csv, videoId, requestedStart, requestedEnd);
-            if (aggregation.impressions > 0) {
-                found = true;
-                totalImpressions += aggregation.impressions;
-                weightedCtr += aggregation.weightedCtr;
-                ctrImpressionWeight += aggregation.ctrImpressionWeight;
+            for (Map.Entry<String, DateRange> videoRange : ranges.entrySet()) {
+                DateRange range = videoRange.getValue();
+                if (reportEnd.isBefore(range.startDate()) || reportStart.isAfter(range.endDate())) continue;
+                ReachAggregation aggregation = parseCsv(
+                        csv, videoRange.getKey(), range.startDate(), range.endDate());
+                if (aggregation.rowCount > 0) {
+                    totals.merge(videoRange.getKey(), aggregation, ReachAggregation::merge);
+                }
             }
         }
 
-        if (!found) {
-            return YouTubeReachReportResult.unavailable();
+        Map<String, YouTubeReachReportResult> result = new LinkedHashMap<>();
+        for (Map.Entry<String, DateRange> entry : ranges.entrySet()) {
+            String videoId = entry.getKey();
+            ReachAggregation aggregation = totals.get(videoId);
+            if (aggregation == null || aggregation.rowCount == 0) {
+                result.put(videoId, YouTubeReachReportResult.unavailable());
+                continue;
+            }
+            Double ctr = aggregation.ctrImpressionWeight == 0 ? null
+                    : aggregation.weightedCtr / aggregation.ctrImpressionWeight;
+            result.put(videoId, new YouTubeReachReportResult(aggregation.impressions, ctr, true));
         }
+        return result;
+    }
 
-        Double ctr = ctrImpressionWeight == 0 ? null : weightedCtr / ctrImpressionWeight;
-        return new YouTubeReachReportResult(totalImpressions, ctr, true);
+    private Map<String, YouTubeReachReportResult> unavailableFor(Set<String> videoIds) {
+        Map<String, YouTubeReachReportResult> result = new LinkedHashMap<>();
+        videoIds.forEach(id -> result.put(id, YouTubeReachReportResult.unavailable()));
+        return result;
     }
 
     private String findOrCreateJob() {
@@ -161,6 +188,7 @@ public class YouTubeReachReportingService {
             long impressions = 0L;
             double weightedCtr = 0.0;
             long ctrImpressionWeight = 0L;
+            int rowCount = 0;
             String line;
             while ((line = reader.readLine()) != null) {
                 if (line.isBlank()) continue;
@@ -172,18 +200,27 @@ public class YouTubeReachReportingService {
                 if (date == null || date.isBefore(startDate) || date.isAfter(endDate)) continue;
 
                 long rowImpressions = parseLong(values.get(impressionsIndex));
-                if (rowImpressions <= 0) continue;
+                if (rowImpressions < 0) continue;
+                rowCount++;
                 impressions += rowImpressions;
 
                 Double rowCtr = parseDouble(values.get(ctrIndex));
-                if (rowCtr != null) {
+                if (rowCtr != null && rowImpressions > 0) {
                     weightedCtr += rowCtr * rowImpressions;
                     ctrImpressionWeight += rowImpressions;
                 }
             }
-            return new ReachAggregation(impressions, weightedCtr, ctrImpressionWeight);
+            return new ReachAggregation(impressions, weightedCtr, ctrImpressionWeight, rowCount);
         } catch (Exception ex) {
             return ReachAggregation.empty();
+        }
+    }
+
+    public record DateRange(LocalDate startDate, LocalDate endDate) {
+        public DateRange {
+            if (startDate == null || endDate == null || startDate.isAfter(endDate)) {
+                throw new IllegalArgumentException("A reach date range must have a start date on or before its end date");
+            }
         }
     }
 
@@ -230,9 +267,16 @@ public class YouTubeReachReportingService {
         catch (RuntimeException ex) { return null; }
     }
 
-    private record ReachAggregation(long impressions, double weightedCtr, long ctrImpressionWeight) {
+    private record ReachAggregation(long impressions, double weightedCtr, long ctrImpressionWeight, int rowCount) {
         private static ReachAggregation empty() {
-            return new ReachAggregation(0L, 0.0, 0L);
+            return new ReachAggregation(0L, 0.0, 0L, 0);
+        }
+
+        private ReachAggregation merge(ReachAggregation other) {
+            return new ReachAggregation(impressions + other.impressions,
+                    weightedCtr + other.weightedCtr,
+                    ctrImpressionWeight + other.ctrImpressionWeight,
+                    rowCount + other.rowCount);
         }
     }
 }

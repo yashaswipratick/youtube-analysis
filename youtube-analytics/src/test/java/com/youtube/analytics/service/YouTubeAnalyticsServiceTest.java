@@ -4,6 +4,7 @@ import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
+import com.youtube.analytics.model.VideoPublicStatistics;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -25,6 +26,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class YouTubeAnalyticsServiceTest {
@@ -61,6 +64,58 @@ class YouTubeAnalyticsServiceTest {
         service.getSingleVideoAnalytics("laQbWAoa3NI", "2026-07-27", "2026-08-29", null);
 
         assertThat(requestUri.get()).contains("metrics=views,engagedViews,estimatedMinutesWatched");
+    }
+
+    @Test
+    void usesCurrentDataApiCountersForLifetimeWindowAndPreservesProcessedAnalyticsMetrics() {
+        stubMetadata();
+        when(dataService.getVideoStatistics(List.of("laQbWAoa3NI"))).thenReturn(Map.of(
+                "laQbWAoa3NI", new VideoPublicStatistics("laQbWAoa3NI", 131L, 4L, 0L)));
+        String response = """
+                {"columnHeaders":[
+                  {"name":"views","columnType":"METRIC","dataType":"INTEGER"},
+                  {"name":"engagedViews","columnType":"METRIC","dataType":"INTEGER"},
+                  {"name":"likes","columnType":"METRIC","dataType":"INTEGER"},
+                  {"name":"comments","columnType":"METRIC","dataType":"INTEGER"}
+                ],"rows":[[106,47,4,0]]}
+                """;
+        YouTubeAnalyticsService service = serviceResponding(HttpStatus.OK, response);
+
+        VideoAnalyticsResult result = service.getSingleVideoAnalytics(
+                "laQbWAoa3NI", "2026-07-27", "2026-08-29",
+                List.of("views", "engagedViews", "likes", "comments"));
+
+        assertThat(result.getMetrics())
+                .containsEntry("views", 131L)
+                .containsEntry("engagedViews", 47)
+                .containsEntry("likes", 4L)
+                .containsEntry("comments", 0L);
+        assertThat(result.getAnalyticsMetrics())
+                .containsEntry("views", 106)
+                .containsEntry("engagedViews", 47);
+        assertThat(result.getCurrentStatistics())
+                .containsEntry("viewCount", 131L)
+                .containsEntry("likeCount", 4L)
+                .containsEntry("commentCount", 0L);
+        assertThat(result.getDataFreshness())
+                .containsEntry("lifetimeWindow", true)
+                .containsEntry("publicCountersAppliedToMetrics", true)
+                .containsEntry("engagedViewsMayLag", true);
+    }
+
+    @Test
+    void doesNotReplaceDateFilteredViewsWithLifetimeStatistics() {
+        stubMetadata();
+        YouTubeAnalyticsService service = serviceResponding(HttpStatus.OK, successfulResponse());
+
+        VideoAnalyticsResult result = service.getSingleVideoAnalytics(
+                "laQbWAoa3NI", "2026-08-01", "2026-08-29", List.of("views", "likes", "comments"));
+
+        assertThat(result.getMetrics()).containsEntry("views", 57).containsEntry("likes", 3);
+        assertThat(result.getDataFreshness())
+                .containsEntry("lifetimeWindow", false)
+                .containsEntry("publicCountersAppliedToMetrics", false);
+        verify(dataService, never()).getVideoStatistics(List.of("laQbWAoa3NI"));
     }
 
     @Test

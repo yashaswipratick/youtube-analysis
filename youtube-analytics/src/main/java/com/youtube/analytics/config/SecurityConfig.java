@@ -15,19 +15,18 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/oauth/**",
                         "/login/**",
                         "/error",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**",
-                        "/api/youtube/analytics/ai/analyze",
-                        "/api/youtube/analytics/**"
+                        "/api/youtube-analytics/v1/oauth/success",
+                        "/api/youtube-analytics/v1/analytics/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2
-                .defaultSuccessUrl("/oauth/success", true)
+                .defaultSuccessUrl("/api/youtube-analytics/v1/oauth/success", true)
             )
             .csrf(csrf -> csrf.disable());
 

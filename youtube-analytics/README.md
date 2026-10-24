@@ -4,12 +4,54 @@ Spring Boot REST API for Google OAuth and YouTube Studio Analytics, including ch
 
 ## Run
 
-Requires Java 17 and Maven. Set `youtube.oauth.credentials-file` to a local JSON file containing the Google OAuth `client-id` and `client-secret`, then run:
+Requires Java 17 and Maven. Set `youtube.oauth.credentials-file` (or `YOUTUBE_OAUTH_CREDENTIALS_FILE`) to a local JSON file containing the Google OAuth `client-id` and `client-secret`, then run:
 
 ```sh
 mvn spring-boot:run
 ```
 
-The API is rooted at `/api/youtube/analytics`. OpenAPI documentation is available at `/swagger-ui/index.html` while the application is running.
+Application APIs are rooted at `/api/youtube-analytics/v1`. Analytics endpoints are under `/analytics`, local YouTube Data API compatibility endpoints under `/youtube`, and OAuth helper endpoints under `/oauth`. OpenAPI documentation is available at `/swagger-ui/index.html` while the application is running.
+
+### YouTube Studio analytics reports
+
+Analytics report endpoints are under `/api/youtube-analytics/v1/analytics`:
+
+| Endpoint | Purpose |
+| --- | --- |
+| `GET /reports/overview` | Views, watch time, subscriber gains/losses/net change, average view duration/percentage, likes, comments, shares, and revenue when authorized/available |
+| `GET /reports/videos/top` | Top videos by views with watch time, retention averages, subscribers gained and shares |
+| `GET /reports/videos/compare?videoIds=ID1&videoIds=ID2` | Compare up to 50 selected videos side by side |
+| `GET /reports/audience` | Unique viewers, watch time/views for subscribed vs. unsubscribed viewers, age and gender breakdown |
+| `GET /reports/formats` | Shorts, video-on-demand and livestream breakdown where available |
+| `GET /reports/traffic-sources` | Browse, Suggested, YouTube Search, External, Shorts feed and other traffic source categories |
+| `GET /reports/search-terms` | Search terms that generated views for channel videos |
+| `GET /reports/revenue` | Estimated revenue, RPM-related CPM metrics and revenue by video where available |
+| `GET /reports/videos/benchmarks?limit=15` | First 48-hour (date-granular approximation) and first 28-day metrics for the latest 1–15 uploads, including views, average view duration/percentage, subscribers gained, shares, traffic source, impressions and CTR when Reporting API CSVs are ready |
+| `GET /reports/subtitles` | Subtitle language report from the asynchronous YouTube Reporting API |
+| `GET /video/{videoId}/reach` | Impressions and impressions click-through rate for one video |
+| `GET /reports/capabilities` | Machine-readable list of supported reports and Studio-only metrics not exposed by Google's APIs |
+
+All date-scoped analytics endpoints use `lastNDays` only (1–3650), for example `GET /api/youtube-analytics/v1/analytics/video/sMMJS_Hp8KI?lastNDays=7`. If omitted, the API defaults to the last 28 YouTube reporting days. The public API no longer accepts `startDate` or `endDate` request parameters. For video-specific reports, the API internally uses local video-details metadata (`data.publish_date`) and clamps the analytics start date to the video's publication reporting day. Reporting days use America/Los_Angeles. The bulk `POST /videos` and `POST /recommendations` request bodies also use `lastNDays`.
+
+**Video metric freshness:** the single-video endpoint also fetches current public counters from YouTube Data API v3. When `lastNDays` covers the video's entire lifetime, `metrics.views`, `metrics.likes`, and `metrics.comments` use those current counts; the original processed Analytics API values are retained in `analyticsMetrics`. Current counters are also returned in `currentStatistics`, and `dataFreshness` explains the source. For a shorter date-filtered window, lifetime counters are not substituted. `engagedViews`, watch time, retention and subscriber metrics still come from YouTube Analytics API v2 and may lag by 48–72 hours; the public Data API does not expose a live engaged-views counter.
+
+The OAuth scopes include `yt-analytics.readonly` and `yt-analytics-monetary.readonly`. After adding the monetary scope, re-authorize the Google account via `/oauth2/authorization/google` so consent is refreshed. Revenue still requires an eligible monetized channel. The YouTube Analytics API's data is not real-time and commonly lags by 48–72 hours; the Reporting API generates daily CSV files asynchronously. The 48-hour benchmark is therefore not an exact rolling 48-hour measurement. See `docs/youtube-studio-analytics-coverage.md` for the coverage matrix and limitations.
 
 OpenAI analysis is optional and uses `OPENAI_API_KEY_FILE`, `OPENAI_BASE_URL`, and `OPENAI_MODEL`.
+
+## Local YouTube Data API compatibility endpoints
+
+A self-hosted compatibility API is available under `/api/youtube-analytics/v1/youtube/`. This is the single canonical route family; legacy `/api/tubealfred` and `/api/youtubealfred` aliases are not registered. **All data requests are made directly to Google's official YouTube Data API v3 using the signed-in user's Google OAuth access token.** This project does not call TubeAlfred, does not require a TubeAlfred API key, and does not use a paid third-party API.
+
+The local API implements video details/enhanced details, OAuth-accessible captions, comments and replies, related-video search approximation, channel details/about/uploads/streams/Shorts/playlists, YouTube search and filters, public autocomplete suggestions, hashtag search, most-popular videos, playlists, URL resolution and batch lookups. See `docs/tubealfred-api-inventory.md` for the route-by-route mapping and limitations.
+
+### OAuth and Google API setup
+
+- Enable **YouTube Data API v3** for the Google Cloud project associated with the OAuth client.
+- Google sign-in is initiated at `/oauth2/authorization/google` (Spring Security's OAuth protocol endpoint); the current user's OAuth token is used for YouTube requests. The app's OAuth status/success helper APIs are under `/api/youtube-analytics/v1/oauth`.
+- The configuration includes `youtube.readonly` plus `youtube.force-ssl`. Google uses the latter for OAuth-protected caption listing/download; sign out and authorize again if the newly added scope has not been consented to.
+- Public read operations consume Google's project quota. There is no TubeAlfred subscription or third-party API key. Google Cloud quota and access restrictions still apply.
+- Google does not provide an official public endpoint for channel Community posts, arbitrary public transcripts, or a direct related-video/Shorts-tab feed. For transcript access, this implementation uses Google's captions API and can only fetch tracks the signed-in account is authorized to edit. Related videos and Shorts are best-effort approximations, clearly annotated in their responses. Community-post routes return an explicit unsupported response instead of scraping undocumented endpoints.
+
+Swagger: `/swagger-ui/index.html`  
+OpenAPI JSON: `/v3/api-docs`

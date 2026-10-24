@@ -14,7 +14,11 @@ spring:
               - email
               - profile
               - https://www.googleapis.com/auth/youtube.readonly
+              # Required by Google's OAuth-protected captions.list/download endpoints.
+              - https://www.googleapis.com/auth/youtube.force-ssl
               - https://www.googleapis.com/auth/yt-analytics.readonly
+              # Required for estimated revenue and ad performance reports on monetized channels.
+              - https://www.googleapis.com/auth/yt-analytics-monetary.readonly
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             authorization-grant-type: authorization_code
         provider:
@@ -26,6 +30,12 @@ spring:
 
 server:
   port: 8080
+
+# Automatically open Google sign-in when running locally. Set OAUTH_AUTO_OPEN_BROWSER=false
+# for headless servers or environments where a browser should not be launched.
+app:
+  oauth:
+    auto-open-browser: ${OAUTH_AUTO_OPEN_BROWSER:true}
 
 youtube:
   oauth:

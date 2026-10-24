@@ -5,6 +5,7 @@ import com.youtube.analytics.model.ChannelAnalyticsResult;
 import com.youtube.analytics.model.DailyVideoAnalyticsResult;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.model.VideoMeta;
+import com.youtube.analytics.model.VideoPublicStatistics;
 import com.youtube.analytics.model.VideoRetentionAnalyticsResult;
 import com.youtube.analytics.model.YouTubeAnalyticsApiResponse;
 import com.youtube.analytics.model.YouTubeAnalyticsColumnHeader;
@@ -18,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -72,12 +74,75 @@ public class YouTubeAnalyticsService {
                 .queryParam("metrics", String.join(",", resolvedMetrics)).queryParam("filters", "video==" + videoId)
                 .build().toUri();
 
-        Map<String, Object> metricsMap = parseSingleRowResponse(fetchAnalyticsResponse(uri));
+        Map<String, Object> analyticsMetrics = parseSingleRowResponse(fetchAnalyticsResponse(uri));
+        Map<String, Object> metricsMap = new LinkedHashMap<>(analyticsMetrics);
         Map<String, VideoMeta> meta = youTubeDataService.getVideoMeta(List.of(videoId));
         VideoMeta videoMeta = meta.getOrDefault(videoId, new VideoMeta(videoId, videoId, null));
 
+        boolean lifetimeWindow = coversVideoLifetime(resolvedStart, videoMeta.getPublishedAt());
+        Map<String, Object> currentStatistics = null;
+        Map<String, Object> dataFreshness = new LinkedHashMap<>();
+        dataFreshness.put("analyticsSource", "YouTube Analytics API v2");
+        dataFreshness.put("analyticsDataLatency", "Typically 48–72 hours; recent days may be missing or incomplete");
+        dataFreshness.put("requestedEndDate", resolvedEnd);
+        dataFreshness.put("lifetimeWindow", lifetimeWindow);
+        dataFreshness.put("engagedViewsSource", "YouTube Analytics API v2; videos.list does not expose a current engagedViews counter");
+
+        if (lifetimeWindow) {
+            Map<String, VideoPublicStatistics> statisticsById = youTubeDataService.getVideoStatistics(List.of(videoId));
+            VideoPublicStatistics statistics = statisticsById == null ? null : statisticsById.get(videoId);
+            if (statistics != null) {
+                currentStatistics = new LinkedHashMap<>();
+                putIfPresent(currentStatistics, "viewCount", statistics.viewCount());
+                putIfPresent(currentStatistics, "likeCount", statistics.likeCount());
+                putIfPresent(currentStatistics, "commentCount", statistics.commentCount());
+
+                // On a window that starts at the publication day, the Data API's current
+                // lifetime counters are the best available source for counts shown in Studio.
+                // Preserve the processed Analytics API snapshot separately for auditing.
+                if (metricsMap.containsKey("views") && statistics.viewCount() != null) {
+                    metricsMap.put("views", statistics.viewCount());
+                }
+                if (metricsMap.containsKey("likes") && statistics.likeCount() != null) {
+                    metricsMap.put("likes", statistics.likeCount());
+                }
+                if (metricsMap.containsKey("comments") && statistics.commentCount() != null) {
+                    metricsMap.put("comments", statistics.commentCount());
+                }
+                dataFreshness.put("publicCounterSource", "YouTube Data API v3 videos.list part=statistics");
+                dataFreshness.put("publicCountersAppliedToMetrics", true);
+                dataFreshness.put("publicCountersScope", "Current lifetime totals; overlaid only because the requested window includes the entire video lifetime");
+                dataFreshness.put("engagedViewsMayLag", true);
+                dataFreshness.put("note", "views/likes/comments use current Data API counters for this lifetime window. engagedViews and watch-time metrics remain processed Analytics API values and can lag Studio by 48–72 hours.");
+            } else {
+                dataFreshness.put("publicCountersAppliedToMetrics", false);
+                dataFreshness.put("note", "Current public statistics could not be fetched; all metrics remain from the processed YouTube Analytics API report.");
+            }
+        } else {
+            dataFreshness.put("publicCountersAppliedToMetrics", false);
+            dataFreshness.put("note", "This is a partial date window, so current lifetime counters are not substituted for date-filtered metrics. The YouTube Analytics API may omit the most recent 48–72 hours.");
+        }
+
         return VideoAnalyticsResult.builder().videoId(videoId).title(videoMeta.getTitle()).publishedAt(videoMeta.getPublishedAt())
-                .startDate(resolvedStart).endDate(resolvedEnd).metrics(metricsMap).build();
+                .startDate(resolvedStart).endDate(resolvedEnd).metrics(metricsMap)
+                .analyticsMetrics(analyticsMetrics).currentStatistics(currentStatistics)
+                .dataFreshness(dataFreshness).build();
+    }
+
+    private boolean coversVideoLifetime(String startDate, String publishedAt) {
+        if (startDate == null || publishedAt == null || publishedAt.isBlank()) return false;
+        try {
+            LocalDate publishDay = Instant.parse(publishedAt)
+                    .atZone(AnalyticsDateRangeResolver.REPORTING_ZONE).toLocalDate();
+            return !LocalDate.parse(startDate).isAfter(publishDay);
+        } catch (RuntimeException ex) {
+            log.debug("Cannot determine whether the requested analytics window covers the video's lifetime", ex);
+            return false;
+        }
+    }
+
+    private void putIfPresent(Map<String, Object> target, String key, Long value) {
+        if (value != null) target.put(key, value);
     }
 
     /**

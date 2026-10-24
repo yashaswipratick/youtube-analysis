@@ -1,6 +1,7 @@
 package com.youtube.analytics.service;
 
 import com.youtube.analytics.model.VideoMeta;
+import com.youtube.analytics.model.VideoPublicStatistics;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -123,6 +124,52 @@ public class YouTubeDataService {
 
         log.debug("Fetched metadata for {} videos", result.size());
         return result;
+    }
+
+    /**
+     * Fetches current, non-date-filtered public counters through videos.list.
+     * Google recommends this Data API endpoint for current view/like/comment
+     * counts because YouTube Analytics API reports can lag by 48–72 hours.
+     */
+    public Map<String, VideoPublicStatistics> getVideoStatistics(List<String> videoIds) {
+        Map<String, VideoPublicStatistics> result = new HashMap<>();
+        if (videoIds == null || videoIds.isEmpty()) return result;
+
+        List<List<String>> batches = partition(videoIds, 50);
+        for (List<String> batch : batches) {
+            String ids = String.join(",", batch);
+            String url = YT_DATA_BASE + "/videos?part=statistics&id=" + ids;
+            Map<?, ?> response = youTubeWebClient.get()
+                    .uri(url)
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
+
+            if (response == null) continue;
+            List<?> items = (List<?>) response.get("items");
+            if (items == null) continue;
+            for (Object item : items) {
+                if (!(item instanceof Map<?, ?> videoMap)) continue;
+                String videoId = String.valueOf(videoMap.get("id"));
+                Object statisticsObject = videoMap.get("statistics");
+                if (!(statisticsObject instanceof Map<?, ?> statistics)) continue;
+                result.put(videoId, new VideoPublicStatistics(
+                        videoId,
+                        parseOptionalLong(statistics.get("viewCount")),
+                        parseOptionalLong(statistics.get("likeCount")),
+                        parseOptionalLong(statistics.get("commentCount"))));
+            }
+        }
+        return result;
+    }
+
+    private Long parseOptionalLong(Object value) {
+        if (value == null) return null;
+        try {
+            return value instanceof Number number ? number.longValue() : Long.parseLong(value.toString());
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     private <T> List<List<T>> partition(List<T> list, int size) {

@@ -1,23 +1,24 @@
 package com.youtube.analytics.model;
 
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.List;
 
+/** Request for analytics across a selected set of video IDs. */
 @Data
 public class AnalyticsRequest {
 
     @NotEmpty(message = "videoIds must not be empty")
     private List<@NotBlank(message = "videoIds must not contain blank values") String> videoIds;
 
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "startDate must be in yyyy-MM-dd format")
-    private String startDate;
-
-    @Pattern(regexp = "\\d{4}-\\d{2}-\\d{2}", message = "endDate must be in yyyy-MM-dd format")
-    private String endDate;
+    /** Number of recent YouTube reporting days to retrieve; defaults to 28 when omitted. */
+    @Min(value = 1, message = "lastNDays must be at least 1")
+    @Max(value = 3650, message = "lastNDays must not exceed 3650")
+    private Integer lastNDays;
 
     private List<String> metrics;
 

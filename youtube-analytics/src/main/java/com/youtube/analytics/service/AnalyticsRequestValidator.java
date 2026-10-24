@@ -19,7 +19,14 @@ public final class AnalyticsRequestValidator {
     private static final Set<String> VIDEO_METRICS = Set.of(
             "views", "engagedViews", "estimatedMinutesWatched", "averageViewDuration",
             "averageViewPercentage", "likes", "comments", "shares", "subscribersGained",
-            "subscribersLost");
+            "subscribersLost", "viewerPercentage", "uniques", "redViews", "estimatedRedMinutesWatched",
+            "estimatedRevenue", "estimatedAdRevenue", "estimatedRedPartnerRevenue",
+            "grossRevenue", "cpm", "adImpressions", "monetizedPlaybacks", "playbackBasedCpm",
+            "cardImpressions", "cardClicks", "cardClickRate", "cardTeaserImpressions",
+            "cardTeaserClicks", "cardTeaserClickRate", "videosAddedToPlaylists",
+            "videosRemovedFromPlaylists", "annotationImpressions", "annotationClicks",
+            "annotationClickThroughRate", "annotationClosableImpressions", "annotationCloses",
+            "annotationCloseRate", "annotationClickableImpressions");
 
     private AnalyticsRequestValidator() {
     }
