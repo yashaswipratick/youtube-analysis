@@ -61,6 +61,35 @@ public class YouTubePublicApiService {
     }
 
     /**
+     * Fetches normalized public metadata and any caption text available to the OAuth user.
+     * The official caption endpoints only allow downloading tracks for videos the user can edit.
+     */
+    public JsonNode getVideoDetails(String videoId) {
+        if (videoId == null || !VIDEO_ID.matcher(videoId.trim()).matches()) {
+            throw new IllegalArgumentException("videoId must be an 11-character YouTube video ID");
+        }
+        JsonNode details = videoDetails(videoId.trim(), null, false);
+        if (details == null || details.path("id").asText("").isBlank()) {
+            throw new IllegalArgumentException("No YouTube video was found for video ID " + videoId);
+        }
+        return details;
+    }
+
+    /** Returns the channel associated with the authenticated YouTube account. */
+    public String getAuthorizedChannelId() {
+        JsonNode response = google("/channels", params("part", "id", "mine", "true"));
+        JsonNode items = response.path("items");
+        if (!items.isArray() || items.isEmpty()) {
+            throw new IllegalStateException("No authorized YouTube channel was returned for the signed-in account.");
+        }
+        String channelId = items.get(0).path("id").asText("");
+        if (channelId.isBlank()) {
+            throw new IllegalStateException("The authorized YouTube channel ID is unavailable.");
+        }
+        return channelId;
+    }
+
+    /**
      * Returns the same publication timestamp exposed as data.publish_date by
      * GET /api/youtube-analytics/v1/youtube/video/{videoId}. Analytics services
      * call this service method directly instead of making an HTTP loopback call
@@ -642,6 +671,11 @@ public class YouTubePublicApiService {
         Map<String, String> p = params("part", "snippet", "q", "#" + q, "type", "video", "maxResults", String.valueOf(MAX_RESULTS));
         optional(p, "pageToken", token);
         return google("/search", p);
+    }
+
+    /** Public wrapper for the UI workspace's keyword-idea workflow. */
+    public JsonNode searchSuggestions(String query) {
+        return suggestions(query, null);
     }
 
     private JsonNode suggestions(String q, String previous) {

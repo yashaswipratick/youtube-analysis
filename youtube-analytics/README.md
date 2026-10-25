@@ -39,6 +39,39 @@ The OAuth scopes include `yt-analytics.readonly` and `yt-analytics-monetary.read
 
 OpenAI analysis is optional and uses `OPENAI_API_KEY_FILE`, `OPENAI_BASE_URL`, and `OPENAI_MODEL`.
 
+## Separate analytics UI and backend
+
+The backend is API-only. It does not package or serve `front-end/`. Run it from the project root:
+
+```sh
+mvn spring-boot:run
+```
+
+The backend listens on `http://localhost:8080` by default. Its root returns backend-service JSON, the API routes remain under `/api/youtube-analytics/v1`, and the direct Google OAuth URL is `http://localhost:8080/oauth2/authorization/google`. A direct OAuth login finishes on the backend's `/api/youtube-analytics/v1/oauth/success` JSON response.
+
+Run the independent UI in a second terminal:
+
+```sh
+python3 -m http.server 3000 --bind 127.0.0.1 --directory front-end
+```
+
+Open `http://localhost:3000/`. The UI's backend base URL is configured in `front-end/config.js` (`apiBaseUrl`, default `http://localhost:8080`). The UI sign-in button starts OAuth through the backend's `/api/youtube-analytics/v1/oauth/start` route; that flow returns to the UI after sign-in, while directly opening the OAuth URL above displays the backend success response. The backend root (`/`) returns JSON service metadata, never the UI.
+
+To change the backend port, start it with `SERVER_PORT=8090 mvn spring-boot:run` and update `apiBaseUrl` in `front-end/config.js` to `http://localhost:8090`. Also set `CORS_ALLOWED_ORIGINS` if the frontend origin changes, and `UI_BASE_URL` if the UI URL changes. In Google Cloud Console, update the OAuth client's authorized redirect URI to `http://localhost:8090/login/oauth2/code/google` when changing the backend port; Google redirects to the Spring Boot callback port, never the UI port. CORS origins are configured with `CORS_ALLOWED_ORIGINS` (comma-separated).
+
+### Format-specific dashboards
+
+The frontend has two independent dashboard pages, each with its own sidebar and format-restricted library, video deep-dive, and comparison screens:
+
+- `http://localhost:3000/shorts.html` — Shorts dashboard.
+- `http://localhost:3000/long-form.html` — long-form video dashboard.
+
+Both pages use the same configurable backend origin from `front-end/config.js` and existing workspace API. Format filtering is based on duration (180 seconds or less is a Shorts approximation), not an authoritative Shorts-tab classification. Each dashboard analyzes videos selected from its matching recent-upload sample and keeps its comparison rows within that format.
+
+The workspace layer is under `/api/youtube-analytics/v1/analytics/workspace` and provides channel/video analysis, Shorts/long-form comparison, upload consistency, keyword opportunity candidates, public comparable videos, and rolling period reports. See [docs/youtube-analytics-ui.md](docs/youtube-analytics-ui.md) for endpoint contracts, metric limitations, and definitions.
+
+Keyword opportunity scores are heuristic estimates, not measured CTR or search volume. CTR is reported only as a measured video-level reach metric when YouTube Reporting API data is available. Competitor retention, watch time, audience metrics, revenue, and CTR are not exposed by public endpoints and are not invented.
+
 ## Local YouTube Data API compatibility endpoints
 
 A self-hosted compatibility API is available under `/api/youtube-analytics/v1/youtube/`. This is the single canonical route family; legacy `/api/tubealfred` and `/api/youtubealfred` aliases are not registered. **All data requests are made directly to Google's official YouTube Data API v3 using the signed-in user's Google OAuth access token.** This project does not call TubeAlfred, does not require a TubeAlfred API key, and does not use a paid third-party API.

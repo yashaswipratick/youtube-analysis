@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0e12">
+  <title>Long-form Analytics — Signal Studio</title>
+  <meta name="description" content="A dedicated dashboard for long-form YouTube videos and their analytics.">
+  <link rel="stylesheet" href="/styles.css">
+  <script>window.YOUTUBE_ANALYTICS_PAGE_MODE = "long-form";</script>
+  <script src="/config.js"></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="shell format-shell long-form-shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="/long-form.html" aria-label="Long-form dashboard home"><span class="brand-icon"><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="1" y="1" width="34" height="34" rx="11" fill="#789cff"/><rect x="8" y="9" width="20" height="18" rx="3" fill="none" stroke="#fff" stroke-width="2.2"/><path d="M15 13.5l8 4.5-8 4.5v-9z" fill="#fff"/></svg></span><span class="brand-copy"><strong>signal<span>.</span></strong><small>LONG-FORM ANALYTICS</small></span></a>
+      <div class="nav-caption">LONG-FORM WORKSPACE</div>
+      <nav class="nav-list" aria-label="Long-form analytics navigation">
+        <button class="nav-item active" data-view="overview"><span class="nav-glyph">◫</span><span>Overview</span></button>
+        <button class="nav-item" data-view="library"><span class="nav-glyph">▤</span><span>Video library</span></button>
+        <button class="nav-item" data-view="video"><span class="nav-glyph">▷</span><span>Video analytics</span></button>
+        <button class="nav-item" data-view="compare"><span class="nav-glyph">⇄</span><span>Performance</span></button>
+        <button class="nav-item" data-view="competitor"><span class="nav-glyph">◎</span><span>Video vs competitor</span></button>
+        <a class="nav-item dashboard-switch" href="/shorts.html" target="_blank" rel="noopener"><span class="nav-glyph">▶</span><span>Open Shorts dashboard ↗</span></a>
+        <a class="nav-item dashboard-switch" href="/index.html"><span class="nav-glyph">⌂</span><span>Full workspace</span></a>
+      </nav>
+      <div class="sidebar-bottom"><div class="session-card"><div class="session-top"><span class="session-dot" id="session-dot"></span><strong id="session-title">Checking session</strong></div><div class="session-sub" id="session-sub">Connecting to Google OAuth</div><a class="login-link hidden" id="login-link" href="http://localhost:8080/api/youtube-analytics/v1/oauth/start">Connect Google account <span>↗</span></a></div><div class="sidebar-foot">Long-form-only workspace · Measured metrics only</div></div>
+    </aside>
+    <div class="main">
+      <header class="topbar"><button class="menu-btn" id="menu-btn" aria-label="Open navigation">☰</button><div class="crumb"><span>Signal Studio</span><span class="slash">/</span><strong id="page-name">Long-form overview</strong></div><div class="top-actions"><span class="data-badge"><span class="session-dot"></span>LONG-FORM ONLY</span><a class="studio-button" href="https://studio.youtube.com/" target="_blank" rel="noreferrer">YouTube Studio ↗</a><div class="user-avatar" id="user-avatar">S</div></div></header>
+      <main id="app" class="content" aria-live="polite"><div class="loading"><span class="spinner"></span><p>Opening long-form analytics…</p></div></main>
+      <footer class="footer"><span>Format: duration greater than 180 seconds.</span><span>Private analytics require channel authorization.</span></footer>
+    </div>
+  </div><div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

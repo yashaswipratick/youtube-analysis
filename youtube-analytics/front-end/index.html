@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0c0e12">
+  <title>Signal Studio — YouTube Analytics</title>
+  <meta name="description" content="A data-grounded workspace for YouTube channel performance, retention, consistency and content experiments.">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/config.js"></script>
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="/" aria-label="Signal Studio home">
+        <span class="brand-icon"><svg viewBox="0 0 36 36" aria-hidden="true"><rect x="1" y="1" width="34" height="34" rx="11" fill="#ff4f62"/><path d="M9 22.5h4.3l3.7-9 4 12 3.2-7h2.8" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <span class="brand-copy"><strong>signal<span>.</span></strong><small>YOUTUBE ANALYTICS</small></span>
+      </a>
+      <div class="nav-caption">WORKSPACE</div>
+      <nav class="nav-list" aria-label="Main navigation">
+        <a class="nav-item dashboard-switch" href="/shorts.html" target="_blank" rel="noopener"><span class="nav-glyph">▶</span><span>Shorts dashboard ↗</span></a>
+        <a class="nav-item dashboard-switch" href="/long-form.html" target="_blank" rel="noopener"><span class="nav-glyph">▣</span><span>Long-form dashboard ↗</span></a>
+        <button class="nav-item active" data-view="overview"><span class="nav-glyph">◫</span><span>Overview</span></button>
+        <button class="nav-item" data-view="channel"><span class="nav-glyph">◎</span><span>Channel analytics</span></button>
+        <button class="nav-item" data-view="video"><span class="nav-glyph">▷</span><span>Video deep-dive</span></button>
+        <button class="nav-item" data-view="compare"><span class="nav-glyph">⇄</span><span>Format comparison</span></button>
+        <button class="nav-item" data-view="keywords"><span class="nav-glyph">⌕</span><span>Keyword lab</span></button>
+        <button class="nav-item" data-view="benchmark"><span class="nav-glyph">⌘</span><span>Similar videos</span></button>
+        <button class="nav-item" data-view="competitor"><span class="nav-glyph">⇄</span><span>Video vs competitor</span></button>
+        <button class="nav-item" data-view="reports"><span class="nav-glyph">▤</span><span>Reports</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="session-card">
+          <div class="session-top"><span class="session-dot" id="session-dot"></span><strong id="session-title">Checking session</strong></div>
+          <div class="session-sub" id="session-sub">Connecting to Google OAuth</div>
+          <a class="login-link hidden" id="login-link" href="/oauth2/authorization/google">Connect Google account <span>↗</span></a>
+        </div>
+        <div class="sidebar-foot">API-backed analytics · No invented metrics</div>
+      </div>
+    </aside>
+    <div class="main">
+      <header class="topbar">
+        <button class="menu-btn" id="menu-btn" aria-label="Open navigation">☰</button>
+        <div class="crumb"><span>Workspace</span><span class="slash">/</span><strong id="page-name">Overview</strong></div>
+        <div class="top-actions">
+          <span class="data-badge"><span class="session-dot"></span>Protected analytics workspace</span>
+          <a class="studio-button" href="https://studio.youtube.com/" target="_blank" rel="noreferrer">YouTube Studio <span>↗</span></a>
+          <div class="user-avatar" id="user-avatar">S</div>
+        </div>
+      </header>
+      <main id="app" class="content" aria-live="polite">
+        <div class="loading"><span class="spinner"></span><p>Opening your analytics workspace…</p></div>
+      </main>
+      <footer class="footer"><span>Analytics reports may lag 48–72 hours.</span><span>Private analytics require channel authorization.</span></footer>
+    </div>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

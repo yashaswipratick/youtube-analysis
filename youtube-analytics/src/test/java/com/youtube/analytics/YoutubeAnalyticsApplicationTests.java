@@ -9,6 +9,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,5 +44,36 @@ class YoutubeAnalyticsApplicationTests {
     void analyticsRoutesRequireAnAuthenticatedOAuthSession() throws Exception {
         mockMvc.perform(get("/api/youtube-analytics/v1/analytics/reports/capabilities"))
                 .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
+    void frontendOriginCanCallApiWithCredentialedCors() throws Exception {
+        mockMvc.perform(options("/api/youtube-analytics/v1/oauth/me")
+                        .header("Origin", "http://localhost:3000")
+                        .header("Access-Control-Request-Method", "GET"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .header().string("Access-Control-Allow-Origin", "http://localhost:3000"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .header().string("Access-Control-Allow-Credentials", "true"));
+    }
+
+    @Test
+    void backendRootReturnsJsonMetadataAndOAuthStatusIsPublicBeforeLogin() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .content().contentTypeCompatibleWith("application/json"))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .jsonPath("$.service").value("youtube-analytics-api"));
+
+        // Backend must not expose the separately-hosted dashboard assets.
+        mockMvc.perform(get("/index.html"))
+                .andExpect(status().is3xxRedirection());
+
+        mockMvc.perform(get("/api/youtube-analytics/v1/oauth/me"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers
+                        .jsonPath("$.status").value("unauthenticated"));
     }
 }

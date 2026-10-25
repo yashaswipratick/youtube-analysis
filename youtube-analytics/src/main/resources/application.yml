@@ -29,13 +29,21 @@ spring:
             user-name-attribute: sub
 
 server:
-  port: 8080
+  # Override SERVER_PORT when deploying the API on a different port.
+  port: ${SERVER_PORT:8080}
 
 # Automatically open Google sign-in when running locally. Set OAUTH_AUTO_OPEN_BROWSER=false
 # for headless servers or environments where a browser should not be launched.
 app:
   oauth:
     auto-open-browser: ${OAUTH_AUTO_OPEN_BROWSER:true}
+  ui:
+    # Used only when login was started from the separate UI. Direct OAuth URL visits
+    # finish at the backend's /api/youtube-analytics/v1/oauth/success response.
+    base-url: ${UI_BASE_URL:http://localhost:3000}
+  cors:
+    # Comma-separated frontend origins allowed to call the backend with session cookies.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://127.0.0.1:3000}
 
 youtube:
   oauth:
@@ -71,6 +79,11 @@ openai:
   api-key-file: ${OPENAI_API_KEY_FILE:/Users/yashaswipratick/Desktop/OPEN_API_KEY.txt}
   base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
   model: ${OPENAI_MODEL:gpt-5.6-luna}
+
+# Optional local executable for public competitor captions. Install with `brew install yt-dlp` on macOS,
+# or set YTDLP_COMMAND to an executable path. The app never runs this through a shell.
+transcript:
+  yt-dlp-command: ${YTDLP_COMMAND:yt-dlp}
 
 logging:
   level:
