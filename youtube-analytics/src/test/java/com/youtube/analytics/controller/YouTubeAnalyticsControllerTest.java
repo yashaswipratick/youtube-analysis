@@ -48,6 +48,7 @@ class YouTubeAnalyticsControllerTest {
         analyticsService = mock(YouTubeAnalyticsService.class);
         YouTubeAnalyticsReportAggregationService reportAggregationService = mock(YouTubeAnalyticsReportAggregationService.class);
         when(reportAggregationService.enrich(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(reportAggregationService.enrich(any(), any())).thenAnswer(invocation -> invocation.getArgument(0));
         YouTubeTrafficSourceAnalyticsService trafficSourceService = mock(YouTubeTrafficSourceAnalyticsService.class);
         YouTubeGeographyAnalyticsService geographyService = mock(YouTubeGeographyAnalyticsService.class);
         YouTubeChannelGeographyAnalyticsService channelGeographyService = mock(YouTubeChannelGeographyAnalyticsService.class);

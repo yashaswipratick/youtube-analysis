@@ -13,6 +13,8 @@ public class YouTubeAnalyticsProperties {
 
     private int reportingLagDays = 3;
     private String archiveDirectory = "./data/youtube-analytics/reports";
+    /** Zero disables automatic archive deletion. */
+    private int archiveRetentionDays = 0;
     private Metrics metrics = new Metrics();
 
     public int getReportingLagDays() {
@@ -29,6 +31,14 @@ public class YouTubeAnalyticsProperties {
 
     public void setArchiveDirectory(String archiveDirectory) {
         this.archiveDirectory = archiveDirectory;
+    }
+
+    public int getArchiveRetentionDays() {
+        return archiveRetentionDays;
+    }
+
+    public void setArchiveRetentionDays(int archiveRetentionDays) {
+        this.archiveRetentionDays = Math.max(0, Math.min(archiveRetentionDays, 36500));
     }
 
     public Metrics getMetrics() {

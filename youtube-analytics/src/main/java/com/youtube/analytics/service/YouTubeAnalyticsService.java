@@ -1,5 +1,6 @@
 package com.youtube.analytics.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youtube.analytics.exception.YouTubeAnalyticsApiException;
 import com.youtube.analytics.config.YouTubeAnalyticsProperties;
 import com.youtube.analytics.model.ChannelAnalyticsResult;
@@ -36,6 +37,7 @@ public class YouTubeAnalyticsService {
     private static final String YT_ANALYTICS_BASE = "https://youtubeanalytics.googleapis.com/v2/reports";
     private static final String CHANNEL_IDS = "channel==MINE";
     private static final int ANALYTICS_BATCH_SIZE = 500;
+    private static final ObjectMapper RAW_RESPONSE_MAPPER = new ObjectMapper();
 
     private final WebClient youTubeWebClient;
     private final YouTubeDataService youTubeDataService;
@@ -72,7 +74,8 @@ public class YouTubeAnalyticsService {
                 .queryParam("metrics", String.join(",", resolvedMetrics)).queryParam("filters", "video==" + videoId)
                 .build().toUri();
 
-        Map<String, Object> analyticsMetrics = parseSingleRowResponse(fetchAnalyticsResponse(uri));
+        FetchedAnalyticsResponse fetched = fetchAnalyticsResponseWithRaw(uri);
+        Map<String, Object> analyticsMetrics = parseSingleRowResponse(fetched.response());
         Map<String, Object> metricsMap = new LinkedHashMap<>(analyticsMetrics);
         Map<String, VideoMeta> meta = youTubeDataService.getVideoMeta(List.of(videoId));
         VideoMeta videoMeta = meta.getOrDefault(videoId, new VideoMeta(videoId, videoId, null));
@@ -124,7 +127,9 @@ public class YouTubeAnalyticsService {
         return VideoAnalyticsResult.builder().videoId(videoId).title(videoMeta.getTitle()).publishedAt(videoMeta.getPublishedAt())
                 .startDate(resolvedStart).endDate(resolvedEnd).metrics(metricsMap)
                 .analyticsMetrics(analyticsMetrics).currentStatistics(currentStatistics)
-                .dataFreshness(dataFreshness).build();
+                .dataFreshness(dataFreshness)
+                .rawReportResponses(Map.of("base-analytics", fetched.rawBody()))
+                .build();
     }
 
     private boolean coversVideoLifetime(String startDate, String endDate, String publishedAt) {
@@ -357,6 +362,23 @@ public class YouTubeAnalyticsService {
                 .onStatus(status -> status.isError(), response -> Mono.error(new YouTubeAnalyticsApiException(response.statusCode())))
                 .bodyToMono(YouTubeAnalyticsApiResponse.class).block();
     }
+
+    /** Preserves the original body for reproducible archives on the enriched single-video path. */
+    private FetchedAnalyticsResponse fetchAnalyticsResponseWithRaw(URI uri) {
+        String body = youTubeWebClient.get().uri(uri).retrieve()
+                .onStatus(status -> status.isError(), response -> Mono.error(new YouTubeAnalyticsApiException(response.statusCode())))
+                .bodyToMono(String.class).block();
+        if (body == null || body.isBlank()) {
+            throw new IllegalStateException("YouTube Analytics returned an empty response body");
+        }
+        try {
+            return new FetchedAnalyticsResponse(RAW_RESPONSE_MAPPER.readValue(body, YouTubeAnalyticsApiResponse.class), body);
+        } catch (Exception ex) {
+            throw new IllegalStateException("Unable to decode the YouTube Analytics response", ex);
+        }
+    }
+
+    private record FetchedAnalyticsResponse(YouTubeAnalyticsApiResponse response, String rawBody) { }
 
     private <T> List<List<T>> partition(List<T> list, int size) {
         List<List<T>> parts = new ArrayList<>();

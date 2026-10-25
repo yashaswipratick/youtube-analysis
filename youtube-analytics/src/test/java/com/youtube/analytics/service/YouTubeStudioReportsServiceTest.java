@@ -13,11 +13,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 class YouTubeStudioReportsServiceTest {
+
+    @Test
+    void topVideosSupportsOnlyDocumentedRankingMetrics() {
+        AtomicReference<String> requestedUri = new AtomicReference<>();
+        ExchangeFunction exchange = request -> {
+            requestedUri.set(request.url().toString());
+            return Mono.just(ClientResponse.create(HttpStatus.OK)
+                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .body("{\"columnHeaders\":[{\"name\":\"video\"},{\"name\":\"views\"}],\"rows\":[]}")
+                    .build());
+        };
+        YouTubeStudioReportsService service = new YouTubeStudioReportsService(
+                WebClient.builder().exchangeFunction(exchange).build(),
+                mock(YouTubeDataService.class),
+                mock(YouTubeReachReportingService.class));
+
+        Map<String, Object> result = service.topVideos("2026-10-01", "2026-10-15", 10, "subscribersGained");
+
+        assertThat(result).containsEntry("sortBy", "subscribersGained").containsEntry("sort", "-subscribersGained");
+        assertThat(requestedUri.get()).contains("sort=-subscribersGained");
+        assertThatThrownBy(() -> service.topVideos("2026-10-01", "2026-10-15", 10, "inventedMetric"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("sortBy must be one of");
+    }
 
     @Test
     void overviewReturnsCoreMetricsAndMarksRevenueUnavailableWithoutMonetaryAccess() {
@@ -139,8 +165,11 @@ class YouTubeStudioReportsServiceTest {
         Map<String, Object> result = service.uploadFrequency("2026-10-01", "2026-10-10");
 
         assertThat(result).containsEntry("totalPublishedVideosInRange", 2)
-                .containsEntry("averageUploadsPerWeek", 1.0)
-                .containsEntry("averageUploadsPerMonth", 2.0);
+                .containsEntry("averageUploadsPerWeek", 1.4)
+                .containsEntry("averageUploadsPerMonth", 6.09);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> averageRateBasis = (Map<String, Object>) result.get("averageRateBasis");
+        assertThat(averageRateBasis).containsEntry("daysInRequestedRange", 10L);
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> weekly = (List<Map<String, Object>>) result.get("weekly");
         assertThat(weekly).hasSize(2);

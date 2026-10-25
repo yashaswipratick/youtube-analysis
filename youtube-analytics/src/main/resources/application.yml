@@ -43,6 +43,8 @@ youtube:
   analytics:
     reporting-lag-days: ${YOUTUBE_ANALYTICS_REPORTING_LAG_DAYS:3}
     archive-directory: ${YOUTUBE_ANALYTICS_ARCHIVE_DIR:./data/youtube-analytics/reports}
+    # Zero keeps every snapshot. Positive values prune expired snapshots for a video when that video is enriched.
+    archive-retention-days: ${YOUTUBE_ANALYTICS_ARCHIVE_RETENTION_DAYS:0}
     metrics:
       core: views,engagedViews,estimatedMinutesWatched,averageViewDuration,averageViewPercentage,likes,dislikes,comments,shares,subscribersGained,subscribersLost,videosAddedToPlaylists,videosRemovedFromPlaylists
       cards: cardImpressions,cardClicks,cardClickRate,cardTeaserImpressions,cardTeaserClicks,cardTeaserClickRate
@@ -58,11 +60,12 @@ youtube:
       format: views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage
       playlist: averageTimeInPlaylist,playlistAverageViewDuration,playlistEstimatedMinutesWatched,playlistSaves,playlistStarts,playlistViews,viewsPerPlaylistStart
       geography: engagedViews,views,estimatedMinutesWatched,averageViewDuration,averageViewPercentage
+
   reporting:
     metrics:
       reach: video_thumbnail_impressions,video_thumbnail_impressions_ctr
+      reach-combined: video_thumbnail_impressions,video_thumbnail_impressions_ctr
       end-screens: end_screen_element_impressions,end_screen_element_clicks,end_screen_element_click_rate
-
 openai:
   # Local development only. Never commit the key file itself.
   api-key-file: ${OPENAI_API_KEY_FILE:/Users/yashaswipratick/Desktop/OPEN_API_KEY.txt}

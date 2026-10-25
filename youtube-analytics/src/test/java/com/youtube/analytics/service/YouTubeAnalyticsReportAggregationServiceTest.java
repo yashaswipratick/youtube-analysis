@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFunction;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -15,8 +16,12 @@ import reactor.core.publisher.Mono;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,6 +48,7 @@ class YouTubeAnalyticsReportAggregationServiceTest {
                 .startDate(safeEnd.minusDays(27).toString())
                 .endDate(safeEnd.toString())
                 .metrics(Map.of("views", 12, "likes", 2, "comments", 1, "subscribersGained", 1))
+                .rawReportResponses(Map.of("base-analytics", ANALYTICS_RESPONSE))
                 .build();
 
         VideoAnalyticsResult enriched = service.enrich(input);
@@ -50,7 +56,7 @@ class YouTubeAnalyticsReportAggregationServiceTest {
         assertThat(enriched.getReportSections()).containsKeys(
                 "core", "cards", "premium", "retention", "demographics", "traffic",
                 "trend", "dimensions", "liveStream", "liveOrOnDemand", "youtubeProduct",
-                "channelBenchmark", "revenue", "reach", "endScreens", "optionalMetricValidation", "archive");
+                "channelBenchmark", "revenue", "reach", "reachCombined", "endScreens", "optionalMetricValidation", "archive");
         Map<?, ?> benchmark = (Map<?, ?>) enriched.getReportSections().get("channelBenchmark");
         Map<?, ?> benchmarkSummary = (Map<?, ?>) benchmark.get("summary");
         assertThat(benchmarkSummary.get("medianViews")).isEqualTo(12.0);
@@ -66,7 +72,9 @@ class YouTubeAnalyticsReportAggregationServiceTest {
 
         assertThat(calls.get()).isEqualTo(beforeReplay);
         assertThat(replayed.getArchiveSnapshotId()).isEqualTo(enriched.getArchiveSnapshotId());
-        assertThat(replayed.getRawReportResponses()).isNotEmpty();
+        assertThat(replayed.getRawReportResponses()).isNotEmpty()
+                .containsEntry("base-analytics", ANALYTICS_RESPONSE);
+        assertThat(snapshot.resolve("base-analytics.json")).exists();
         assertThat(replayed.getReportSections()).containsKeys("core", "traffic", "revenue");
     }
 
@@ -158,6 +166,85 @@ class YouTubeAnalyticsReportAggregationServiceTest {
                 .containsEntry("end_screen_element_clicks", 35.0)
                 .containsEntry("end_screen_element_click_rate", 0.35);
         assertThat(calls.get()).isGreaterThan(10);
+    }
+
+    @Test
+    void selectedSectionsSkipUnrequestedReportGroupsAndArchiveTheSubset() throws Exception {
+        AtomicInteger calls = new AtomicInteger();
+        YouTubeAnalyticsReportAggregationService service = service(calls, false);
+        LocalDate safeEnd = LocalDate.now(ZoneId.of("America/Los_Angeles")).minusDays(3);
+        VideoAnalyticsResult input = VideoAnalyticsResult.builder()
+                .videoId(VIDEO_ID)
+                .publishedAt("2025-01-01T00:00:00Z")
+                .startDate(safeEnd.minusDays(27).toString())
+                .endDate(safeEnd.toString())
+                .metrics(Map.of("views", 12))
+                .build();
+
+        VideoAnalyticsResult enriched = service.enrich(input, java.util.Set.of("core", "trend"));
+
+        assertThat(enriched.getReportSections()).containsKeys("core", "trend", "requestedSections", "archive")
+                .doesNotContainKeys("cards", "retention", "demographics", "traffic", "revenue", "reach", "endScreens");
+        assertThat(enriched.getReportSections().get("requestedSections")).isEqualTo(List.of("core", "trend"));
+        assertThat(calls.get()).isLessThan(10);
+        assertThat(Files.exists(archiveDirectory.resolve(VIDEO_ID)
+                .resolve(enriched.getArchiveSnapshotId()).resolve("snapshot.json"))).isTrue();
+    }
+
+    @Test
+    void rejectsUnknownEnrichmentSections() {
+        YouTubeAnalyticsReportAggregationService service = service(new AtomicInteger(), false);
+        VideoAnalyticsResult input = VideoAnalyticsResult.builder().videoId(VIDEO_ID).build();
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> service.enrich(input, java.util.Set.of("invented")))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("Unknown includeSections");
+    }
+
+    @Test
+    void prunesExpiredSnapshotsOnlyWhenRetentionIsConfigured() throws Exception {
+        AtomicInteger calls = new AtomicInteger();
+        YouTubeAnalyticsReportAggregationService service = service(calls, false);
+        YouTubeAnalyticsProperties properties = (YouTubeAnalyticsProperties)
+                ReflectionTestUtils.getField(service, "analyticsProperties");
+        properties.setArchiveRetentionDays(1);
+        Path videoDirectory = archiveDirectory.resolve(VIDEO_ID);
+        Path expired = videoDirectory.resolve("expired_snapshot");
+        Files.createDirectories(expired);
+        Files.writeString(expired.resolve("old.json"), "{}");
+        Files.setLastModifiedTime(expired, FileTime.from(Instant.now().minus(Duration.ofDays(3))));
+
+        LocalDate safeEnd = LocalDate.now(ZoneId.of("America/Los_Angeles")).minusDays(3);
+        VideoAnalyticsResult input = VideoAnalyticsResult.builder()
+                .videoId(VIDEO_ID)
+                .publishedAt("2025-01-01T00:00:00Z")
+                .startDate(safeEnd.minusDays(27).toString())
+                .endDate(safeEnd.toString())
+                .metrics(Map.of("views", 12))
+                .build();
+        VideoAnalyticsResult enriched = service.enrich(input, java.util.Set.of("core"));
+
+        assertThat(expired).doesNotExist();
+        assertThat(videoDirectory.resolve(enriched.getArchiveSnapshotId()).resolve("snapshot.json")).exists();
+    }
+
+    @Test
+    void includesOfficialReachCombinedReportingApiReportTypeWhenRequested() {
+        YouTubeAnalyticsReportAggregationService service = service(new AtomicInteger(), false);
+        LocalDate safeEnd = LocalDate.now(ZoneId.of("America/Los_Angeles")).minusDays(3);
+        VideoAnalyticsResult input = VideoAnalyticsResult.builder()
+                .videoId(VIDEO_ID)
+                .publishedAt("2025-01-01T00:00:00Z")
+                .startDate(safeEnd.minusDays(27).toString())
+                .endDate(safeEnd.toString())
+                .metrics(Map.of("views", 12))
+                .build();
+
+        VideoAnalyticsResult enriched = service.enrich(input, java.util.Set.of("reachCombined"));
+
+        assertThat(enriched.getReportSections()).containsKey("reachCombined");
+        assertThat(((Map<?, ?>) enriched.getReportSections().get("reachCombined")).get("reportTypeId"))
+                .isEqualTo("channel_reach_combined_a1");
     }
 
     @Test

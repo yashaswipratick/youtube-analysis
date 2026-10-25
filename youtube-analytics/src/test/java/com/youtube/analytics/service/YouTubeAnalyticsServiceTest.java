@@ -54,6 +54,7 @@ class YouTubeAnalyticsServiceTest {
         assertThat(result.getVideoId()).isEqualTo("laQbWAoa3NI");
         assertThat(result.getTitle()).isEqualTo("Weekend Trip");
         assertThat(result.getMetrics()).containsEntry("views", 57).containsEntry("likes", 3).containsEntry("comments", 1);
+        assertThat(result.getRawReportResponses()).containsEntry("base-analytics", successfulResponse());
         assertThat(requestUri.get()).contains("metrics=views,likes,comments").contains("filters=video==laQbWAoa3NI");
     }
 

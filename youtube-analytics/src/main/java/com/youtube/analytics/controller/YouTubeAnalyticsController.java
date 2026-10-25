@@ -107,12 +107,14 @@ public class YouTubeAnalyticsController {
     public ResponseEntity<ApiResponse<VideoAnalyticsResult>> getSingleVideoAnalytics(
             @PathVariable String videoId,
             @RequestParam(required = false) @Min(1) @Max(3650) Integer lastNDays,
-            @RequestParam(required = false) List<String> metrics) {
+            @RequestParam(required = false) List<String> metrics,
+            @RequestParam(required = false) List<String> includeSections) {
         DateRange range = dateRangeResolver.resolveForVideo(videoId, lastNDays);
         log.info("GET /video/{} | {} → {}", videoId, range.startDate(), range.endDate());
         VideoAnalyticsResult result = analyticsService.getSingleVideoAnalytics(
                 videoId, range.startDateText(), range.endDateText(), metrics);
-        return ResponseEntity.ok(ApiResponse.success(reportAggregationService.enrich(result)));
+        return ResponseEntity.ok(ApiResponse.success(reportAggregationService.enrich(result,
+                includeSections == null ? null : new java.util.LinkedHashSet<>(includeSections))));
     }
 
     @GetMapping("/video/{videoId}/reports/replay/{snapshotId}")
@@ -227,10 +229,11 @@ public class YouTubeAnalyticsController {
     @GetMapping("/reports/videos/top")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getTopVideoReport(
             @RequestParam(required = false) @Min(1) @Max(3650) Integer lastNDays,
-            @RequestParam(defaultValue = "15") int limit) {
+            @RequestParam(defaultValue = "15") int limit,
+            @RequestParam(defaultValue = "views") String sortBy) {
         DateRange range = dateRangeResolver.resolve(lastNDays);
         return ResponseEntity.ok(ApiResponse.success(studioReportsService.topVideos(
-                range.startDateText(), range.endDateText(), limit)));
+                range.startDateText(), range.endDateText(), limit, sortBy)));
     }
 
     @GetMapping("/reports/videos/compare")

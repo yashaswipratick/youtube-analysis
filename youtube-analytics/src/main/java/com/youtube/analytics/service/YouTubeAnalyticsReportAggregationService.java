@@ -56,6 +56,10 @@ public class YouTubeAnalyticsReportAggregationService {
     private static final List<String> PLAYBACK_LOCATION_METRICS =
             List.of("engagedViews", "views", "estimatedMinutesWatched");
     private static final Set<Integer> TRANSIENT_STATUSES = Set.of(429);
+    private static final Set<String> ENRICHMENT_SECTIONS = Set.of(
+            "core", "cards", "premium", "retention", "demographics", "traffic", "trend",
+            "dimensions", "liveStream", "liveOrOnDemand", "youtubeProduct", "channelBenchmark",
+            "revenue", "reach", "reachCombined", "endScreens", "playlist");
 
     private final WebClient youTubeWebClient;
     private final ObjectMapper objectMapper;
@@ -93,12 +97,24 @@ public class YouTubeAnalyticsReportAggregationService {
      * metrics, analyticsMetrics, and currentStatistics) are left intact.
      */
     public VideoAnalyticsResult enrich(VideoAnalyticsResult result) {
+        return enrich(result, null);
+    }
+
+    /**
+     * Enriches a video with selected report groups. A null section set preserves the legacy
+     * full-enrichment behavior; a non-null set avoids querying groups the caller did not request.
+     */
+    public VideoAnalyticsResult enrich(VideoAnalyticsResult result, Set<String> requestedSections) {
         if (result == null || result.getVideoId() == null) return result;
         AnalyticsRequestValidator.validateVideoId(result.getVideoId());
+        Set<String> selected = resolveSections(requestedSections);
 
         String snapshotId = newSnapshotId();
         ArchiveContext archive = new ArchiveContext();
         archive.snapshotId = snapshotId;
+        if (result.getRawReportResponses() != null) {
+            result.getRawReportResponses().forEach((name, body) -> archive.add(name, "json", body));
+        }
         LocalDate today = LocalDate.now(REPORTING_ZONE);
         LocalDate safeEnd = today.minusDays(analyticsProperties.getReportingLagDays());
         LocalDate requestedEnd = parseDate(result.getEndDate(), safeEnd);
@@ -116,29 +132,34 @@ public class YouTubeAnalyticsReportAggregationService {
                 "reportingLagDays", analyticsProperties.getReportingLagDays(),
                 "reportingZone", REPORTING_ZONE.getId(),
                 "note", "Analytics reports exclude the most recent configured lag days because YouTube processing is not final."));
-        sections.put("core", coreWindows(result, publishDay, safeEnd, archive));
-        sections.put("cards", analyticsReport("cards", result.getVideoId(), boundedStart, safeEnd,
+        if (selected.contains("core")) sections.put("core", coreWindows(result, publishDay, safeEnd, archive));
+        if (selected.contains("cards")) sections.put("cards", analyticsReport("cards", result.getVideoId(), boundedStart, safeEnd,
                 analyticsProperties.getMetrics().getCards(), null, null, null, null, archive));
-        sections.put("premium", analyticsReport("premium", result.getVideoId(), boundedStart, safeEnd,
+        if (selected.contains("premium")) sections.put("premium", analyticsReport("premium", result.getVideoId(), boundedStart, safeEnd,
                 analyticsProperties.getMetrics().getPremium(), null, null, null, null, archive));
-        sections.put("retention", retentionReports(result.getVideoId(), boundedStart, safeEnd, archive));
-        sections.put("demographics", analyticsReport("demographics", result.getVideoId(), boundedStart, safeEnd,
+        if (selected.contains("retention")) sections.put("retention", retentionReports(result.getVideoId(), boundedStart, safeEnd, archive));
+        if (selected.contains("demographics")) sections.put("demographics", analyticsReport("demographics", result.getVideoId(), boundedStart, safeEnd,
                 analyticsProperties.getMetrics().getDemographics(), "ageGroup,gender", null, "-viewerPercentage", 50, archive));
-        sections.put("traffic", trafficReports(result.getVideoId(), boundedStart, safeEnd, archive));
-        sections.put("trend", trendReports(result.getVideoId(), boundedStart, safeEnd, publishDay, archive));
-        sections.put("dimensions", dimensionReports(result.getVideoId(), boundedStart, safeEnd, archive));
-        sections.put("liveStream", liveStreamReports(result.getVideoId(), boundedStart, safeEnd, archive));
-        sections.put("liveOrOnDemand", liveOrOnDemandReports(result.getVideoId(), boundedStart, safeEnd, archive));
-        sections.put("youtubeProduct", youtubeProductReports(result.getVideoId(), boundedStart, safeEnd, archive));
-        sections.put("channelBenchmark", channelBenchmarkReport(result, boundedStart, safeEnd, archive));
-        sections.put("revenue", revenueReports(result.getVideoId(), boundedStart, safeEnd, archive));
-        sections.put("reach", reportingApiReport(result.getVideoId(), boundedStart, safeEnd,
+        if (selected.contains("traffic")) sections.put("traffic", trafficReports(result.getVideoId(), boundedStart, safeEnd, archive));
+        if (selected.contains("trend")) sections.put("trend", trendReports(result.getVideoId(), boundedStart, safeEnd, publishDay, archive));
+        if (selected.contains("dimensions")) sections.put("dimensions", dimensionReports(result.getVideoId(), boundedStart, safeEnd, archive));
+        if (selected.contains("liveStream")) sections.put("liveStream", liveStreamReports(result.getVideoId(), boundedStart, safeEnd, archive));
+        if (selected.contains("liveOrOnDemand")) sections.put("liveOrOnDemand", liveOrOnDemandReports(result.getVideoId(), boundedStart, safeEnd, archive));
+        if (selected.contains("youtubeProduct")) sections.put("youtubeProduct", youtubeProductReports(result.getVideoId(), boundedStart, safeEnd, archive));
+        if (selected.contains("channelBenchmark")) sections.put("channelBenchmark", channelBenchmarkReport(result, boundedStart, safeEnd, archive));
+        if (selected.contains("revenue")) sections.put("revenue", revenueReports(result.getVideoId(), boundedStart, safeEnd, archive));
+        if (selected.contains("reach")) sections.put("reach", reportingApiReport(result.getVideoId(), boundedStart, safeEnd,
                 "channel_reach_basic_a1", "reach", reportingProperties.getMetrics().getReach(), archive));
-        sections.put("endScreens", reportingApiReport(result.getVideoId(), boundedStart, safeEnd,
+        if (selected.contains("reachCombined")) sections.put("reachCombined", reportingApiReport(result.getVideoId(), boundedStart, safeEnd,
+                "channel_reach_combined_a1", "reachCombined", reportingProperties.getMetrics().getReachCombined(), archive));
+        if (selected.contains("endScreens")) sections.put("endScreens", reportingApiReport(result.getVideoId(), boundedStart, safeEnd,
                 "channel_end_screens_a2", "endScreens", reportingProperties.getMetrics().getEndScreens(), archive));
-        sections.put("playlist", notApplicable(
+        if (selected.contains("playlist")) sections.put("playlist", notApplicable(
                 "Playlist-level metrics require a playlist ID. Video add/remove playlist counters remain available in core."));
-        sections.put("optionalMetricValidation", optionalMetricValidation(sections));
+        if (selected.contains("reach") || selected.contains("reachCombined") || selected.contains("endScreens")) {
+            sections.put("optionalMetricValidation", optionalMetricValidation(sections));
+        }
+        sections.put("requestedSections", requestedSections == null ? List.of("all") : selected.stream().sorted().toList());
 
         result.setReportSections(sections);
         result.setDerivedInsights(deriveInsights(result, sections));
@@ -151,6 +172,24 @@ public class YouTubeAnalyticsReportAggregationService {
             sections.put("archive", mapOf("status", "FAILED", "reason", "Raw report responses could not be persisted."));
         }
         return result;
+    }
+
+    private Set<String> resolveSections(Set<String> requestedSections) {
+        if (requestedSections == null) return ENRICHMENT_SECTIONS;
+        Set<String> normalized = new LinkedHashSet<>();
+        for (String section : requestedSections) {
+            if (section == null || section.isBlank()) continue;
+            String value = section.trim();
+            if (!ENRICHMENT_SECTIONS.contains(value)) {
+                throw new IllegalArgumentException("Unknown includeSections value '" + value
+                        + "'. Supported values: " + String.join(", ", ENRICHMENT_SECTIONS));
+            }
+            normalized.add(value);
+        }
+        if (normalized.isEmpty()) {
+            throw new IllegalArgumentException("includeSections must contain at least one supported section");
+        }
+        return Collections.unmodifiableSet(normalized);
     }
 
     /**
@@ -823,8 +862,8 @@ public class YouTubeAnalyticsReportAggregationService {
         Map<String, Object> result = new LinkedHashMap<>();
         Map<String, String> mapping = reportingFieldMap();
         Map<String, String> groupByField = Map.of(
-                "videoThumbnailImpressions", "reach",
-                "videoThumbnailImpressionsClickRate", "reach",
+                "videoThumbnailImpressions", sections.containsKey("reach") ? "reach" : "reachCombined",
+                "videoThumbnailImpressionsClickRate", sections.containsKey("reach") ? "reach" : "reachCombined",
                 "endScreenElementImpressions", "endScreens",
                 "endScreenElementClicks", "endScreens",
                 "endScreenElementClickRate", "endScreens");
@@ -847,7 +886,11 @@ public class YouTubeAnalyticsReportAggregationService {
     }
 
     private Map<String, Object> deriveInsights(VideoAnalyticsResult video, Map<String, Object> sections) {
-        Map<String, Object> metrics = video.getMetrics() == null ? Map.of() : video.getMetrics();
+        // Derived rates use the date-filtered Analytics API response consistently. The public
+        // lifetime counters overlaid into metrics are deliberately not mixed into these rates.
+        Map<String, Object> metrics = video.getAnalyticsMetrics() != null
+                ? video.getAnalyticsMetrics()
+                : video.getMetrics() == null ? Map.of() : video.getMetrics();
         Long views = number(metrics.get("views"));
         Long likes = number(metrics.get("likes"));
         Long comments = number(metrics.get("comments"));
@@ -887,7 +930,8 @@ public class YouTubeAnalyticsReportAggregationService {
             derived.put("targetViewIsOutlierWithinTopCohort", summary.get("targetViewIsOutlierWithinTopCohort"));
             derived.put("channelBenchmarkCohortSize", summary.get("returnedVideoCount"));
         }
-        derived.put("note", "Derived values are calculated from the API data available in this response and inherit the source report's processing delay.");
+        derived.put("provenance", "Rates and watch-time-per-view use the date-filtered YouTube Analytics API values, not the current lifetime public counters overlaid in metrics.");
+        derived.put("note", "Derived values are calculated from date-filtered Analytics API data where available and inherit the source report's processing delay.");
         return derived;
     }
 
@@ -997,9 +1041,43 @@ public class YouTubeAnalyticsReportAggregationService {
                         objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(manifest),
                         StandardCharsets.UTF_8);
             }
+            pruneExpiredSnapshots(videoId, archive.snapshotId);
             return archiveInfo;
         } catch (IOException ex) {
             throw new IllegalStateException("Raw analytics response archival failed", ex);
+        }
+    }
+
+    /**
+     * Optionally prune old snapshots for this video. Disabled by default; cleanup is restricted
+     * to child directories of the configured archive root and never removes the current snapshot.
+     */
+    private void pruneExpiredSnapshots(String videoId, String keepSnapshotId) {
+        int retentionDays = analyticsProperties.getArchiveRetentionDays();
+        if (retentionDays <= 0 || videoId == null || "standalone".equals(videoId)) return;
+        Path base = Path.of(analyticsProperties.getArchiveDirectory()).toAbsolutePath().normalize();
+        Path videoDir = base.resolve(videoId).normalize();
+        if (!videoDir.startsWith(base) || !Files.isDirectory(videoDir)) return;
+        Instant cutoff = Instant.now().minus(Duration.ofDays(retentionDays));
+        try (var children = Files.list(videoDir)) {
+            children.filter(Files::isDirectory).forEach(snapshot -> {
+                if (snapshot.getFileName().toString().equals(keepSnapshotId)) return;
+                try {
+                    Instant lastModified = Files.getLastModifiedTime(snapshot).toInstant();
+                    if (!lastModified.isBefore(cutoff) || !snapshot.normalize().startsWith(videoDir)) return;
+                    try (var paths = Files.walk(snapshot)) {
+                        for (Path path : paths.sorted(Comparator.reverseOrder()).toList()) {
+                            Files.deleteIfExists(path);
+                        }
+                    }
+                    log.info("Pruned expired analytics archive snapshot for video {}", videoId);
+                } catch (IOException ex) {
+                    log.warn("Could not prune expired analytics archive snapshot for video {}: {}",
+                            videoId, ex.getMessage());
+                }
+            });
+        } catch (IOException ex) {
+            log.warn("Could not inspect analytics archive snapshots for video {}: {}", videoId, ex.getMessage());
         }
     }
 

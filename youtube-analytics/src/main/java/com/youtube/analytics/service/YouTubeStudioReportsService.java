@@ -101,12 +101,21 @@ public class YouTubeStudioReportsService {
     }
 
     public Map<String, Object> topVideos(String startDate, String endDate, int limit) {
+        return topVideos(startDate, endDate, limit, "views");
+    }
+
+    /** Ranks channel videos by one of the supported Analytics API top-video sort metrics. */
+    public Map<String, Object> topVideos(String startDate, String endDate, int limit, String sortBy) {
         if (limit < 1 || limit > 50) throw new IllegalArgumentException("limit must be between 1 and 50");
+        String resolvedSort = sortBy == null || sortBy.isBlank() ? "views" : sortBy.trim();
+        if (!Set.of("views", "estimatedMinutesWatched", "subscribersGained", "subscribersLost").contains(resolvedSort)) {
+            throw new IllegalArgumentException("sortBy must be one of views, estimatedMinutesWatched, subscribersGained, subscribersLost");
+        }
         DateWindow window = resolveWindow(startDate, endDate);
         YouTubeAnalyticsApiResponse response = query(window,
                 List.of("views", "estimatedMinutesWatched", "averageViewDuration",
-                        "averageViewPercentage", "subscribersGained", "shares"),
-                "video", null, "-views", limit);
+                        "averageViewPercentage", "subscribersGained", "subscribersLost", "shares"),
+                "video", null, "-" + resolvedSort, limit);
         List<Map<String, Object>> rows = rows(response);
         List<String> ids = rows.stream().map(row -> String.valueOf(row.get("video")))
                 .filter(id -> !id.isBlank() && !"null".equals(id)).toList();
@@ -121,6 +130,8 @@ public class YouTubeStudioReportsService {
         });
         Map<String, Object> result = envelope(window, "top videos");
         result.put("limit", limit);
+        result.put("sortBy", resolvedSort);
+        result.put("sort", "-" + resolvedSort);
         result.put("rows", rows);
         return result;
     }
@@ -249,14 +260,21 @@ public class YouTubeStudioReportsService {
         result.put("totalPublishedVideosInRange", totalPublishedVideos);
         result.put("weekly", weekly);
         result.put("monthly", monthly);
-        result.put("averageUploadsPerWeek", weekly.isEmpty() ? 0.0
-                : Math.round(totalPublishedVideos * 100.0 / weekly.size()) / 100.0);
-        result.put("averageUploadsPerMonth", monthly.isEmpty() ? 0.0
-                : Math.round(totalPublishedVideos * 100.0 / monthly.size()) / 100.0);
+        long inclusiveDays = ChronoUnit.DAYS.between(window.startDate(), window.endDate()) + 1;
+        // Normalize over the requested day span rather than bucket count: the first and last
+        // week/month buckets are often partial and otherwise bias the average downward.
+        result.put("averageUploadsPerWeek", inclusiveDays <= 0 ? 0.0
+                : Math.round(totalPublishedVideos * 700.0 / inclusiveDays) / 100.0);
+        result.put("averageUploadsPerMonth", inclusiveDays <= 0 ? 0.0
+                : Math.round(totalPublishedVideos * (365.2425 / 12.0) * 100.0 / inclusiveDays) / 100.0);
         result.put("weeklyPeriodCount", weekly.size());
         result.put("monthlyPeriodCount", monthly.size());
         result.put("source", "YouTube Data API v3 uploads playlist contentDetails.videoPublishedAt");
-        result.put("note", "Weekly periods start Monday. Average rates divide by the displayed week/month buckets; the first and last weekly buckets may be partial when the requested dates do not align to Mondays. The uploads playlist publish-date cache refreshes every 30 minutes. This reports publication cadence, not views or engagement.");
+        result.put("averageRateBasis", Map.of(
+                "daysInRequestedRange", inclusiveDays,
+                "weekly", "uploads per 7 calendar days, normalized to the exact inclusive date range",
+                "monthly", "uploads per average Gregorian month (365.2425 / 12 days), normalized to the exact inclusive date range"));
+        result.put("note", "Weekly periods start Monday. Display buckets may be partial, but averages are normalized to the exact inclusive requested date range instead of dividing by partial bucket count. The uploads playlist publish-date cache refreshes every 30 minutes. This reports publication cadence, not views or engagement.");
         return result;
     }
 

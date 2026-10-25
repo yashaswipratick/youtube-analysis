@@ -17,12 +17,25 @@ The application binds report metric lists through `YouTubeAnalyticsProperties` a
 The archive defaults to `./data/youtube-analytics/reports`; set
 `YOUTUBE_ANALYTICS_ARCHIVE_DIR` to customize the destination. The default
 `YOUTUBE_ANALYTICS_REPORTING_LAG_DAYS` is `3`, and the archive folder is ignored by Git.
+Archive retention is disabled by default (`YOUTUBE_ANALYTICS_ARCHIVE_RETENTION_DAYS=0`). A
+positive value removes per-video snapshot directories older than that many days when that video
+is enriched; it never deletes the snapshot created by the current request. Cleanup is on demand
+per video, not a background global sweep.
 
 ## Single-video response sections
 
 `GET /api/youtube-analytics/v1/analytics/video/{videoId}?lastNDays=28` keeps the
 legacy fields `metrics`, `analyticsMetrics`, `currentStatistics`, and
 `dataFreshness`. It adds:
+
+Supplementary enrichment can be limited with repeated query parameters, for example
+`includeSections=core&includeSections=trend`. Supported values are `core`, `cards`, `premium`,
+`retention`, `demographics`, `traffic`, `trend`, `dimensions`, `liveStream`, `liveOrOnDemand`,
+`youtubeProduct`, `channelBenchmark`, `revenue`, `reach`, `reachCombined`, `endScreens`, and `playlist`.
+Omitting `includeSections` preserves full legacy enrichment. Supplying one or more values executes
+only those supplementary groups (in addition to reporting-window, derived-insight, and archive
+metadata). Unknown values and an empty supplied list are rejected, not silently ignored. This only
+reduces supplementary calls; it does not alter the base Analytics API query.
 
 | Section | Source / query shape | Compatibility notes |
 | --- | --- | --- |
@@ -40,7 +53,8 @@ legacy fields `metrics`, `analyticsMetrics`, `currentStatistics`, and
 | `youtubeProduct` | Daily data filtered to supported YouTube products | Empty sections are normal for unavailable products or periods. |
 | `channelBenchmark` | Top-video cohort (up to 200 videos) by views | Provides median metrics, IQR outlier fences, target rank if returned, and target-vs-median comparison. This is not a census of all uploads. |
 | `revenue` | Estimated revenue (per metric), ad-type performance, playback-based performance | Separated into compatible requests; requires monetary scope and YPP eligibility where applicable. |
-| `reach` | Reporting type `channel_reach_basic_a1` | Asynchronous report availability and report-file lag apply. |
+| `reach` | Reporting type `channel_reach_basic_a1` | Basic thumbnail impressions and CTR; asynchronous report availability and report-file lag apply. |
+| `reachCombined` | Reporting type `channel_reach_combined_a1` | Reach metrics by traffic source, traffic-source detail, OS, and device; asynchronous report availability and report-file lag apply. |
 | `endScreens` | Reporting type `channel_end_screens_a2` | Asynchronous report availability and report-file lag apply. |
 | `playlist` | Not queried from a video ID alone | Playlist metrics require a playlist identifier. Per-video add/remove counts remain in core. |
 | `derivedInsights` | Application-calculated values | Includes engagement rates, subscribers per 1,000 views, net subscribers, average watch time per view and a 28-day view change where data is available. |
@@ -81,7 +95,24 @@ calendar month, including empty periods. Weeks begin on Monday. Publish timestam
 from YouTube Data API v3 `playlistItems.contentDetails.videoPublishedAt` and cached in memory
 for 30 minutes to avoid paginating the entire uploads playlist on every request. This report
 measures upload cadence only; it does not imply performance or engagement. Because the cache is
-process-local, separate application instances maintain their own refresh windows.
+process-local, separate application instances maintain their own refresh windows. Average
+weekly uploads are normalized to uploads per seven calendar days across the exact inclusive
+requested date range. Average monthly uploads use the mean Gregorian month length; the displayed
+week/month buckets can still be partial at their edges.
+
+## Bulk endpoint scope
+
+`POST /api/youtube-analytics/v1/analytics/videos` and
+`GET /api/youtube-analytics/v1/analytics/videos/all` return the base Analytics API results and do
+not automatically run supplementary per-video report enrichment. This is intentional: enabling
+full enrichment for every upload would issue many more API calls per request and can trigger quota
+or latency problems on larger channels. Use the single-video route with `includeSections` to fetch
+only the supplementary groups needed for a video.
+
+`GET /api/youtube-analytics/v1/analytics/reports/videos/top` accepts `sortBy=views` (default),
+`sortBy=estimatedMinutesWatched`, `sortBy=subscribersGained`, or `sortBy=subscribersLost`.
+The sort values are explicitly allow-listed; unsupported sort fields return a validation error
+rather than being sent to Google as a guessed query.
 
 ## Metric units
 
@@ -108,11 +139,15 @@ and replay snapshots.
 - HTTP 429 and all HTTP 5xx statuses receive bounded exponential retries; when exhausted, the affected section is `TEMPORARILY_UNAVAILABLE`.
 - Other HTTP errors become `API_ERROR`.
 - Reporting API reports are asynchronous. Missing current files return `PENDING_OR_EMPTY`; the CSV schema is used to check whether optional fields are available.
-- A raw response/body is stored for each attempted API call. Replay loads the manifest and raw bodies from disk without calling Google APIs.
+- A raw response/body is stored for each attempted supplementary API call. On the single-video path, the original base Analytics API response is also archived as `base-analytics.json`; replay loads the manifest and raw bodies from disk without calling Google APIs. Raw responses can include channel-specific analytics, so protect the archive directory and configure retention deliberately.
 
 Replay a saved snapshot using:
 
 `GET /api/youtube-analytics/v1/analytics/video/{videoId}/reports/replay/{snapshotId}`
+
+## Unsupported Studio-only metrics
+
+The public YouTube Analytics/Reporting APIs do not expose every metric and panel shown in YouTube Studio. This implementation does not synthesize the following from unrelated counters: the audience-activity heatmap (“when your viewers are on YouTube”), other channels/videos your audience watches, uncovered search-demand estimates, or the Shorts “viewed versus swiped away” panel. They remain unsupported until Google documents an authorized API/report combination for them. Returning/new-viewer metrics are only exposed where the specific documented report/query combination supports them; the application does not infer returning viewers from daily unique viewers.
 
 ## API compatibility and intentionally separate capabilities
 
