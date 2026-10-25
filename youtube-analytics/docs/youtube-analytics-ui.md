@@ -25,6 +25,14 @@ Each page filters the library and comparisons to the selected format. Duration i
 
 The dashboard uses plain HTML, CSS and JavaScript. It does not need a Node.js server or a third-party charting runtime. The API port uses `SERVER_PORT`; when changed, update `apiBaseUrl` and the Google authorized redirect URI. Configure UI return URL with `UI_BASE_URL` and allowed frontend origins with the comma-separated `CORS_ALLOWED_ORIGINS` setting.
 
+## OpenAI credential and request diagnostics
+
+On startup, the backend validates the configured OpenAI credential by calling the authenticated `GET /v1/models` endpoint; this is a lightweight authentication check and does not run model inference. Startup checking can be disabled with `OPENAI_VALIDATE_ON_STARTUP=false`. The same diagnostic is available at `GET /api/youtube-analytics/v1/analytics/ai/key-status` after signing in to the backend.
+
+The response reports whether the key file is configured, whether OpenAI accepted the key, and whether the configured model appears in the model list. HTTP errors are categorized in logs, including HTTP 401 (invalid/revoked key), 403 (permissions/project access), 404 (endpoint/model), and 429 (rate limit/quota).
+
+Every AI Responses request logs operation, model, endpoint, duration, response ID/status, and failure details. Full request and response payloads are enabled locally by default via `OPENAI_LOG_PAYLOADS=true`; payload logs can contain full transcripts and analytics context. Set `OPENAI_LOG_PAYLOADS=false` for shared or production logs. Credential-like values are redacted from logged bodies, and the Authorization header/API key is never logged.
+
 ## Workspace endpoint contract
 
 Base path: `/api/youtube-analytics/v1/analytics/workspace`

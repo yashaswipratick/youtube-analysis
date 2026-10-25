@@ -64,4 +64,62 @@ class OpenAiAnalysisServiceTest {
                 .isEqualTo("Search and related traffic exist.");
         assertThat(result.missingData()).containsExactly("retention");
     }
+
+    @Test
+    void validatesApiKeyAgainstModelsEndpointWithoutGeneratingContent() {
+        AtomicReference<String> requestUrl = new AtomicReference<>();
+        ExchangeFunction exchange = request -> {
+            requestUrl.set(request.url().toString());
+            return Mono.just(ClientResponse.create(HttpStatus.OK)
+                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .body("""
+                    {"data":[{"id":"gpt-5.6-luna"}]}
+                    """)
+                    .build());
+        };
+        OpenAiConfig config = new OpenAiConfig("/tmp/openai-key", "https://api.openai.com/v1", "gpt-5.6-luna");
+        OpenAiApiKeyProvider keyProvider = new OpenAiApiKeyProvider(config) {
+            @Override
+            public String getApiKey() {
+                return "test-key";
+            }
+        };
+        OpenAiAnalysisService service = new OpenAiAnalysisService(
+                WebClient.builder().exchangeFunction(exchange), config, keyProvider, new ObjectMapper());
+
+        Map<String, Object> result = service.validateApiKey();
+
+        assertThat(requestUrl.get()).isEqualTo("https://api.openai.com/v1/models");
+        assertThat(result.get("configured")).isEqualTo(true);
+        assertThat(result.get("valid")).isEqualTo(true);
+        assertThat(result.get("modelListed")).isEqualTo(true);
+        assertThat(result.get("status")).isEqualTo("VALID");
+    }
+
+    @Test
+    void reportsUnauthorizedApiKeyFromModelsEndpoint() {
+        ExchangeFunction exchange = request -> Mono.just(ClientResponse.create(HttpStatus.UNAUTHORIZED)
+                .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                .body("""
+                {"error":{"message":"Incorrect API key provided"}}
+                """)
+                .build());
+        OpenAiConfig config = new OpenAiConfig("/tmp/openai-key", "https://api.openai.com/v1", "gpt-5.6-luna");
+        OpenAiApiKeyProvider keyProvider = new OpenAiApiKeyProvider(config) {
+            @Override
+            public String getApiKey() {
+                return "bad-test-key";
+            }
+        };
+        OpenAiAnalysisService service = new OpenAiAnalysisService(
+                WebClient.builder().exchangeFunction(exchange), config, keyProvider, new ObjectMapper());
+
+        Map<String, Object> result = service.validateApiKey();
+
+        assertThat(result.get("configured")).isEqualTo(true);
+        assertThat(result.get("valid")).isEqualTo(false);
+        assertThat(result.get("status")).isEqualTo("INVALID_OR_REVOKED_API_KEY");
+        assertThat(result.get("httpStatus")).isEqualTo(401);
+        assertThat(result.get("message").toString()).contains("rejected the API key");
+    }
 }

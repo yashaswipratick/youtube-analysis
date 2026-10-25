@@ -69,6 +69,11 @@ public class YouTubeAnalyticsController {
     private final YouTubeStudioReportsService studioReportsService;
     private final AnalyticsDateRangeResolver dateRangeResolver;
 
+    @GetMapping("/ai/key-status")
+    public ResponseEntity<Map<String, Object>> getOpenAiKeyStatus() {
+        return ResponseEntity.ok(openAiAnalysisService.validateApiKey());
+    }
+
     @PostMapping("/ai/analyze")
     public ResponseEntity<ApiResponse<AiAnalysisResult>> analyzeWithAi(@Valid @RequestBody AiAnalysisRequest request) {
         log.info("POST /ai/analyze | contextPresent={}", request.context() != null && !request.context().isEmpty());
