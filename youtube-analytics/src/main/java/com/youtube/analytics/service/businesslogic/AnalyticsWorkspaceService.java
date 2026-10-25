@@ -147,6 +147,11 @@ public class AnalyticsWorkspaceService {
         return result;
     }
 
+    /** Returns recent owned uploads without running channel-wide aggregate reports. */
+    public Map<String, Object> ownedVideoCatalog() {
+        return channel("mine", 365, false);
+    }
+
     public Map<String, Object> video(String videoId, Integer lastNDays) {
         AnalyticsRequestValidator.validateVideoId(videoId);
         int days = validDays(lastNDays);

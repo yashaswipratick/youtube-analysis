@@ -2,6 +2,7 @@ package com.youtube.analytics.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.youtube.analytics.model.CreatorVideoAnalysisRequest;
 import com.youtube.analytics.model.TranscriptComparisonRequest;
 import com.youtube.analytics.model.VideoAnalyticsResult;
 import com.youtube.analytics.service.businesslogic.AnalyticsWorkspaceService;
@@ -16,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -37,7 +40,9 @@ import java.util.stream.Stream;
 public class TranscriptComparisonService {
     private static final Pattern VIDEO_ID = Pattern.compile("[A-Za-z0-9_-]{11}");
     private static final Pattern VTT_TIMECODE = Pattern.compile(
-            "^(?:\\d{1,2}:)?\\d{2}:\\d{2}\\.\\d{3}\\s+-->\\s+(?:\\d{1,2}:)?\\d{2}:\\d{2}\\.\\d{3}.*$");
+            "^(?:\\d{1,2}:)?\\d{2}:\\d{2}[.,]\\d{3}\\s+-->\\s+(?:\\d{1,2}:)?\\d{2}:\\d{2}[.,]\\d{3}.*$");
+    private static final Pattern CAPTION_TIME_START = Pattern.compile(
+            "^(?:(\\d{1,2}):)?(\\d{2}):(\\d{2})[.,](\\d{3})\\s+-->.*$");
     private static final int MAX_TRANSCRIPT_CHARS = 60_000;
     private static final Set<String> PERFORMANCE_METRICS = Set.of(
             "views", "estimatedMinutesWatched", "averageViewDuration", "averageViewPercentage",
@@ -116,6 +121,8 @@ public class TranscriptComparisonService {
             context.put("performance", result.get("performance"));
             context.put("myTranscriptSource", myTranscript.source());
             context.put("competitorTranscriptSource", competitorTranscript.source());
+            context.put("myTranscriptTruncated", myTranscript.truncated());
+            context.put("competitorTranscriptTruncated", competitorTranscript.truncated());
             context.put("myTranscript", myTranscript.text());
             context.put("competitorTranscript", competitorTranscript.text());
             try {
@@ -136,6 +143,212 @@ public class TranscriptComparisonService {
                 "Competitor retention, impressions, click-through rate, watch time, revenue and audience analytics are private and are not retrieved or inferred."
         ));
         return result;
+    }
+
+
+    /** Analyzes an owned video and its own prior-upload baseline, without requiring a competitor video. */
+    public Map<String, Object> analyzeCreatorVideo(CreatorVideoAnalysisRequest request) {
+        String videoId = normalizeVideoId(request.videoId());
+        int days = request.lastNDays() == null ? 365 : request.lastNDays();
+        if (days < 1 || days > 365) throw new IllegalArgumentException("lastNDays must be between 1 and 365");
+        String language = request.outputLanguage() == null || request.outputLanguage().isBlank()
+                ? "hinglish" : request.outputLanguage().trim().toLowerCase(Locale.ROOT);
+        if (!Set.of("en", "hi", "hinglish").contains(language)) {
+            throw new IllegalArgumentException("outputLanguage must be en, hi or hinglish");
+        }
+
+        JsonNode details = publicApiService.getVideoDetails(videoId);
+        String authorizedChannelId = publicApiService.getAuthorizedChannelId();
+        String videoChannelId = details.path("channel").path("id").asText("");
+        if (authorizedChannelId == null || authorizedChannelId.isBlank() || !authorizedChannelId.equals(videoChannelId)) {
+            throw new IllegalArgumentException("The selected video is not owned by the currently connected YouTube channel.");
+        }
+
+        Map<String, Object> video = videoMetadata(details, videoId);
+        TranscriptData transcript = transcript(request.transcript(), details, videoId, false);
+        Map<String, Object> currentWorkspace = workspaceService.video(videoId, days);
+        if (Boolean.TRUE.equals(currentWorkspace.get("publicOnly"))) {
+            throw new IllegalArgumentException("Private analytics require the video to belong to the currently connected YouTube channel.");
+        }
+
+        Map<String, Object> catalog = workspaceService.ownedVideoCatalog();
+        List<Map<String, Object>> uploads = mapList(catalog.get("recentVideos"));
+        Map<String, Object> catalogCurrent = uploads.stream()
+                .filter(item -> videoId.equals(String.valueOf(item.getOrDefault("videoId", ""))))
+                .findFirst().orElse(Map.of());
+        String publishedAt = String.valueOf(catalogCurrent.getOrDefault("publishedAt", video.getOrDefault("publishedAt", "")));
+        if (!publishedAt.isBlank()) video.put("publishedAt", publishedAt);
+        Double durationFromCatalog = numericValue(catalogCurrent.get("durationSeconds"));
+        Double durationSeconds = durationFromCatalog != null ? durationFromCatalog
+                : numericValue(video.get("durationMs")) == null ? null : numericValue(video.get("durationMs")) / 1000.0;
+        video.put("durationSeconds", durationSeconds);
+        String format = durationSeconds == null ? "unknown" : durationSeconds <= 180 ? "SHORT_APPROXIMATION" : "LONG_FORM";
+        video.put("format", format);
+        video.put("thumbnailDescription", blankToNull(request.thumbnailDescription()));
+
+        LocalDate currentPublishDate = parsePublishDate(publishedAt);
+        Long videoAgeDays = currentPublishDate == null ? null
+                : Math.max(0, java.time.temporal.ChronoUnit.DAYS.between(currentPublishDate, LocalDate.now(ZoneId.of("Asia/Kolkata"))));
+
+        List<Map<String, Object>> eligibleHistory = uploads.stream()
+                .filter(item -> !videoId.equals(String.valueOf(item.getOrDefault("videoId", ""))))
+                .filter(item -> isSameFormat(item, durationSeconds))
+                .filter(item -> {
+                    LocalDate date = parsePublishDate(String.valueOf(item.getOrDefault("publishedAt", "")));
+                    return currentPublishDate != null && date != null && date.isBefore(currentPublishDate);
+                })
+                .sorted(Comparator.comparing(item -> String.valueOf(item.getOrDefault("publishedAt", "")), Comparator.reverseOrder()))
+                .limit(3)
+                .toList();
+
+        List<Map<String, Object>> previousVideos = new ArrayList<>();
+        for (Map<String, Object> prior : eligibleHistory) {
+            String priorId = String.valueOf(prior.getOrDefault("videoId", ""));
+            if (priorId.isBlank()) continue;
+            Map<String, Object> priorVideo = new LinkedHashMap<>();
+            priorVideo.put("videoId", priorId);
+            priorVideo.put("title", prior.getOrDefault("title", ""));
+            priorVideo.put("publish_date", prior.getOrDefault("publishedAt", ""));
+            priorVideo.put("duration_seconds", prior.get("durationSeconds"));
+            priorVideo.put("duration", prior.getOrDefault("duration", ""));
+            priorVideo.put("format", format);
+            priorVideo.put("hook_style", null);
+            priorVideo.put("notes", null);
+            priorVideo.putAll(creatorAnalytics(workspaceService.video(priorId, days), numericValue(prior.get("durationSeconds"))));
+            previousVideos.add(priorVideo);
+        }
+
+        Map<String, Object> currentAnalytics = creatorAnalytics(currentWorkspace, durationSeconds);
+        int wordCount = transcript.text().isBlank() ? 0 : transcript.text().trim().split("\\s+").length;
+        Map<String, Object> creatorProfile = new LinkedHashMap<>();
+        creatorProfile.put("channel_stage", "new/small creator; subscriber count was not supplied");
+        creatorProfile.put("style", "story-driven, on-camera travel vlogs with cinematic, reflective narration");
+        creatorProfile.put("language_mix", "Hindi voice-over and natural Hinglish on camera; transcript may contain Kannada words");
+        creatorProfile.put("goals", "grow a loyal audience for weekend drives, road trips and hidden destinations near Bangalore");
+        creatorProfile.put("must_keep", List.of("reflective, poetic narration", "cinematic opening", "personal on-camera voice",
+                "contrast and sensory details", "the connection between storytelling voice-over and lived on-camera moments"));
+
+        Map<String, Object> context = new LinkedHashMap<>();
+        context.put("output_language", language);
+        context.put("creator_profile", creatorProfile);
+        context.put("video", video);
+        context.put("analytics", currentAnalytics);
+        context.put("transcript", transcript.text());
+        context.put("transcript_source", transcript.source());
+        context.put("transcript_truncated", transcript.truncated());
+        context.put("transcript_word_count", wordCount);
+        context.put("video_age_days", videoAgeDays);
+        context.put("previous_videos", previousVideos);
+        context.put("history_available", previousVideos.size() >= 3);
+        context.put("creator_notes", blankToNull(request.creatorNotes()));
+        context.put("history_sample_note", "Earlier uploads are selected from the latest 50 uploads in the owned channel catalog and matched by approximate format. Hook style/older-video notes were not supplied unless explicitly present. A missing field is unavailable.");
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("video", video);
+        response.put("transcript", transcriptMap(transcript));
+        response.put("analytics", currentAnalytics);
+        response.put("previousVideos", previousVideos);
+        response.put("historyCount", previousVideos.size());
+        response.put("analysis", null);
+        response.put("analysisMessage", "");
+
+        if (transcript.text().isBlank()) {
+            response.put("analysisMessage", "No accessible transcript was found. Paste or correct the transcript below and run the analysis again. Analytics and eligible earlier uploads were still checked.");
+            return response;
+        }
+        try {
+            response.put("analysis", openAiAnalysisService.analyzeCreatorVideo(context));
+            response.put("analysisMessage", "Analysis uses this video's transcript and the available private analytics. History comparisons remain directional and are only treated as patterns when at least three eligible earlier uploads are available.");
+        } catch (RuntimeException ex) {
+            log.warn("Creator video transcript retrieved but AI analysis failed: {}", ex.getMessage());
+            response.put("analysisError", safeMessage(ex));
+            response.put("analysisMessage", "The transcript and analytics were retrieved, but the AI analysis did not complete. Check the OpenAI configuration or retry.");
+        }
+        return response;
+    }
+
+    private Map<String, Object> creatorAnalytics(Map<String, Object> workspaceData, Double durationSeconds) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        Map<String, Object> analyticsObject = asMap(workspaceData.get("analytics"));
+        Map<String, Object> metrics = asMap(analyticsObject.get("metrics"));
+        Map<String, Object> reach = asMap(workspaceData.get("reach"));
+        Map<String, Object> normalized = new LinkedHashMap<>();
+        for (String key : List.of("views", "estimatedMinutesWatched", "averageViewDuration", "averageViewPercentage",
+                "likes", "comments", "shares", "subscribersGained", "subscribersLost")) {
+            Object value = metrics.get(key);
+            if (value != null) normalized.put(key, value);
+        }
+        Object impressions = firstValue(reach.get("impressions"), reach.get("videoThumbnailImpressions"));
+        Object ctr = firstValue(reach.get("impressionsClickThroughRate"), reach.get("videoThumbnailImpressionsClickRate"));
+        if (impressions != null) normalized.put("impressions", impressions);
+        if (ctr != null) normalized.put("ctr", ctr);
+        Object range = workspaceData.get("range");
+        if (range != null) normalized.put("reporting_window", range);
+
+        Map<String, Object> retention = asMap(workspaceData.get("retention"));
+        List<Map<String, Object>> curve = new ArrayList<>();
+        for (Map<String, Object> point : mapList(retention.get("retention"))) {
+            Double ratio = numericValue(point.get("elapsedVideoTimeRatio"));
+            Double watchRatio = numericValue(point.get("audienceWatchRatio"));
+            if (ratio == null || watchRatio == null || durationSeconds == null) continue;
+            Map<String, Object> sample = new LinkedHashMap<>();
+            sample.put("seconds", Math.round(ratio * durationSeconds));
+            sample.put("audienceWatchRatio", watchRatio);
+            if (point.get("relativeRetentionPerformance") != null) {
+                sample.put("relativeRetentionPerformance", point.get("relativeRetentionPerformance"));
+            }
+            curve.add(sample);
+        }
+        normalized.put("retention_curve", curve);
+        normalized.put("retention_curve_available", !curve.isEmpty());
+        Map<String, Object> trafficSources = asMap(workspaceData.get("trafficSources"));
+        if (!trafficSources.isEmpty()) normalized.put("traffic_sources", trafficSources);
+        result.putAll(normalized);
+        result.put("analyticsAvailable", !metrics.isEmpty() || !reach.isEmpty());
+        result.put("privateMetricsNote", workspaceData.getOrDefault("privacyNote",
+                "Metric availability depends on the authorized YouTube Analytics reports and reporting delay."));
+        return result;
+    }
+
+    private List<Map<String, Object>> mapList(Object value) {
+        if (!(value instanceof List<?> list)) return List.of();
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Object item : list) {
+            Map<String, Object> row = asMap(item);
+            if (!row.isEmpty()) result.add(row);
+        }
+        return result;
+    }
+
+    private Double numericValue(Object value) {
+        if (value instanceof Number number) return number.doubleValue();
+        if (value == null) return null;
+        try { return Double.parseDouble(String.valueOf(value)); }
+        catch (NumberFormatException ignored) { return null; }
+    }
+
+    private Object firstValue(Object first, Object second) {
+        return first != null ? first : second;
+    }
+
+    private String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
+    }
+
+    private boolean isSameFormat(Map<String, Object> video, Double currentDurationSeconds) {
+        Double priorDuration = numericValue(video.get("durationSeconds"));
+        if (priorDuration == null || currentDurationSeconds == null) return false;
+        return (priorDuration <= 180) == (currentDurationSeconds <= 180);
+    }
+
+    private LocalDate parsePublishDate(String value) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            if (value.matches("\\d{8}")) return LocalDate.parse(value, java.time.format.DateTimeFormatter.BASIC_ISO_DATE);
+            if (value.length() >= 10 && value.charAt(4) == '-' && value.charAt(7) == '-') {
+                return LocalDate.parse(value.substring(0, 10));
+            }
+        } catch (RuntimeException ignored) { }
+        return null;
     }
 
     public static String normalizeVideoId(String value) {
@@ -173,33 +386,61 @@ public class TranscriptComparisonService {
 
     private TranscriptData transcript(String suppliedText, JsonNode details, String videoId, boolean allowPublicFallback) {
         if (suppliedText != null && !suppliedText.isBlank()) {
-            return new TranscriptData(limit(suppliedText), "USER_PROVIDED", "Transcript pasted or edited in the comparison form.");
+            return transcriptData(suppliedText, "USER_PROVIDED", "Transcript pasted or edited in the comparison form.");
         }
-        String official = limit(details.path("transcript_only_text").asText(""));
-        if (official.isBlank() && details.path("transcript").isArray()) {
-            StringBuilder text = new StringBuilder();
-            details.path("transcript").forEach(segment -> {
-                String part = segment.path("text").asText("");
-                if (!part.isBlank()) {
-                    if (!text.isEmpty()) text.append(' ');
-                    text.append(part);
-                }
-            });
-            official = limit(text.toString());
-        }
-        if (!official.isBlank()) {
-            return new TranscriptData(official, "YOUTUBE_CAPTIONS_API", "Fetched using the official captions API under the signed-in account's permissions.");
+        String officialText = timestampedTranscript(details);
+        if (!officialText.isBlank()) {
+            return transcriptData(officialText, "YOUTUBE_CAPTIONS_API", "Fetched using the official captions API under the signed-in account's permissions. Timestamps are retained when returned by the captions source.");
         }
         if (allowPublicFallback) {
             String extracted = fetchWithYtDlp(videoId);
             if (!extracted.isBlank()) {
-                return new TranscriptData(limit(extracted), "YT_DLP_PUBLIC_CAPTIONS", "Fetched by the optional local yt-dlp executable from available public subtitles.");
+                return transcriptData(extracted, "YT_DLP_PUBLIC_CAPTIONS", "Fetched by the optional local yt-dlp executable from available public subtitles. Cue timestamps are retained when present.");
             }
         }
         String reason = allowPublicFallback
                 ? "No accessible transcript was found. Public captions may be disabled, or yt-dlp may be missing or blocked."
                 : "No transcript was accessible through the signed-in account. Paste the transcript to continue.";
-        return new TranscriptData("", "UNAVAILABLE", reason);
+        return new TranscriptData("", "UNAVAILABLE", reason, false);
+    }
+
+    private TranscriptData transcriptData(String fullText, String source, String message) {
+        boolean truncated = fullText != null && fullText.length() > MAX_TRANSCRIPT_CHARS;
+        return new TranscriptData(limit(fullText), source, message, truncated);
+    }
+
+    /**
+     * Prefer caption segments with source-provided timing; fall back to plain text when timing is absent.
+     * Package-private so timestamp handling can be verified with deterministic unit tests.
+     */
+    static String timestampedTranscript(JsonNode videoDetails) {
+        JsonNode segments = videoDetails == null ? null : videoDetails.path("transcript");
+        if (segments != null && segments.isArray() && !segments.isEmpty()) {
+            StringBuilder text = new StringBuilder();
+            for (JsonNode segment : segments) {
+                String phrase = segment.path("text").asText("").trim();
+                if (phrase.isBlank()) continue;
+                String timestamp = segment.path("start_time_text").asText("").trim();
+                if (timestamp.isBlank() && segment.path("start_ms").asLong(-1) >= 0) {
+                    long seconds = Math.max(0, segment.path("start_ms").asLong() / 1000);
+                    timestamp = formatTimestamp(seconds);
+                }
+                if (!text.isEmpty()) text.append(' ');
+                if (!timestamp.isBlank()) text.append('[').append(timestamp).append("] ");
+                text.append(phrase);
+            }
+            if (!text.isEmpty()) return text.toString();
+        }
+        return videoDetails == null ? "" : videoDetails.path("transcript_only_text").asText("");
+    }
+
+    private static String formatTimestamp(long totalSeconds) {
+        long hours = totalSeconds / 3600;
+        long minutes = (totalSeconds % 3600) / 60;
+        long seconds = totalSeconds % 60;
+        return hours > 0
+                ? String.format(Locale.ROOT, "%02d:%02d:%02d", hours, minutes, seconds)
+                : String.format(Locale.ROOT, "%02d:%02d", minutes, seconds);
     }
 
     private String fetchWithYtDlp(String videoId) {
@@ -254,9 +495,10 @@ public class TranscriptComparisonService {
         return 2;
     }
 
-    private String cleanSubtitleFile(String input) {
+    static String cleanSubtitleFile(String input) {
         StringBuilder result = new StringBuilder();
         String previous = "";
+        String nextTimestamp = "";
         boolean skipBlock = false;
         for (String rawLine : input.replace("\uFEFF", "").split("\\R")) {
             String line = rawLine.trim();
@@ -264,13 +506,24 @@ public class TranscriptComparisonService {
             if (line.equalsIgnoreCase("WEBVTT")) continue;
             if (line.startsWith("NOTE") || line.equals("STYLE") || line.equals("REGION")) { skipBlock = true; continue; }
             if (skipBlock) continue;
-            if (line.matches("\\d+") || VTT_TIMECODE.matcher(line).matches() || line.matches("^(?:Kind|Language|X-TIMESTAMP-MAP):.*$")) continue;
+            var timeMatcher = CAPTION_TIME_START.matcher(line);
+            if (timeMatcher.matches()) {
+                long hours = timeMatcher.group(1) == null ? 0 : Long.parseLong(timeMatcher.group(1));
+                long minutes = Long.parseLong(timeMatcher.group(2));
+                long seconds = Long.parseLong(timeMatcher.group(3));
+                nextTimestamp = formatTimestamp(hours * 3600 + minutes * 60 + seconds);
+                continue;
+            }
+            if (line.matches("\\d+") || VTT_TIMECODE.matcher(line).matches()
+                    || line.matches("^(?:Kind|Language|X-TIMESTAMP-MAP):.*$")) continue;
             line = line.replaceAll("<[^>]*>", " ").replace("&nbsp;", " ").replace("&amp;", "&")
                     .replace("&lt;", "<").replace("&gt;", ">").replaceAll("\\s+", " ").trim();
-            if (line.isBlank() || line.equals(previous)) continue;
+            if (line.isBlank() || line.equals(previous)) { nextTimestamp = ""; continue; }
             if (!result.isEmpty()) result.append(' ');
+            if (!nextTimestamp.isBlank()) result.append('[').append(nextTimestamp).append("] ");
             result.append(line);
             previous = line;
+            nextTimestamp = "";
         }
         return result.toString().trim();
     }
@@ -351,6 +604,7 @@ public class TranscriptComparisonService {
         Map<String, Object> map = new LinkedHashMap<>();
         map.put("text", transcript.text());
         map.put("available", !transcript.text().isBlank());
+        map.put("truncated", transcript.truncated());
         map.put("source", transcript.source());
         map.put("message", transcript.message());
         return map;
@@ -380,5 +634,5 @@ public class TranscriptComparisonService {
         }
     }
 
-    private record TranscriptData(String text, String source, String message) { }
+    private record TranscriptData(String text, String source, String message, boolean truncated) { }
 }

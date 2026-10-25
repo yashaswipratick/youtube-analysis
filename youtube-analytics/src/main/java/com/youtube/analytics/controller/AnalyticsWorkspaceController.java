@@ -1,5 +1,6 @@
 package com.youtube.analytics.controller;
 
+import com.youtube.analytics.model.CreatorVideoAnalysisRequest;
 import com.youtube.analytics.model.TranscriptComparisonRequest;
 import com.youtube.analytics.service.TranscriptComparisonService;
 import com.youtube.analytics.service.businesslogic.AnalyticsWorkspaceService;
@@ -53,6 +54,12 @@ public class AnalyticsWorkspaceController {
             @RequestParam(defaultValue = "10") Integer count,
             @RequestParam(required = false) Integer lastNDays) {
         return ResponseEntity.ok(workspaceService.compare(channelId, contentType, count, lastNDays));
+    }
+
+    @PostMapping("/creator-video-analysis")
+    public ResponseEntity<Map<String, Object>> creatorVideoAnalysis(
+            @Valid @RequestBody CreatorVideoAnalysisRequest request) {
+        return ResponseEntity.ok(transcriptComparisonService.analyzeCreatorVideo(request));
     }
 
     @PostMapping("/transcript-compare")
