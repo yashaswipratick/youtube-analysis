@@ -254,6 +254,23 @@ public class YouTubeAnalyticsController {
                 range.startDateText(), range.endDateText(), videoId)));
     }
 
+    @GetMapping("/reports/uploads-frequency")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getUploadFrequencyReport(
+            @RequestParam(required = false) @Min(1) @Max(3650) Integer lastNDays) {
+        DateRange range = dateRangeResolver.resolve(lastNDays);
+        return ResponseEntity.ok(ApiResponse.success(studioReportsService.uploadFrequency(
+                range.startDateText(), range.endDateText())));
+    }
+
+    @GetMapping("/reports/playlists/{playlistId}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getPlaylistAnalyticsReport(
+            @PathVariable String playlistId,
+            @RequestParam(required = false) @Min(1) @Max(3650) Integer lastNDays) {
+        DateRange range = dateRangeResolver.resolve(lastNDays);
+        return ResponseEntity.ok(ApiResponse.success(studioReportsService.playlistAnalytics(
+                range.startDateText(), range.endDateText(), playlistId)));
+    }
+
     @GetMapping("/reports/formats")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getFormatBreakdown(
             @RequestParam(required = false) @Min(1) @Max(3650) Integer lastNDays) {

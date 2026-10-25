@@ -166,6 +166,36 @@ class YouTubeAnalyticsControllerTest {
     }
 
     @Test
+    void exposesUploadFrequencyReportUsingLastNDays() throws Exception {
+        when(studioReportsService.uploadFrequency(any(), any())).thenReturn(Map.of(
+                "report", "upload frequency", "totalPublishedVideosInRange", 3,
+                "weekly", java.util.List.of(Map.of("periodStart", "2026-10-19", "uploads", 2L)),
+                "monthly", java.util.List.of(Map.of("periodStart", "2026-10-01", "uploads", 3L))));
+
+        mockMvc.perform(get("/api/youtube-analytics/v1/analytics/reports/uploads-frequency")
+                        .param("lastNDays", "30"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.totalPublishedVideosInRange").value(3))
+                .andExpect(jsonPath("$.data.weekly[0].uploads").value(2))
+                .andExpect(jsonPath("$.data.monthly[0].uploads").value(3));
+    }
+
+    @Test
+    void exposesPlaylistAnalyticsReportUsingPlaylistIdAndDateRange() throws Exception {
+        when(studioReportsService.playlistAnalytics(any(), any(), eq("PLabcdefghijklmno01234567")))
+                .thenReturn(Map.of("report", "playlist analytics", "playlistId", "PLabcdefghijklmno01234567",
+                        "overviewStatus", "AVAILABLE", "overview", Map.of("playlistViews", 25)));
+
+        mockMvc.perform(get("/api/youtube-analytics/v1/analytics/reports/playlists/PLabcdefghijklmno01234567")
+                        .param("lastNDays", "15"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.playlistId").value("PLabcdefghijklmno01234567"))
+                .andExpect(jsonPath("$.data.overview.playlistViews").value(25));
+    }
+
+    @Test
     void exposesStudioOverviewReportUsingLastNDays() throws Exception {
         when(studioReportsService.overview(any(), any())).thenReturn(Map.of(
                 "report", "channel overview",

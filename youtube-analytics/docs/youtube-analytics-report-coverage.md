@@ -58,6 +58,31 @@ processed Analytics API metrics. The current counters are applied to `metrics` o
 requested range covers the publication day and its end date is not earlier than the publication
 day. `analyticsMetrics` preserves the date-filtered Analytics API values.
 
+## Playlist report endpoint
+
+`GET /api/youtube-analytics/v1/analytics/reports/playlists/{playlistId}?lastNDays=28`
+returns playlist overview metrics, daily time series, and traffic-source breakdown. It uses
+the official YouTube Analytics API v2 playlist report combinations with the required
+`playlist==PLAYLIST_ID` filter. Playlist IDs are validated before making Google API calls.
+The playlist must be available to the authenticated channel; aggregated video metrics can be
+empty for a playlist containing only videos from other channels. The report is separate from
+the single-video response because playlist context cannot be inferred from a video ID alone.
+
+Channel revenue and overview revenue are now split into three separate report groups:
+estimated revenue, ad-performance metrics grouped by `adType`, and playback-based performance.
+Unique viewers in the audience endpoint are queried with the required `day` dimension.
+Daily unique-viewer counts are not added together to invent a multi-day total.
+
+## Upload frequency endpoint
+
+`GET /api/youtube-analytics/v1/analytics/reports/uploads-frequency?lastNDays=90`
+uses the authenticated channel's uploads playlist to count published videos per week and per
+calendar month, including empty periods. Weeks begin on Monday. Publish timestamps are read
+from YouTube Data API v3 `playlistItems.contentDetails.videoPublishedAt` and cached in memory
+for 30 minutes to avoid paginating the entire uploads playlist on every request. This report
+measures upload cadence only; it does not imply performance or engagement. Because the cache is
+process-local, separate application instances maintain their own refresh windows.
+
 ## Metric units
 
 - `estimatedMinutesWatched` and `estimatedRedMinutesWatched`: minutes.
@@ -66,6 +91,14 @@ day. `analyticsMetrics` preserves the date-filtered Analytics API values.
 - `elapsedVideoTimeRatio`: fraction of video elapsed, normally in the 0–1 interval.
 - `audienceWatchRatio`: returned by YouTube as a ratio. It can exceed 1 when segments are replayed and must not be clamped to 1.
 - Thumbnail click-through rate and end-screen click rate values are preserved in the Reporting API's provided units; conversion should be based on the report schema/value definition, not assumed.
+
+## Authentication and deployment safety
+
+Analytics routes are protected by the Spring Security OAuth login session. Only login,
+error, Swagger/OpenAPI, and the OAuth success route are publicly permitted. Do not re-add
+`/api/youtube-analytics/v1/analytics/**` to the `permitAll` matcher before exposing this
+service beyond a trusted local environment; those endpoints return private channel analytics
+and replay snapshots.
 
 ## Error and data-availability behavior
 
@@ -97,4 +130,4 @@ The following are not represented as fabricated Analytics API v2 metrics:
 - Shorts “viewed versus swiped away” is not exposed as a supported metric by these report combinations.
 - Playlist-in-context metrics need a playlist ID.
 - Median benchmarks and per-1,000-view conversion values are derived by application logic and do not come from a single YouTube metric. The current channel benchmark is limited to the top 200 videos returned by the query, not every upload.
-- Upload-frequency-per-week/month has not been added in this increment; monthly video performance trends are available, but upload frequency needs channel upload metadata and should be implemented without adding a large per-request Data API fan-out.
+- The upload-frequency endpoint uses publish timestamps and a 30-minute in-memory cache to control Data API pagination. It does not yet share a distributed cache across application instances.

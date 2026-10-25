@@ -22,6 +22,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.time.DayOfWeek;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -56,15 +58,20 @@ public class YouTubeStudioReportsService {
             "cardTeaserClickRate", "videosAddedToPlaylists", "videosRemovedFromPlaylists",
             "annotationImpressions", "annotationClicks", "annotationClickThroughRate",
             "annotationClosableImpressions", "annotationCloses", "annotationCloseRate",
-            "annotationClickableImpressions");
+            "annotationClickableImpressions", "averageTimeInPlaylist", "playlistAverageViewDuration",
+            "playlistEstimatedMinutesWatched", "playlistSaves", "playlistStarts", "playlistViews",
+            "viewsPerPlaylistStart");
     private static final List<String> OVERVIEW_METRICS = List.of(
             "views", "estimatedMinutesWatched", "subscribersGained", "subscribersLost",
             "averageViewDuration", "averageViewPercentage", "likes", "comments", "shares");
     private static final List<String> PERFORMANCE_METRICS = List.of(
             "views", "averageViewDuration", "averageViewPercentage", "subscribersGained", "shares");
-    private static final List<String> REVENUE_METRICS = List.of(
-            "estimatedRevenue", "estimatedAdRevenue", "estimatedRedPartnerRevenue",
-            "grossRevenue", "cpm", "playbackBasedCpm", "adImpressions", "monetizedPlaybacks");
+    private static final List<String> ESTIMATED_REVENUE_METRICS = List.of(
+            "estimatedRevenue", "estimatedAdRevenue", "estimatedRedPartnerRevenue");
+    private static final List<String> AD_PERFORMANCE_METRICS = List.of(
+            "grossRevenue", "cpm", "adImpressions");
+    private static final List<String> PLAYBACK_PERFORMANCE_METRICS = List.of(
+            "playbackBasedCpm", "monetizedPlaybacks");
 
     private final WebClient youTubeWebClient;
     private final YouTubeDataService youTubeDataService;
@@ -73,15 +80,8 @@ public class YouTubeStudioReportsService {
     public Map<String, Object> overview(String startDate, String endDate) {
         DateWindow window = resolveWindow(startDate, endDate);
         Map<String, Object> metrics = firstRow(query(window, OVERVIEW_METRICS, null, null, null, null));
-        Object revenue;
-        boolean revenueAvailable;
-        try {
-            revenue = firstRow(query(window, REVENUE_METRICS, null, null, null, null));
-            revenueAvailable = !((Map<?, ?>) revenue).isEmpty();
-        } catch (RuntimeException ex) {
-            revenue = null;
-            revenueAvailable = false;
-        }
+        Map<String, Object> revenue = revenueSummary(window);
+        boolean revenueAvailable = Boolean.TRUE.equals(revenue.get("available"));
         Map<String, Object> result = envelope(window, "channel overview");
         result.put("metrics", metrics);
         Object gained = metrics.get("subscribersGained");
@@ -172,14 +172,27 @@ public class YouTubeStudioReportsService {
         } catch (RuntimeException ex) {
             demographics = List.of();
         }
+        List<Map<String, Object>> uniqueViewersByDay;
+        String uniqueViewersStatus;
         try {
-            uniqueViewers = firstRow(query(window, List.of("uniques"), null, filter, null, null)).get("uniques");
+            uniqueViewersByDay = rows(query(window, List.of("uniques"),
+                    "day", filter, "day", 200));
+            uniqueViewersStatus = uniqueViewersByDay.isEmpty() ? "EMPTY" : "AVAILABLE";
+            uniqueViewers = window.startDate().equals(window.endDate()) && !uniqueViewersByDay.isEmpty()
+                    ? uniqueViewersByDay.get(0).get("uniques") : null;
         } catch (RuntimeException ex) {
+            uniqueViewersByDay = List.of();
             uniqueViewers = null;
+            uniqueViewersStatus = "UNAVAILABLE";
         }
 
         Map<String, Object> result = envelope(window, "audience reports");
         result.put("uniqueViewers", uniqueViewers);
+        result.put("uniqueViewersByDay", uniqueViewersByDay);
+        result.put("uniqueViewersStatus", uniqueViewersStatus);
+        result.put("uniqueViewersNote", window.startDate().equals(window.endDate())
+                ? "Unique viewers is reported for the selected day."
+                : "Unique viewers is queried with the required day dimension. Daily unique viewers are not additive, so uniqueViewers is null for multi-day ranges; use uniqueViewersByDay rather than summing daily values.");
         result.put("watchTimeBySubscribedStatus", subscribed);
         result.put("ageAndGender", demographics);
         result.put("returningViewers", null);
@@ -189,6 +202,112 @@ public class YouTubeStudioReportsService {
         result.put("otherChannelsAudienceWatches", null);
         result.put("otherVideosAudienceWatches", null);
         result.put("audienceResearchNote", "Other channels/videos watched are Studio audience-research surfaces and are not returned by the official reporting endpoints.");
+        return result;
+    }
+
+    /**
+     * Playlist analytics are available only for playlists owned by the authenticated channel.
+     * A playlist filter is required by the official playlist report combinations.
+     */
+    public Map<String, Object> uploadFrequency(String startDate, String endDate) {
+        DateWindow window = resolveWindow(startDate, endDate);
+        Map<String, String> publishDates = youTubeDataService.getAllUploadedVideoPublishDates();
+        Map<LocalDate, Long> weeklyCounts = new HashMap<>();
+        Map<LocalDate, Long> monthlyCounts = new HashMap<>();
+        int totalPublishedVideos = 0;
+
+        for (String timestamp : publishDates.values()) {
+            LocalDate published = parsePublishDate(timestamp);
+            if (published == null || published.isBefore(window.startDate()) || published.isAfter(window.endDate())) continue;
+            totalPublishedVideos++;
+            LocalDate weekStart = published.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            LocalDate monthStart = published.withDayOfMonth(1);
+            weeklyCounts.merge(weekStart, 1L, Long::sum);
+            monthlyCounts.merge(monthStart, 1L, Long::sum);
+        }
+
+        List<Map<String, Object>> weekly = new ArrayList<>();
+        LocalDate week = window.startDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        LocalDate finalWeek = window.endDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+        while (!week.isAfter(finalWeek)) {
+            weekly.add(Map.of("periodStart", week.toString(),
+                    "periodEnd", week.plusDays(6).toString(),
+                    "uploads", weeklyCounts.getOrDefault(week, 0L)));
+            week = week.plusWeeks(1);
+        }
+
+        List<Map<String, Object>> monthly = new ArrayList<>();
+        LocalDate month = window.startDate().withDayOfMonth(1);
+        LocalDate finalMonth = window.endDate().withDayOfMonth(1);
+        while (!month.isAfter(finalMonth)) {
+            monthly.add(Map.of("periodStart", month.toString(),
+                    "uploads", monthlyCounts.getOrDefault(month, 0L)));
+            month = month.plusMonths(1);
+        }
+
+        Map<String, Object> result = envelope(window, "upload frequency");
+        result.put("totalPublishedVideosInRange", totalPublishedVideos);
+        result.put("weekly", weekly);
+        result.put("monthly", monthly);
+        result.put("averageUploadsPerWeek", weekly.isEmpty() ? 0.0
+                : Math.round(totalPublishedVideos * 100.0 / weekly.size()) / 100.0);
+        result.put("averageUploadsPerMonth", monthly.isEmpty() ? 0.0
+                : Math.round(totalPublishedVideos * 100.0 / monthly.size()) / 100.0);
+        result.put("weeklyPeriodCount", weekly.size());
+        result.put("monthlyPeriodCount", monthly.size());
+        result.put("source", "YouTube Data API v3 uploads playlist contentDetails.videoPublishedAt");
+        result.put("note", "Weekly periods start Monday. Average rates divide by the displayed week/month buckets; the first and last weekly buckets may be partial when the requested dates do not align to Mondays. The uploads playlist publish-date cache refreshes every 30 minutes. This reports publication cadence, not views or engagement.");
+        return result;
+    }
+
+    public Map<String, Object> playlistAnalytics(String startDate, String endDate, String playlistId) {
+        if (playlistId == null || !playlistId.matches("[A-Za-z0-9_-]{10,128}")) {
+            throw new IllegalArgumentException("playlistId must be a valid YouTube playlist ID");
+        }
+        DateWindow window = resolveWindow(startDate, endDate);
+        List<String> metrics = List.of("engagedViews", "views", "estimatedMinutesWatched",
+                "averageViewDuration", "averageTimeInPlaylist", "playlistAverageViewDuration",
+                "playlistEstimatedMinutesWatched", "playlistSaves", "playlistStarts",
+                "playlistViews", "viewsPerPlaylistStart");
+        Map<String, Object> result = envelope(window, "playlist analytics");
+        result.put("playlistId", playlistId);
+        result.put("metrics", metrics);
+
+        try {
+            Map<String, Object> overview = firstRow(query(window, metrics, null,
+                    "playlist==" + playlistId, null, null));
+            result.put("overview", overview);
+            result.put("overviewStatus", overview.isEmpty() ? "EMPTY" : "AVAILABLE");
+        } catch (RuntimeException ex) {
+            result.put("overview", Map.of());
+            result.put("overviewStatus", "UNAVAILABLE");
+        }
+
+        try {
+            List<Map<String, Object>> daily = rows(query(window, metrics, "day",
+                    "playlist==" + playlistId, "day", 200));
+            result.put("daily", daily);
+            result.put("dailyStatus", daily.isEmpty() ? "EMPTY" : "AVAILABLE");
+        } catch (RuntimeException ex) {
+            result.put("daily", List.of());
+            result.put("dailyStatus", "UNAVAILABLE");
+        }
+
+        try {
+            List<Map<String, Object>> traffic = rows(query(window,
+                    List.of("engagedViews", "views", "estimatedMinutesWatched",
+                            "averageTimeInPlaylist", "playlistAverageViewDuration",
+                            "playlistEstimatedMinutesWatched", "playlistSaves", "playlistStarts",
+                            "playlistViews", "viewsPerPlaylistStart"),
+                    "insightTrafficSourceType", "playlist==" + playlistId, "-playlistViews", 50));
+            result.put("trafficSources", traffic);
+            result.put("trafficSourcesStatus", traffic.isEmpty() ? "EMPTY" : "AVAILABLE");
+        } catch (RuntimeException ex) {
+            result.put("trafficSources", List.of());
+            result.put("trafficSourcesStatus", "UNAVAILABLE");
+        }
+
+        result.put("note", "Playlist reports include in-playlist activity and, where supported, aggregated metrics for videos owned by this channel. Playlists with videos owned only by other channels may have no aggregated video metrics. Playlist must belong to the authenticated channel.");
         return result;
     }
 
@@ -258,52 +377,82 @@ public class YouTubeStudioReportsService {
         if (limit < 1 || limit > 50) throw new IllegalArgumentException("limit must be between 1 and 50");
         DateWindow window = resolveWindow(startDate, endDate);
         String filter = videoId == null || videoId.isBlank() ? null : "video==" + videoId;
+        Map<String, Object> result = envelope(window, "revenue report");
+        Map<String, String> sectionStatus = new LinkedHashMap<>();
+        List<Map<String, Object>> estimatedRevenueRows = List.of();
+        Object estimatedRevenueMetrics = videoId == null || videoId.isBlank() ? List.of() : null;
+
         try {
-            YouTubeAnalyticsApiResponse response = query(window, REVENUE_METRICS,
+            YouTubeAnalyticsApiResponse estimatedResponse = query(window, ESTIMATED_REVENUE_METRICS,
                     videoId == null || videoId.isBlank() ? "video" : null, filter,
                     "-estimatedRevenue", limit);
-            Map<String, Object> result = envelope(window, "revenue report");
-            result.put("available", true);
-            result.put("videoId", videoId);
+            estimatedRevenueRows = rows(estimatedResponse);
+            sectionStatus.put("estimatedRevenue", estimatedRevenueRows.isEmpty() ? "EMPTY" : "AVAILABLE");
             if (videoId == null || videoId.isBlank()) {
-                List<Map<String, Object>> revenueRows = rows(response);
-                Map<String, Long> viewsByVideo = new HashMap<>();
-                try {
-                    YouTubeAnalyticsApiResponse viewsResponse = query(window, List.of("views"),
-                            "video", null, "-views", 200);
-                    for (Map<String, Object> viewsRow : rows(viewsResponse)) {
-                        Object id = viewsRow.get("video");
-                        if (id != null) viewsByVideo.put(String.valueOf(id), asLong(viewsRow.get("views")));
-                    }
-                } catch (RuntimeException ex) {
-                    log.debug("Could not calculate RPM because the views report was unavailable: {}", ex.getMessage());
-                }
-                revenueRows.forEach(row -> {
-                    Object id = row.get("video");
-                    Long views = id == null ? null : viewsByVideo.get(String.valueOf(id));
-                    row.put("rpm", calculateRpm(row.get("estimatedRevenue"), views));
-                });
-                result.put("metrics", revenueRows);
+                estimatedRevenueMetrics = estimatedRevenueRows;
             } else {
-                Map<String, Object> revenueMetrics = firstRow(response);
+                Map<String, Object> metrics = firstRow(estimatedResponse);
                 Long views = null;
                 try {
                     views = asLong(firstRow(query(window, List.of("views"), null, filter, null, null)).get("views"));
                 } catch (RuntimeException ex) {
                     log.debug("Could not calculate RPM for video {}: {}", videoId, ex.getMessage());
                 }
-                revenueMetrics.put("rpm", calculateRpm(revenueMetrics.get("estimatedRevenue"), views));
-                result.put("metrics", revenueMetrics);
+                metrics.put("rpm", calculateRpm(metrics.get("estimatedRevenue"), views));
+                estimatedRevenueMetrics = metrics;
             }
-            result.put("note", "Revenue values are estimated. Google requires the channel to be in the YouTube Partner Program and the yt-analytics-monetary.readonly scope.");
-            return result;
         } catch (RuntimeException ex) {
-            Map<String, Object> result = envelope(window, "revenue report");
-            result.put("available", false);
-            result.put("metrics", null);
-            result.put("reason", "Revenue is unavailable. Confirm channel monetization and re-authorize the Google account with yt-analytics-monetary.readonly.");
-            return result;
+            sectionStatus.put("estimatedRevenue", "UNAVAILABLE");
+            estimatedRevenueMetrics = videoId == null || videoId.isBlank() ? List.of() : null;
         }
+
+        if (videoId == null || videoId.isBlank()) {
+            Map<String, Long> viewsByVideo = new HashMap<>();
+            try {
+                YouTubeAnalyticsApiResponse viewsResponse = query(window, List.of("views"),
+                        "video", null, "-views", 200);
+                for (Map<String, Object> viewsRow : rows(viewsResponse)) {
+                    Object id = viewsRow.get("video");
+                    if (id != null) viewsByVideo.put(String.valueOf(id), asLong(viewsRow.get("views")));
+                }
+                estimatedRevenueRows.forEach(row -> {
+                    Object id = row.get("video");
+                    Long views = id == null ? null : viewsByVideo.get(String.valueOf(id));
+                    row.put("rpm", calculateRpm(row.get("estimatedRevenue"), views));
+                });
+                estimatedRevenueMetrics = estimatedRevenueRows;
+            } catch (RuntimeException ex) {
+                log.debug("Could not calculate RPM for revenue rows: {}", ex.getMessage());
+            }
+        }
+
+        List<Map<String, Object>> adPerformance = List.of();
+        try {
+            adPerformance = rows(query(window, AD_PERFORMANCE_METRICS, "adType", filter, null, 50));
+            sectionStatus.put("adPerformance", adPerformance.isEmpty() ? "EMPTY" : "AVAILABLE");
+        } catch (RuntimeException ex) {
+            sectionStatus.put("adPerformance", "UNAVAILABLE");
+        }
+
+        List<Map<String, Object>> playbackPerformance = List.of();
+        try {
+            playbackPerformance = rows(query(window, PLAYBACK_PERFORMANCE_METRICS,
+                    videoId == null || videoId.isBlank() ? "video" : null, filter,
+                    videoId == null || videoId.isBlank() ? "-monetizedPlaybacks" : null, limit));
+            sectionStatus.put("playbackBasedPerformance", playbackPerformance.isEmpty() ? "EMPTY" : "AVAILABLE");
+        } catch (RuntimeException ex) {
+            sectionStatus.put("playbackBasedPerformance", "UNAVAILABLE");
+        }
+
+        result.put("available", sectionStatus.values().stream()
+                .anyMatch(status -> "AVAILABLE".equals(status)));
+        result.put("videoId", videoId);
+        result.put("metrics", estimatedRevenueMetrics);
+        result.put("adPerformance", adPerformance);
+        result.put("playbackBasedPerformance", playbackPerformance);
+        result.put("sectionStatus", sectionStatus);
+        result.put("note", "Revenue report groups are queried separately because estimated revenue, ad-type performance (adType), and playback-based performance use different report combinations. Revenue values are estimates and require YPP eligibility plus the yt-analytics-monetary.readonly OAuth scope.");
+        return result;
     }
 
     public Map<String, Object> videoReach(String videoId, String startDate, String endDate) {
@@ -483,7 +632,9 @@ public class YouTubeStudioReportsService {
                 Map.entry("subtitleLanguage", "YouTube Reporting API channel_subtitles_a3; asynchronous"),
                 Map.entry("formatComparison", "YouTube Analytics API v2 creatorContentType dimension"),
                 Map.entry("searchTerms", "YouTube Analytics API insightTrafficSourceDetail filtered to YT_SEARCH"),
-                Map.entry("revenue", "YouTube Analytics API v2; requires YPP monetization and monetary OAuth scope")));
+                Map.entry("revenue", "YouTube Analytics API v2; requires YPP monetization and monetary OAuth scope"),
+                Map.entry("playlistAnalytics", "YouTube Analytics API v2 playlist reports; requires a playlist ID owned by the authenticated channel"),
+                Map.entry("uploadFrequency", "YouTube Data API v3 uploads playlist publish timestamps; 30-minute in-memory cache")));
         result.put("unsupportedOrNotOfficiallyExposed", Map.ofEntries(
                 Map.entry("returningViewers", "The official YouTube Analytics API v2 does not expose a returningViewers metric."),
                 Map.entry("whenViewersAreOnYouTube", "The Studio audience activity heatmap has no corresponding supported public API report."),
@@ -491,6 +642,41 @@ public class YouTubeStudioReportsService {
                 Map.entry("otherVideosAudienceWatches", "Studio audience research is not exposed through the official Analytics API."),
                 Map.entry("uncoveredSearchDemand", "The API can return search terms that generated views for your videos, not all searches without matching content.")));
         return result;
+    }
+
+    private Map<String, Object> revenueSummary(DateWindow window) {
+        Map<String, Object> revenue = new LinkedHashMap<>();
+        Map<String, String> status = new LinkedHashMap<>();
+        try {
+            Map<String, Object> values = firstRow(query(window, ESTIMATED_REVENUE_METRICS,
+                    null, null, null, null));
+            revenue.put("estimatedRevenue", values);
+            status.put("estimatedRevenue", values.isEmpty() ? "EMPTY" : "AVAILABLE");
+        } catch (RuntimeException ex) {
+            revenue.put("estimatedRevenue", null);
+            status.put("estimatedRevenue", "UNAVAILABLE");
+        }
+        try {
+            List<Map<String, Object>> values = rows(query(window, AD_PERFORMANCE_METRICS,
+                    "adType", null, null, 50));
+            revenue.put("adPerformance", values);
+            status.put("adPerformance", values.isEmpty() ? "EMPTY" : "AVAILABLE");
+        } catch (RuntimeException ex) {
+            revenue.put("adPerformance", List.of());
+            status.put("adPerformance", "UNAVAILABLE");
+        }
+        try {
+            Map<String, Object> values = firstRow(query(window, PLAYBACK_PERFORMANCE_METRICS,
+                    null, null, null, null));
+            revenue.put("playbackBasedPerformance", values);
+            status.put("playbackBasedPerformance", values.isEmpty() ? "EMPTY" : "AVAILABLE");
+        } catch (RuntimeException ex) {
+            revenue.put("playbackBasedPerformance", Map.of());
+            status.put("playbackBasedPerformance", "UNAVAILABLE");
+        }
+        revenue.put("sectionStatus", status);
+        revenue.put("available", status.values().stream().anyMatch("AVAILABLE"::equals));
+        return revenue;
     }
 
     private YouTubeAnalyticsApiResponse query(DateWindow window, List<String> metrics, String dimensions,

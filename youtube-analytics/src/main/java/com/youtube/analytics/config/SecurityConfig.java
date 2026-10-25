@@ -20,8 +20,7 @@ public class SecurityConfig {
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**",
-                        "/api/youtube-analytics/v1/oauth/success",
-                        "/api/youtube-analytics/v1/analytics/**"
+                        "/api/youtube-analytics/v1/oauth/success"
                 ).permitAll()
                 .anyRequest().authenticated()
             )

@@ -600,15 +600,13 @@ public class YouTubeAnalyticsReportAggregationService {
         }
         String prefix = "reporting-" + sectionName;
         try {
-            String jobsBody = apiCall(HttpMethod.GET, REPORTING_BASE + "/jobs", null, archive, prefix + "-jobs", "json");
-            JsonNode jobs = objectMapper.readTree(jobsBody);
+            List<JsonNode> jobs = listReportingResources(
+                    REPORTING_BASE + "/jobs", "jobs", archive, prefix + "-jobs");
             String jobId = null;
-            if (jobs.path("jobs").isArray()) {
-                for (JsonNode job : jobs.path("jobs")) {
-                    if (reportTypeId.equals(job.path("reportTypeId").asText())) {
-                        jobId = job.path("id").asText(null);
-                        break;
-                    }
+            for (JsonNode job : jobs) {
+                if (reportTypeId.equals(job.path("reportTypeId").asText())) {
+                    jobId = job.path("id").asText(null);
+                    break;
                 }
             }
             if (jobId == null) {
@@ -621,25 +619,29 @@ public class YouTubeAnalyticsReportAggregationService {
                 return mapOf("report", sectionName, "api", "YouTube Reporting API v1",
                         "status", "UNAVAILABLE", "reason", "No Reporting API job is available.");
             }
-            String reportsBody = apiCall(HttpMethod.GET, REPORTING_BASE + "/jobs/" + jobId + "/reports",
-                    null, archive, prefix + "-list-reports", "json");
-            JsonNode reports = objectMapper.readTree(reportsBody);
+            List<JsonNode> reports = listReportingResources(
+                    REPORTING_BASE + "/jobs/" + jobId + "/reports", "reports", archive, prefix + "-list-reports");
             List<Map<String, Object>> matchingRows = new ArrayList<>();
             Map<String, Double> totals = new LinkedHashMap<>();
+            Map<String, Double> weightedRateNumerators = new LinkedHashMap<>();
+            Map<String, Double> weightedRateDenominators = new LinkedHashMap<>();
             Set<String> discoveredFields = new LinkedHashSet<>();
             int availableReports = 0;
-            if (reports.path("reports").isArray()) {
-                for (JsonNode report : reports.path("reports")) {
-                    LocalDate reportStart = parseDate(report.path("startTime").asText(null), null);
-                    LocalDate reportEnd = parseDate(report.path("endTime").asText(null), null);
-                    if (reportStart == null || reportEnd == null || reportEnd.isBefore(start) || reportStart.isAfter(end)) continue;
-                    String downloadUrl = report.path("downloadUrl").asText(null);
-                    if (downloadUrl == null || downloadUrl.isBlank()) continue;
-                    String csv = apiCall(HttpMethod.GET, downloadUrl, null, archive,
-                            prefix + "-csv-" + (++availableReports), "csv");
-                    matchingRows.addAll(parseCsvReport(csv, videoId, start, end, totals, sectionName, discoveredFields));
-                }
+            for (JsonNode report : reports) {
+                LocalDate reportStart = parseDate(report.path("startTime").asText(null), null);
+                LocalDate reportEnd = parseDate(report.path("endTime").asText(null), null);
+                if (reportStart == null || reportEnd == null || reportEnd.isBefore(start) || reportStart.isAfter(end)) continue;
+                String downloadUrl = report.path("downloadUrl").asText(null);
+                if (downloadUrl == null || downloadUrl.isBlank()) continue;
+                String csv = apiCall(HttpMethod.GET, downloadUrl, null, archive,
+                        prefix + "-csv-" + (++availableReports), "csv");
+                matchingRows.addAll(parseCsvReport(csv, videoId, start, end, totals, sectionName, discoveredFields,
+                        weightedRateNumerators, weightedRateDenominators));
             }
+            weightedRateNumerators.forEach((rateName, numerator) -> {
+                double denominator = weightedRateDenominators.getOrDefault(rateName, 0.0);
+                if (denominator > 0) totals.put(rateName, numerator / denominator);
+            });
             Map<String, Object> optionalFields = validateReportingFields(sectionName, configuredFields, discoveredFields);
             return mapOf(
                     "report", sectionName,
@@ -662,6 +664,29 @@ public class YouTubeAnalyticsReportAggregationService {
             return mapOf("report", sectionName, "api", "YouTube Reporting API v1",
                     "status", "ERROR", "reason", "The reporting job or file could not be read.");
         }
+    }
+
+    private List<JsonNode> listReportingResources(
+            String baseUri, String collectionName, ArchiveContext archive, String callPrefix) throws Exception {
+        List<JsonNode> collected = new ArrayList<>();
+        String pageToken = null;
+        int page = 0;
+        do {
+            if (++page > 100) {
+                log.warn("Stopped paginating Reporting API resource '{}' after 100 pages", collectionName);
+                break;
+            }
+            String uri = pageToken == null ? baseUri
+                    : UriComponentsBuilder.fromHttpUrl(baseUri).queryParam("pageToken", pageToken)
+                    .build().encode().toUriString();
+            String body = apiCall(HttpMethod.GET, uri, null, archive,
+                    callPrefix + "-page-" + page, "json");
+            JsonNode root = objectMapper.readTree(body);
+            JsonNode items = root.path(collectionName);
+            if (items.isArray()) items.forEach(item -> collected.add(item.deepCopy()));
+            pageToken = root.path("nextPageToken").asText(null);
+        } while (pageToken != null && !pageToken.isBlank());
+        return collected;
     }
 
     private String apiCall(
@@ -698,7 +723,8 @@ public class YouTubeAnalyticsReportAggregationService {
 
     private List<Map<String, Object>> parseCsvReport(
             String csv, String videoId, LocalDate start, LocalDate end,
-            Map<String, Double> totals, String reportType, Set<String> discoveredFields) {
+            Map<String, Double> totals, String reportType, Set<String> discoveredFields,
+            Map<String, Double> weightedRateNumerators, Map<String, Double> weightedRateDenominators) {
         if (csv == null || csv.isBlank()) return List.of();
         List<String> lines = csv.lines().toList();
         if (lines.isEmpty()) return List.of();
@@ -731,8 +757,20 @@ public class YouTubeAnalyticsReportAggregationService {
                         double number = Double.parseDouble(value);
                         if (Double.isFinite(number)) {
                             if (key.endsWith("_ctr") || key.endsWith("_click_rate")) {
-                                // Rates remain available per row; weighted aggregate is computed separately where impressions exist.
                                 row.put(key, number);
+                                String weightColumn = rateWeightColumn(key);
+                                Integer weightIndex = weightColumn == null ? null : indexes.get(weightColumn);
+                                if (weightIndex != null && weightIndex < values.size()) {
+                                    try {
+                                        double weight = Double.parseDouble(values.get(weightIndex));
+                                        if (Double.isFinite(weight) && weight > 0) {
+                                            weightedRateNumerators.merge(key, number * weight, Double::sum);
+                                            weightedRateDenominators.merge(key, weight, Double::sum);
+                                        }
+                                    } catch (NumberFormatException ignored) {
+                                        // Preserve the row rate but exclude it from weighted totals if its denominator is missing.
+                                    }
+                                }
                             } else {
                                 row.put(key, number);
                                 totals.merge(key, number, Double::sum);
@@ -746,6 +784,15 @@ public class YouTubeAnalyticsReportAggregationService {
             rows.add(row);
         }
         return rows;
+    }
+
+    private String rateWeightColumn(String rateColumn) {
+        if (rateColumn == null) return null;
+        if (rateColumn.endsWith("_ctr")) return rateColumn.substring(0, rateColumn.length() - "_ctr".length());
+        if (rateColumn.endsWith("_click_rate")) {
+            return rateColumn.substring(0, rateColumn.length() - "_click_rate".length()) + "_impressions";
+        }
+        return null;
     }
 
     private Map<String, Object> validateReportingFields(
