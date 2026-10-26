@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.youtube.analytics.config.CassandraOAuth2AuthorizedClientService;
 import com.youtube.analytics.config.CassandraSchemaInitializer;
 import com.youtube.analytics.service.creatorcoach.CreatorCoachStore;
+import com.youtube.analytics.service.vlogscript.VlogScriptStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CassandraPersistenceIntegrationTest {
     private CqlSession session;
     private CreatorCoachStore store;
+    private VlogScriptStore vlogScriptStore;
     private String ownerId;
 
     @BeforeEach
@@ -41,12 +43,15 @@ class CassandraPersistenceIntegrationTest {
                 .withLocalDatacenter("datacenter1")
                 .build();
         new CassandraSchemaInitializer(session, new DefaultResourceLoader()).afterPropertiesSet();
-        store = new CreatorCoachStore(session, new ObjectMapper());
+        ObjectMapper mapper = new ObjectMapper();
+        store = new CreatorCoachStore(session, mapper);
+        vlogScriptStore = new VlogScriptStore(session, mapper);
         ownerId = "cassandra-it-" + UUID.randomUUID();
     }
 
     @AfterEach
     void tearDown() {
+        if (vlogScriptStore != null && ownerId != null) vlogScriptStore.deleteAllForOwner(ownerId);
         if (store != null && ownerId != null) store.deleteAllForOwner(ownerId);
         if (session != null) session.close();
     }
@@ -63,6 +68,60 @@ class CassandraPersistenceIntegrationTest {
         assertThat(store.delete(ownerId, "video-plan", "plan-1")).isTrue();
         assertThat(store.get(ownerId, "video-plan", "plan-1")).isEmpty();
         assertThat(store.count(ownerId, "video-plan")).isEqualTo(1);
+    }
+
+    @Test
+    void repeatVisitsToOneDestinationRemainSeparateTripsAndKeepOrderedEpisodeScripts() {
+        Map<String, Object> opening = Map.of(
+                "id", "coorg-episode-1",
+                "title", "Episode 1 — Arrival",
+                "sections", java.util.List.of(Map.of(
+                        "id", "hook",
+                        "title", "Opening hook",
+                        "script", "The road disappears into the mist.",
+                        "notes", "Start with a wide shot.")));
+        Map<String, Object> secondEpisode = Map.of(
+                "id", "coorg-episode-2",
+                "title", "Episode 2 — Hidden Coorg",
+                "sections", java.util.List.of(Map.of(
+                        "id", "reservoir",
+                        "title", "Harangi Reservoir",
+                        "script", "Sometimes a view has a deeper story.")));
+
+        vlogScriptStore.saveTrip(ownerId, Map.of(
+                "id", "trip-coorg-october",
+                "name", "Coorg",
+                "tripLabel", "Coorg — October 2026",
+                "startDate", "2026-10-20",
+                "tripType", "Weekend getaway",
+                "episodes", java.util.List.of(opening, secondEpisode)));
+        vlogScriptStore.saveTrip(ownerId, Map.of(
+                "id", "trip-coorg-next-visit",
+                "name", "Coorg",
+                "tripLabel", "Coorg — Future visit",
+                "episodes", java.util.List.of(Map.of(
+                        "id", "episode-single",
+                        "title", "One-day escape",
+                        "sections", java.util.List.of()))));
+
+        var trips = vlogScriptStore.listTrips(ownerId);
+        assertThat(trips).hasSize(2);
+        assertThat(trips).extracting(trip -> trip.get("name")).containsOnly("Coorg");
+        assertThat(trips).extracting(trip -> trip.get("id"))
+                .containsExactlyInAnyOrder("trip-coorg-october", "trip-coorg-next-visit");
+
+        Map<String, Object> savedFirstVisit = vlogScriptStore.getTrip(ownerId, "trip-coorg-october").orElseThrow();
+        assertThat(savedFirstVisit.get("tripLabel")).isEqualTo("Coorg — October 2026");
+        assertThat((java.util.List<?>) savedFirstVisit.get("episodes")).hasSize(2);
+        @SuppressWarnings("unchecked")
+        Map<String, Object> savedEpisode = (Map<String, Object>) ((java.util.List<?>) savedFirstVisit.get("episodes")).get(0);
+        assertThat(savedEpisode.get("id")).isEqualTo("coorg-episode-1");
+        @SuppressWarnings("unchecked")
+        Map<String, Object> savedSection = (Map<String, Object>) ((java.util.List<?>) savedEpisode.get("sections")).get(0);
+        assertThat(savedSection.get("script")).isEqualTo("The road disappears into the mist.");
+
+        assertThat(vlogScriptStore.deleteTrip(ownerId, "trip-coorg-next-visit")).isTrue();
+        assertThat(vlogScriptStore.listTrips(ownerId)).hasSize(1);
     }
 
     @Test
