@@ -1,0 +1,1460 @@
+{
+  "format": "vlogscript-studio",
+  "version": 1,
+  "projects": [
+    {
+      "id": "coorg-kodagu-all-destinations-oct-2026",
+      "title": "Coorg — Destination Script Library",
+      "location": "Coorg / Kodagu, Karnataka",
+      "scriptLibraryVersion": 9,
+      "description": "YASH XPLORE · Corporate life. Weekend escapes. Bangalore to anywhere.\n\nDestination Script Library · 17 independent destination modules. Voice-overs are written in natural Roman Hinglish as audience-facing stories: an opening idea or question, researched history/cultural legend/geography, a meaningful reveal or change over time, and a connection to the landscape the viewer can see. The VO must not talk about filming itself or say the creator is not there to take photos. On-camera scripts are natural Hinglish. All checklist items remain separately tagged for voice-over or on-camera shots. No destination is assigned to a specific day.",
+      "scenes": [
+        {
+          "id": "coorgall_scene_06_dubare",
+          "title": "Dubare Elephant Camp",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Dubare Elephant Camp, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: a former Mysore Dasara elephant-training camp and its change into a place where visitors learn about elephant behaviour. Keep wildlife interactions conditional on current permissions.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: a former Mysore Dasara elephant-training camp and its change into a place where visitors learn about elephant behaviour. Keep wildlife interactions conditional on current permissions.\n\nSOURCES:\nOfficial Kodagu district: https://kodagu.nic.in/en/tourist-place/dubare-elephant-camp/\nWikipedia background: https://en.wikipedia.org/wiki/Dubare\n\nFACTUAL / FIELD NOTE: Do not imply a specific elephant interaction took place unless it actually did. Confirm current access and activity rules before travelling. Keep animals and handlers at a respectful distance and follow staff directions.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Kaveri nadi ke kinare khade hokar, jab paani ki awaaz sunai deti hai, toh dimaag seedha Dubare ke haathiyon par chala jaata hai. Maine bhi pehle yahi socha tha—haathi dekho, unke baare mein thoda jaan lo aur aage badh jao.\n\nLekin Dubare ki kahani ek visit se kaafi lambi hai. Kodagu district ki official website ke mutabik, yeh wahi camp tha jahan Mysore Dasara ke royal procession ke liye elephants ko taiyar kiya jaata tha. Sochiye, Dasara mein jo grand procession kuch ghanton ke liye hazaaron logon ke saamne hota hai, uske peeche training, mahavaton ke saath roz ka rishta aur lambi taiyaari hoti hai. Public ko aksar final spectacle dikhta hai; Dubare us kahani ka doosra hissa kholta hai.\n\nAaj yahan elephant behaviour aur ecology ko samajhne ka mauka bhi milta hai. Waqt ke saath jagah ka role badla hai, lekin elephants aur forest ka connection iski pehchaan ka hissa bana hua hai. Kaveri paas mein behti rehti hai, aur Dubare yaad dilata hai ki ek royal procession ki kahani sirf us din se nahi, usse pehle ke saalon se banti hai.",
+          "oncamera": "Dubare ki sabse interesting baat yeh hai ki yeh pehle Mysore Dasara ke elephants ka training camp tha. Socho, jo elephants procession mein dikhte hain, unki preparation ka bhi apna ek world hota hai. Aaj dekhte hain ki Dubare mein elephant care aur river-side forest ka experience kaisa hai—aur filhaal kaun se activities allowed hain.",
+          "shots": [
+            {
+              "id": "coorgall_scene_06_dubare_shot_01",
+              "done": false,
+              "name": "VO · Public entrance or name board, only if entry is open",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_06_dubare_shot_02",
+              "done": false,
+              "name": "VO · Kaveri river and forest edge from a permitted public area",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_06_dubare_shot_03",
+              "done": false,
+              "name": "VO · Slow environmental details: leaves, water, trees and natural ambience",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_06_dubare_shot_07",
+              "done": false,
+              "name": "VO · Any official information or authorised activity actually available that day",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_06_dubare_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce Dubare and state what is actually open today",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_06_dubare_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Honest reaction after seeing the river / surroundings",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_06_dubare_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Explain what you did or could not do without making assumptions",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_06_dubare_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Closing line from a safe spot; mention next stop only after deciding",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_07_harangi-camp",
+          "title": "Harangi Elephant Camp & Tree Park",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Harangi Tree Park and Elephant Camp, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: a newer elephant camp created near the reservoir in 2022, with elephants shifted from Dubare. Connect its relatively recent history to the landscape, rather than inventing an older royal past.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: a newer elephant camp created near the reservoir in 2022, with elephants shifted from Dubare. Connect its relatively recent history to the landscape, rather than inventing an older royal past.\n\nSOURCES:\nOfficial Kodagu district: https://kodagu.nic.in/en/tourist-place/harangi-tree-park-and-elephant-camp/\nWikipedia, Harangi Dam: https://en.wikipedia.org/wiki/Harangi_Dam\n\nFACTUAL / FIELD NOTE: Confirm today's public access, elephant-related activities and park hours. Do not claim to have seen elephants or activities that were unavailable.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Kuch jagahon ki kahani bahut purani hoti hai. Harangi ki ek important kahani hamare apne waqt mein shuru hoti hai. Pehli nazar mein yeh reservoir ke paas ek shaant green landscape lag sakta hai, lekin is jagah ka ek specific chapter 8 August 2022 se juda hai.\n\nKodagu district ki official website ke mutabik, Harangi Tree Park aur Elephant Camp ka inauguration isi din hua tha, aur Dubare se 15 elephants ko yahan shift kiya gaya. Is detail se Harangi aur Dubare ki kahaniyan ek doosre se jud jaati hain—ek jagah jahan elephants ke training-camp ka purana chapter raha, aur doosri jagah jahan unki story ka naya setup shuru hua.\n\nHar jagah ka past sadiyon purana nahi hota; kabhi-kabhi ek naya chapter hamare saamne likha ja raha hota hai. Reservoir aur ped is kahani ka backdrop hain; beech mein elephants ki zindagi se juda ek naya chapter hai.",
+          "oncamera": "Harangi ka yeh camp kaafi naya hai—district ki official website ke mutabik, 2022 mein inaugurate hua tha aur Dubare se 15 elephants yahan shift kiye gaye. Matlab Harangi aur Dubare ki stories alag nahi hain. Ab dekhte hain ki reservoir ke paas yeh jagah kaise develop hui hai aur aaj public ke liye kya open hai.",
+          "shots": [
+            {
+              "id": "coorgall_scene_07_harangi-camp_shot_01",
+              "done": false,
+              "name": "VO · Harangi Tree Park / camp sign at the public entrance",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_07_harangi-camp_shot_02",
+              "done": false,
+              "name": "VO · Tree-park path, canopy and planted landscape if open",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_07_harangi-camp_shot_03",
+              "done": false,
+              "name": "VO · Show the relationship between the park and reservoir from a permitted viewpoint",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_07_harangi-camp_shot_07",
+              "done": false,
+              "name": "VO · Record official information board or authorised activity only if present",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_07_harangi-camp_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce this as an optional Harangi stop, not a promised activity",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_07_harangi-camp_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Explain what is open today after checking on-site",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_07_harangi-camp_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Natural reaction to the park / water landscape",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_07_harangi-camp_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Wrap without promising a particular activity at the next stop",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_08_harangi-reservoir",
+          "title": "Harangi Reservoir",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Harangi Reservoir, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: move from seeing a pretty body of water to understanding the engineering story behind it—Harangi River, Kaveri tributary, construction beginning in 1969 and opening in 1982.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: move from seeing a pretty body of water to understanding the engineering story behind it—Harangi River, Kaveri tributary, construction beginning in 1969 and opening in 1982.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Harangi_Dam\n\nFACTUAL / FIELD NOTE: Shoot from an authorised, safe public viewpoint. Water levels and access can change; do not approach restricted dam infrastructure or reservoir edges.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Kuch jagah par pahunchkar bolne se zyada, bas kuch der chup rehne ka mann karta hai. Harangi Reservoir ke saamne paani door tak phaila ho, pahaad uske peeche shaant khade hon, aur hawa halki si chal rahi ho—toh aisa lagta hai jaise waqt ne kuch pal ke liye apni raftaar dheemi kar di ho. Pehli nazar mein bas sukoon dikhta hai.\n\nLekin yeh sukoon ek din mein nahi bana. Harangi Dam ka construction 1969 mein shuru hua aur 1982 mein complete hua—terah saal. Socho, jis nazare ko hum kuch seconds mein dekh lete hain, uske peeche saalon ki planning, engineering aur construction chhupi hai. Aaj paani nazar aata hai; use is roop tak laane wali mehnat nazar nahi aati.\n\nHarangi River ka paani ek bade system ka hissa hai, jo irrigation ke liye bhi kaam aata hai. Nadi ka flow apni jagah powerful hai, aur insaan ne us paani ko store karne aur zaroorat ke waqt istemaal karne ka tareeka banaya. Yeh nature ko hara dene ki kahani nahi. Yeh uske saath jeene, uske flow ko samajhne aur apni zarooraton ke liye kaam karne ki koshish hai.\n\nShayad isi liye yahan ka sukoon alag lagta hai. Upar se paani thama hua sa dikhta hai, lekin iske peeche mausam, nadi, engineering aur logon ki zindagi judi hui hai. Jo nazara pehle sirf khoobsurat lag raha tha, ab uske peeche ka waqt bhi mehsoos hone lagta hai.\n\nHarangi mujhe yahi yaad dilata hai: kabhi-kabhi shaanti ka matlab yeh nahi hota ki kuch hua hi nahi. Kabhi is shaanti ke peeche saalon ki koshish hoti hai—and jab yeh baat samajh aati hai, toh paani aur pahaad wahi rehte hain, lekin unhe dekhne ka ehsaas badal jaata hai.",
+          "oncamera": "Harangi ka view peaceful lagta hai, lekin iske peeche ka timeline interesting hai. Dam ka construction 1969 mein shuru hua aur 1982 mein open hua. Yeh Harangi River par bana hai, jo Kaveri system ka hissa hai. Ab is water landscape ko dekhte hain—kyunki yahan nature aur engineering dono saath nazar aate hain.",
+          "shots": [
+            {
+              "id": "coorgall_scene_08_harangi-reservoir_shot_01",
+              "done": false,
+              "name": "VO · Wide reservoir establishing shot from an authorised safe viewpoint",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_08_harangi-reservoir_shot_02",
+              "done": false,
+              "name": "VO · Water texture, reflections and shoreline details from a safe distance",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_08_harangi-reservoir_shot_03",
+              "done": false,
+              "name": "VO · Slow pan showing reservoir, hills and tree line in one frame",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_08_harangi-reservoir_shot_07",
+              "done": false,
+              "name": "VO · Record natural water, wind and birds for 10–15 seconds",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_08_harangi-reservoir_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce Harangi Reservoir and its connection to Harangi Dam",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_08_harangi-reservoir_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Describe the actual weather and water view instead of promising scenery",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_08_harangi-reservoir_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Share the personal reaction after quietly observing the landscape",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_08_harangi-reservoir_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Closing line from safe ground; no edge or bank walk for a shot",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_09_greenway-coffee",
+          "title": "Greenway Coffee Island Plantation Tour",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Greenway Coffee Island Plantation Tour, 7th Hosakote / Suntikoppa area",
+          "duration": "",
+          "purpose": "Story spine: coffee as a crop that reshaped Kodagu's economy and landscape. There is no dedicated Wikipedia history found for this specific tour, so don't assign it an invented origin date.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: coffee as a crop that reshaped Kodagu's economy and landscape. There is no dedicated Wikipedia history found for this specific tour, so don't assign it an invented origin date.\n\nSOURCES:\nWikipedia, Coorg Province: https://en.wikipedia.org/wiki/Coorg_Province\nWikipedia, Kodava people: https://en.wikipedia.org/wiki/Kodava_people\nWikipedia, History of coffee: https://en.wikipedia.org/wiki/History_of_coffee\n\nFACTUAL / FIELD NOTE: The history here is regional, not a verified founding history of Greenway Coffee Island itself. Ask the guide before recording claims about this individual plantation.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Coorg ka naam sunte hi coffee ka khayaal aata hai. Itni baar yeh dono saath sunne ko milte hain ki lag sakta hai jaise yeh pehchaan hamesha se yahin thi. Lekin Kodagu ki farming history isse zyada purani aur alag hai.\n\nHistorical accounts ke mutabik, Kodagu rulers ke daur mein rice ek important crop tha. 1834 ke baad British rule ke saath coffee plantations ka expansion tez hua; Mercara ke paas 1854 mein ek early European coffee plantation establish hui. Dheere-dheere coffee sirf kheti ka hissa nahi rahi—usne region ke landscape, kaam aur bahar ki duniya mein Coorg ki pehchaan ko bhi shape kiya.\n\nAaj coffee plants ke beech chalna is badlaav ko ek alag tarah se samajhne ka mauka deta hai. Coorg ki coffee sirf cup tak simit nahi; iske peeche zameen, mausam aur generations ka kaam juda hai. Ek region ki pehchaan kisi ek din mein nahi banti—kabhi ek crop, dheere-dheere, poore landscape aur usse judi zindagi ka hissa ban jaati hai.",
+          "oncamera": "Coorg aur coffee aaj ek doosre se almost inseparable lagte hain, lekin region ki farming hamesha coffee-centred nahi thi. British rule ke baad yahan coffee plantations expand hui, aur 1854 mein Mercara ke paas ek early plantation establish hui. Aaj plantation ko dekhte waqt isi history ko mind mein rakhkar samajhte hain ki coffee ka safar zameen se cup tak kaise aata hai.",
+          "shots": [
+            {
+              "id": "coorgall_scene_09_greenway-coffee_shot_01",
+              "done": false,
+              "name": "VO · Plantation entrance / sign, if tour is booked and access is permitted",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_09_greenway-coffee_shot_02",
+              "done": false,
+              "name": "VO · Coffee plants, shade canopy and row layout only where present",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_09_greenway-coffee_shot_03",
+              "done": false,
+              "name": "VO · Macro details of leaf / fruit / beans only if actually seen",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_09_greenway-coffee_shot_07",
+              "done": false,
+              "name": "VO · Record the guide's permitted demonstration or processing explanation",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_09_greenway-coffee_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Explain why you chose to explore coffee beyond the café cup",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_09_greenway-coffee_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Ask or reflect on one real thing learned from the guide",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_09_greenway-coffee_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Taste or smell coffee only if genuinely offered; record honest response",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_09_greenway-coffee_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Wrap the experience and mention only what the tour actually covered",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_10_hanging-bridge",
+          "title": "Coorg Hanging Bridge",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Coorg Hanging Bridge, Basavanahalli, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: an honest present-day bridge story tied to the importance of rivers and crossings in a road journey. No reliable Wikipedia article or construction history was found for this specific bridge.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: an honest present-day bridge story tied to the importance of rivers and crossings in a road journey. No reliable Wikipedia article or construction history was found for this specific bridge.\n\nSOURCES:\nWikipedia, Kaveri River (regional river context only): https://en.wikipedia.org/wiki/Kaveri\nNo dedicated Wikipedia history for this specific bridge was found in this search.\n\nFACTUAL / FIELD NOTE: Verify the exact map pin and whether public access is permitted. Do not use or move across a bridge if it is closed, unstable or unsafe; do not lean over its rails.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Road trip mein hum aksar raaste ko bas ek cheez samajhte hain—destination tak pahunchne ka zariya. Lekin kabhi-kabhi ek bridge par aakar journey ka pace badal jaata hai. Ek taraf se doosri taraf ka fasla chhota ho sakta hai, par neeche behta paani aur dono kinare landscape ko dekhne ka ek naya angle de dete hain.\n\nBridge ka kaam simple hai: do tarafon ko connect karna. Lekin is par chalte hue, crossing sirf ek point se doosre point tak pahunchna nahi rehti; kuch pal ke liye aap river aur zameen ko ek alag nazariye se dekhte ho. Neeche ka flow apni speed se chalta rehta hai, chahe upar se kitne hi log guzrein.\n\nKabhi crossing sirf raasta chhota karti hai; kabhi woh aapko kuch seconds ke liye dheema kar deti hai. Is bridge ki kahani us chhote transition mein hai—ek taraf se doosri taraf tak, aur journey ke ek moment se agle moment tak.",
+          "oncamera": "Road trip mein kuch stops planned hote hain, kuch bas raaste mein mil jaate hain. Yeh hanging bridge unhi mein se ek ho sakta hai. Is bridge ki verified history mujhe nahi mili, lekin abhi jo view hai—structure, paani aur surroundings—usi ko dekhte hain. Pehle confirm karenge ki bridge open aur safe hai ya nahi.",
+          "shots": [
+            {
+              "id": "coorgall_scene_10_hanging-bridge_shot_01",
+              "done": false,
+              "name": "VO · Safe approach and bridge establishing view from stable ground",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_10_hanging-bridge_shot_02",
+              "done": false,
+              "name": "VO · Bridge ropes, deck or construction details from a safe standing place",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_10_hanging-bridge_shot_03",
+              "done": false,
+              "name": "VO · River / stream and the surroundings without leaning over the edge",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_10_hanging-bridge_shot_07",
+              "done": false,
+              "name": "VO · Hold a static shot with natural ambience; no unnecessary movement on bridge",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_10_hanging-bridge_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce the stop as an unplanned-or-planned quiet pause, as applicable",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_10_hanging-bridge_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Share a real reaction to the bridge and surroundings",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_10_hanging-bridge_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Describe what makes this pause worth recording, if it does",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_10_hanging-bridge_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Leave the location from the safe access path",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_11_adventure-park",
+          "title": "Coorg Adventure Park",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Coorg Adventure Park, BM Road near Nisargadhama, Baichanahalli",
+          "duration": "",
+          "purpose": "Story spine: use this module for the real experience of trying an activity, rather than inventing a historical backstory for a specific commercial adventure park.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: use this module for the real experience of trying an activity, rather than inventing a historical backstory for a specific commercial adventure park.\n\nSOURCES:\nNo dedicated Wikipedia history for this specific commercial park was found in this search. Regional context: https://en.wikipedia.org/wiki/Kodagu_district\n\nFACTUAL / FIELD NOTE: Follow the operator's safety briefing. Do not film while using equipment if the operator says not to; ask permission before filming staff or other visitors.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Coorg mein adventure ke beech ka ek moment simple sa hota hai: aap kuch naya karne ki soch rahe hote ho. Kabhi excitement pehle aati hai, kabhi thoda sochna padta hai. Jab rules clear ho jaate hain, toh apna decision lena aasaan ho jaata hai.\n\nHar experience ka result alag hoga, lekin decision aur usse judi feeling is outing ko personal bana deti hai. Travel ki memories sirf places ki nahi, un moments ki bhi hoti hain jahan routine se alag kuch hota hai. Kabhi ek nayi activity yaad reh jaati hai, kabhi woh feeling ki aaj kuch naya try kiya.\n\nKahani activity se zyada us moment ke baare mein hai jo usse humare liye khaas banata hai.",
+          "oncamera": "Abhi ek adventure activity ka option saamne hai. Dekhte hain main try karta hoon ya nahi—pehle safety briefing aur rules samajh lete hain. Kabhi-kabhi trip ka sabse yaadgaar moment wahi hota hai jahan aapko decide karna padta hai ki comfort zone se bahar jaana hai ya nahi.",
+          "shots": [
+            {
+              "id": "coorgall_scene_11_adventure-park_shot_01",
+              "done": false,
+              "name": "VO · Park name / entrance if open",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_11_adventure-park_shot_02",
+              "done": false,
+              "name": "VO · Safety equipment and briefing from an allowed camera position",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_11_adventure-park_shot_03",
+              "done": false,
+              "name": "VO · Actual activity sequence, only if you take part and recording is permitted",
+              "angle": "Wide",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_11_adventure-park_shot_07",
+              "done": false,
+              "name": "VO · Reaction detail after the activity; preserve authentic audio",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_11_adventure-park_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Explain which activity you are actually choosing today",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_11_adventure-park_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Short pre-activity line after hearing the safety briefing",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_11_adventure-park_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Record the honest post-activity reaction while still fresh",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_11_adventure-park_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Wrap the experience without listing activities you did not try",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_12_nisargadhama",
+          "title": "Kaveri Nisargadhama",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Kaveri Nisargadhama, Kushalnagar, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: a landscape made by the Kaveri—an island-like delta with bamboo, sandalwood and teak groves. Tell its geography rather than inventing a dynastic history.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: a landscape made by the Kaveri—an island-like delta with bamboo, sandalwood and teak groves. Tell its geography rather than inventing a dynastic history.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Nisargadhama\n\nFACTUAL / FIELD NOTE: Use designated paths and only permitted river-access areas. Activities, bridges and public access may change with weather and management rules.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Kabhi hum river ko ek aisi cheez samajhte hain jo bas ek jagah se guzarti hui aage nikal jaati hai. Lekin paani sirf beh kar aage nahi badhta; waqt ke saath woh zameen ka shape bhi badal sakta hai. Kaveri Nisargadhama isi connection ko samajhne ki ek jagah hai.\n\nKushalnagar ke paas Kaveri ne ek delta banaya hai, jise island-jaisi landform ke roop mein jaana jaata hai. Yahan bamboo ke groves ke saath sandalwood aur teak ke ped bhi milte hain. In details ke beech jagah ki pehchaan kisi ek monument se nahi, balki river aur land ke relationship se banti hai.\n\nIsliye Nisargadhama ka experience sirf greenery ke beech walk karna nahi hai. Yeh sochne ka mauka hai ki jo landscape aaj humein settled aur natural lagta hai, woh bhi dheere-dheere hone wale natural processes ka result hai. Kaveri ka flow is kahani mein background nahi—zameen ke is roop ko samajhne ki key hai.",
+          "oncamera": "Kaveri Nisargadhama ko river se bana island-jaisa delta kaha jaata hai. Yahan bamboo, sandalwood aur teak ke groves ka bhi mention milta hai. Mujhe interesting lagta hai ki river sirf paani nahi laati—woh landscape ko bhi shape karti hai. Chalo dekhte hain yahan river aur forest ka combination kaisa lagta hai.",
+          "shots": [
+            {
+              "id": "coorgall_scene_12_nisargadhama_shot_01",
+              "done": false,
+              "name": "VO · Public entrance / bridge approach if open",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_12_nisargadhama_shot_02",
+              "done": false,
+              "name": "VO · Bamboo grove and tree canopy while following designated paths",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_12_nisargadhama_shot_03",
+              "done": false,
+              "name": "VO · Rope bridge from stable ground; use the bridge only if open",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_12_nisargadhama_shot_07",
+              "done": false,
+              "name": "VO · River and foliage ambience from designated public paths",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_12_nisargadhama_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce the riverine-island idea and what you hope to explore",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_12_nisargadhama_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Mid-walk reaction; comment on actual atmosphere, not assumed quietness",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_12_nisargadhama_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Point out a real detail you noticed in the trees or surroundings",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_12_nisargadhama_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Closing line before leaving the park",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_13_mandalpatti",
+          "title": "Mandalpatti Viewpoint",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Mandalpatti Viewpoint, Madikeri",
+          "duration": "",
+          "purpose": "Story spine: the district's name for Mandalpatti, ‘Muguli-peth’—translated as ‘market of clouds’—turns the viewpoint into a story about a landscape that may reveal itself or disappear into mist.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: the district's name for Mandalpatti, ‘Muguli-peth’—translated as ‘market of clouds’—turns the viewpoint into a story about a landscape that may reveal itself or disappear into mist.\n\nSOURCES:\nOfficial Kodagu district: https://kodagu.nic.in/en/tourist-place/mandalpatti/\nWikipedia, Pushpagiri Wildlife Sanctuary: https://en.wikipedia.org/wiki/Pushpagiri_Wildlife_Sanctuary\n\nFACTUAL / FIELD NOTE: Access often involves an authorised 4×4/jeep route. Check current rules and weather. Do not walk past barriers or film near unsafe drops.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Mandalpatti ke liye ek naam use hota hai—“Muguli-peth”, yaani “market of clouds”. Kodagu district ki official website is naam ka yahi meaning deti hai. Naam pehle poetic lag sakta hai, lekin hills ke beech mausam badalte dekhkar samajh aata hai ki cloud yahan sirf background nahi; kabhi-kabhi wahi poori kahani ban jaata hai.\n\nHum viewpoint ke baare mein aksar ek clear panorama soch kar nikalte hain—door tak khulti valleys, ridges aur ek perfect view. Lekin Mandalpatti ka landscape fixed picture nahi hai. Mist aati hai, hills ko cover kar deti hai, phir hawa badle toh kuch der ke liye valley saamne aa sakti hai. Har visit par wahi reveal milna zaroori nahi.\n\nIs jagah ka interesting part yahi hai: aap height tak pahunch sakte ho, lekin view ko order nahi kar sakte. Aaj clouds ke beech sirf outlines dikhein ya poori valley khul jaaye, Mandalpatti ka naam us changing mood ko capture karta hai. Yahan wait bhi experience ka hissa hai.",
+          "oncamera": "Mandalpatti ko “Muguli-peth”—market of clouds—bhi kaha jaata hai. Naam kaafi fitting hai, kyunki yahan kabhi hills clear dikhte hain aur kabhi clouds sab cover kar dete hain. Ab dekhte hain aaj nature ka mood kya hai.",
+          "shots": [
+            {
+              "id": "coorgall_scene_13_mandalpatti_shot_01",
+              "done": false,
+              "name": "VO · Road / approach shots recorded from a safe stop or as a passenger",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_13_mandalpatti_shot_02",
+              "done": false,
+              "name": "VO · First reveal of the real view: clear, cloudy or mist-covered",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_13_mandalpatti_shot_03",
+              "done": false,
+              "name": "VO · Ridge lines / cloud movement / landscape texture from safe viewpoint",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_13_mandalpatti_shot_07",
+              "done": false,
+              "name": "VO · 10 seconds of wind and ambient sound without talking",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_13_mandalpatti_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · First honest reaction after seeing the view or cloud cover",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_13_mandalpatti_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Explain the difference between expectation and today's real conditions",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_13_mandalpatti_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Optional line about the journey up, only if it reflects your actual route",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_13_mandalpatti_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Wrap from a stable area; do not stand near exposed edges",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_14_abbey-falls",
+          "title": "Abbey Falls",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Abbey Falls, Madikeri",
+          "duration": "",
+          "purpose": "Story spine: a waterfall remembered under an older name—Jessi Falls—and later surrounded by coffee and spice plantations. Connect the old name to the landscape visible now.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: a waterfall remembered under an older name—Jessi Falls—and later surrounded by coffee and spice plantations. Connect the old name to the landscape visible now.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Abbey_Falls\n\nFACTUAL / FIELD NOTE: Keep behind safety barriers and follow current access restrictions. After heavy rain, do not approach the water or slippery rocks.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Abbey Falls ki kahani aaj ke naam se nahi, ek purane naam se shuru hoti hai. Historical accounts ke mutabik, ise pehle Jessi Falls kaha jaata tha. Baad mein Neravanda B. Nanaiah ne is area ko acquire kiya aur coffee aur spice plantation develop ki; aaj bhi plantation ka landscape falls ke aas-paas nazar aata hai.\n\nYeh detail jagah ko dekhne ka nazariya badal deti hai. Waterfall ek natural force hai, lekin logon ka uske aas-paas kaam karna, land ka use aur naam badalna us jagah ki human history ko bhi jod dete hain. Ek waqt ke jungle aur baad ke plantation landscape ke beech, paani apni jagah flow karta raha.\n\nAbbey Falls sirf ek dramatic drop nahi. Yahan nature aur human history ek hi frame mein maujood hain—naam badla, zameen ka use badla, aur waterfall apni awaaz ke saath is badalte landscape ka hissa bana raha.",
+          "oncamera": "Abbey Falls ka pehle naam Jessi Falls tha, ek British officer ki daughter ke naam par. Baad mein iske aas-paas coffee aur spice plantation develop hui, jo aaj bhi landscape ka hissa hai. Matlab waterfall ke saath uske surroundings ki bhi apni history hai. Chalo pehle approach aur phir falls ko dekhte hain.",
+          "shots": [
+            {
+              "id": "coorgall_scene_14_abbey-falls_shot_01",
+              "done": false,
+              "name": "VO · Path and coffee / spice greenery on the approach if visible",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_14_abbey-falls_shot_02",
+              "done": false,
+              "name": "VO · Waterfall reveal from the designated viewing point",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_14_abbey-falls_shot_03",
+              "done": false,
+              "name": "VO · Record 10–15 seconds of clean waterfall sound",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_14_abbey-falls_shot_07",
+              "done": false,
+              "name": "VO · Details of water, mist and vegetation without crossing any barrier",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_14_abbey-falls_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce Abbey Falls and its former name Jessi Falls",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_14_abbey-falls_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Immediate honest reaction to the volume and sound of water",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_14_abbey-falls_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Share how the plantation surroundings change the approach",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_14_abbey-falls_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Wrap while staying in the official viewing zone",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_15_rajas-seat",
+          "title": "Raja’s Seat",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Raja’s Seat, Madikeri",
+          "duration": "",
+          "purpose": "Story spine: a royal recreation spot turned into a public viewpoint. The same human desire to pause and look over a valley links the rulers of the past to a road-tripper today.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: a royal recreation spot turned into a public viewpoint. The same human desire to pause and look over a valley links the rulers of the past to a road-tripper today.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Raja%27s_Seat\n\nFACTUAL / FIELD NOTE: View conditions depend on weather and daylight. Record the actual view rather than promising a sunset or clear valley before seeing it.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Raja’s Seat naam mein hi is jagah ke past ka ek clue chhupa hai. Kodagu ke rulers aur unki families 17th aur 18th century mein yahan garden pavilion se western valleys ka view dekhne aur waqt guzaarne aate the. Jo jagah kabhi royal recreation ka hissa thi, aaj Madikeri ke well-known viewpoints mein se ek hai.\n\nMujhe is continuity mein ek simple si baat interesting lagti hai. Daur badal gaya, rulers nahi rahe, lekin valley ko dekhne ke liye rukne ki zaroorat khatam nahi hui. Pehle yeh royal routine ka pause tha; aaj kisi ke liye drive ke beech ka break, kisi ke liye sunset, aur kisi ke liye bas thodi der ka sukoon.\n\nView har din ek jaisa nahi hota. Kabhi light hills ko alag shape deti hai, kabhi clouds poori valley ko dhak lete hain. Raja’s Seat ka naam ek purane use ko yaad dilata hai: kabhi-kabhi kisi jagah ki sabse badi value bas itni hoti hai ki woh aapko ruk kar door dekhne ka waqt deti hai.",
+          "oncamera": "Raja’s Seat ko Kodagu ke rulers ke recreation spot ke roop mein jaana jaata tha. Socho, 17th–18th century mein bhi log yahan valley ka view dekhne aur thoda waqt guzaarne aate the. Aaj hum bhi isi view ke liye ruke hain—dekhte hain aaj western valley ka mood kaisa hai.",
+          "shots": [
+            {
+              "id": "coorgall_scene_15_rajas-seat_shot_01",
+              "done": false,
+              "name": "VO · Pavilion establishing shot with the garden around it",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_15_rajas-seat_shot_02",
+              "done": false,
+              "name": "VO · Western valley view as it actually appears today",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_15_rajas-seat_shot_03",
+              "done": false,
+              "name": "VO · Pavilion pillars, arches and material details",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_15_rajas-seat_shot_07",
+              "done": false,
+              "name": "VO · Slow natural ambience / garden movement / passing clouds",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_15_rajas-seat_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce the name and historic association of Raja’s Seat",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_15_rajas-seat_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Describe the actual view, without pretending it is a sunset if it is not",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_15_rajas-seat_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Personal reflection on taking a break in a historic viewpoint",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_15_rajas-seat_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Transition line only after choosing what comes next",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_16_madikeri-fort",
+          "title": "Madikeri Fort",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Madikeri Fort, Madikeri, Karnataka",
+          "duration": "",
+          "purpose": "Story spine: one fort with different rulers leaving different layers—Muddu Raja's original fort, Tipu Sultan's granite rebuild and Jaffarabad name, Dodda Vira Rajendra's recapture, and later royal and British alterations.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: one fort with different rulers leaving different layers—Muddu Raja's original fort, Tipu Sultan's granite rebuild and Jaffarabad name, Dodda Vira Rajendra's recapture, and later royal and British alterations.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Madikeri_Fort\nWikipedia, Madikeri: https://en.wikipedia.org/wiki/Madikeri\n\nFACTUAL / FIELD NOTE: Do not assume every structure is open to visitors. Respect posted access limits and avoid presenting later additions as part of the original fort.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Madikeri Fort ki walls ek hi ruler ya ek hi waqt ki kahani nahi sunati. Is jagah ka roop kai dauron mein badla, aur har badlaav ke saath Kodagu ki political history ka ek aur layer judta gaya.\n\n17th century ke second half mein Muddu Raja ne mud fort banwaya aur Madikeri ko capital banaya. Baad mein Tipu Sultan ke daur mein fort granite ka bana aur ise Jaffarabad naam diya gaya. 1790 mein Dodda Vira Rajendra ka period aaya. Phir 1812–1814 ke beech palace renovate hua, aur 1834 mein British period ke additions hue.\n\nMud se granite tak ka change sirf construction ka detail nahi. Yeh batata hai ki fort ka roop waqt ke saath dobara shape hota raha. Aaj is structure ko dekhte hue ek single grand building nahi, balki ek hi jagah par jama hue Kodagu ke alag-alag historical chapters saamne aate hain.",
+          "oncamera": "Madikeri Fort ki kahani ek ruler par rukti nahi. Pehle Muddu Raja ka mud fort, phir Tipu Sultan ne granite mein rebuild kiya aur Jaffarabad naam diya. 1790 mein Dodda Vira Rajendra ne control wapas liya. Chalo dekhte hain, aaj fort mein kaun se architectural details in changes ki yaad dilate hain.",
+          "shots": [
+            {
+              "id": "coorgall_scene_16_madikeri-fort_shot_01",
+              "done": false,
+              "name": "VO · Fort exterior / public entrance sign",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_16_madikeri-fort_shot_02",
+              "done": false,
+              "name": "VO · Exterior wall, gateway or visible architectural layers",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_16_madikeri-fort_shot_03",
+              "done": false,
+              "name": "VO · Historic details / information board only if photography is permitted",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_16_madikeri-fort_shot_07",
+              "done": false,
+              "name": "VO · Establishing shot placing the fort within present-day Madikeri",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_16_madikeri-fort_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Explain why the fort gives Madikeri a history beyond scenery",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_16_madikeri-fort_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Deliver a concise version of the fort's changing history",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_16_madikeri-fort_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Share one architectural detail you genuinely noticed",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_16_madikeri-fort_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Wrap from a permitted public area",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_17_rajas-tomb",
+          "title": "Raja’s Tomb (Gaddige)",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Raja’s Tomb (Gaddige), Madikeri",
+          "duration": "",
+          "purpose": "Story spine: two royal tombs from the early 19th century, with central domes, minaret-like corner turrets and Nandi figures. Tell the story through the unusual details that the official district description records.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: two royal tombs from the early 19th century, with central domes, minaret-like corner turrets and Nandi figures. Tell the story through the unusual details that the official district description records.\n\nSOURCES:\nOfficial Kodagu district: https://kodagu.nic.in/en/tourist-place/gaddige/\n\nFACTUAL / FIELD NOTE: Treat this as a memorial site. Be respectful, do not climb or touch fragile details, and follow any photography restrictions.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Gaddige ko dekhte hue sabse pehle uske domes aur corner par minaret-jaisi turrets nazar aati hain. Phir kuch details nazar ko rok leti hain—turrets ke upar Nandi, yaani bull figures. Yeh mix is memorial ko ek distinct architectural identity deta hai.\n\nKodagu district ki official website ke mutabik, Lingarajendra ka memorial 1809 mein bana aur Veerarajendra ka 1821 mein. Dono royal memorials ek hi complex mein hain. Har structure ek alag insaan aur ek alag royal memory se juda hua hai. Architecture sirf building nahi rehta; woh batata hai ki kisi ko yaad rakhne ke liye us daur ne kya form chuna.\n\nMadikeri ki history mein forts power ke chapters sambhalte hain, jabki Gaddige ka mood alag hai. Yahan kahani remembrance ki hai. Domes, turrets aur Nandi figures ke beech past ek shaant memorial ke roop mein khada hai—aur aaj bhi skyline ka hissa hai.",
+          "oncamera": "Yeh Gaddige hai, jise Raja’s Tomb bhi kaha jaata hai. Official district website Lingarajendra ke tomb ko 1809 aur Veerarajendra ke tomb ko 1821 mein date karti hai. Domes aur minaret-jaisi turrets ke upar Nandi figures is place ko kaafi distinctive banati hain.",
+          "shots": [
+            {
+              "id": "coorgall_scene_17_rajas-tomb_shot_01",
+              "done": false,
+              "name": "VO · Respectful wide establishing shot of the full tomb complex",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_17_rajas-tomb_shot_02",
+              "done": false,
+              "name": "VO · Domes and corner turrets from a permitted angle",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_17_rajas-tomb_shot_03",
+              "done": false,
+              "name": "VO · Bull figures / stone detail if clearly visible and accessible",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_17_rajas-tomb_shot_07",
+              "done": false,
+              "name": "VO · Record the layout and quiet surroundings without intrusive visitor close-ups",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_17_rajas-tomb_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce Gaddige and clearly attribute its historical details to the district site",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_17_rajas-tomb_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Explain the visual contrast between domes, turrets and bull figures",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_17_rajas-tomb_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Share a quiet personal reaction; keep tone respectful",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_17_rajas-tomb_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Close the stop from a permitted public area",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_18_bhagamandala",
+          "title": "Bhagamandala & Triveni Sangama",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Bhagamandala and Triveni Sangama, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: a sacred meeting of Kaveri, Kannike and the mythical Sujyoti rivers, with the Bhagandeshwara Temple and a political chapter in which Tipu Sultan renamed the settlement Afzalabad before Kodagu ruler Dodda Vira Rajendra reclaimed it.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: a sacred meeting of Kaveri, Kannike and the mythical Sujyoti rivers, with the Bhagandeshwara Temple and a political chapter in which Tipu Sultan renamed the settlement Afzalabad before Kodagu ruler Dodda Vira Rajendra reclaimed it.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Bhagamandala\nWikipedia, History of Kodagu: https://en.wikipedia.org/wiki/History_of_Kodagu\n\nFACTUAL / FIELD NOTE: This is an active sacred place. Ask before filming worshippers or rituals, follow temple instructions and avoid presenting religious tradition as a scientifically verified river course.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Bhagamandala mein ek hi jagah par milne wali streams ko dekhkar confluence ka matlab samajh aata hai—alag flows ek point par milte hain. Lekin yahan confluence sirf geography nahi. Religious tradition mein Triveni Sangama ko Kaveri, Kannike aur mythical Sujyoti ke milan ki jagah maana jaata hai. Devotees ke liye yeh paani ek sacred connection bhi rakhta hai.\n\nIs jagah ka past sirf faith tak limited nahi hai. 1785 se 1790 ke dauran Tipu Sultan ke rule ke waqt settlement ko Afzalabad naam diya gaya. 1790 mein Kodagu ruler Dodda Vira Rajendra ke daur mein area ka naam aur control phir badla. Yaani rivers ke milne ki jagah ne political control aur place-names badalne ka daur bhi dekha.\n\nIsi liye Bhagamandala ki story layers mein khulti hai: ek taraf sacred tradition, doosri taraf historical political changes. Ek confluence mein paani milta hai; yahan uske saath belief, place-names aur history ke alag chapters bhi saamne aate hain.",
+          "oncamera": "Bhagamandala mein Triveni Sangama ko Kaveri, Kannike aur mythical Sujyoti ka confluence maana jaata hai. Lekin yahan political history bhi hai—ek waqt par settlement ka naam Afzalabad rakha gaya tha, phir 1790 mein Kodagu ruler Dodda Vira Rajendra ne control wapas liya. Yahan river aur history ki dono layers ek saath milti hain.",
+          "shots": [
+            {
+              "id": "coorgall_scene_18_bhagamandala_shot_01",
+              "done": false,
+              "name": "VO · Public approach / village establishing shot",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_18_bhagamandala_shot_02",
+              "done": false,
+              "name": "VO · Triveni Sangama from a safe public riverside viewpoint",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_18_bhagamandala_shot_03",
+              "done": false,
+              "name": "VO · Bhagandeshwara Temple exterior and sign where filming is allowed",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_18_bhagamandala_shot_07",
+              "done": false,
+              "name": "VO · River movement and natural ambience without filming rituals intrusively",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_18_bhagamandala_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce the confluence and distinguish tradition from geography",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_18_bhagamandala_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Share the historical name-change detail with the period stated",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_18_bhagamandala_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Personal reflection on the atmosphere; speak quietly and respectfully",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_18_bhagamandala_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Closing line away from active worship and restricted areas",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_19_mallalli",
+          "title": "Mallalli Falls",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Mallalli Falls, Somwarpet, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: follow the Kumaradhara beyond the waterfall on its longer journey to join the Netravati and eventually the Arabian Sea. There is little recorded human history for this specific waterfall, so the river becomes the narrative.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: follow the Kumaradhara beyond the waterfall on its longer journey to join the Netravati and eventually the Arabian Sea. There is little recorded human history for this specific waterfall, so the river becomes the narrative.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Mallalli_Falls\n\nFACTUAL / FIELD NOTE: Waterfall paths can become slippery and access may be restricted during heavy rain. Stay behind barriers, do not enter the water and follow local instructions.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Mallalli Falls ko dekhte hue lag sakta hai ki paani ki story isi dramatic drop par shuru hoti hai aur yahin khatam. Lekin waterfall ek river ke safar ka sirf ek moment hai.\n\nMallalli Falls ka main watercourse Kumaradhara River hai. Yeh aage Kukke Subrahmanya ke area se guzarti hai, phir Uppinangadi ke paas Netravati River se milti hai, aur aakhir mein Arabian Sea tak pahunchti hai. Jo paani yahan rocks par girte hue itna powerful lagta hai, woh yahan rukne ke liye nahi aaya. Uska safar is point ke baad bhi jaari rehta hai.\n\nIs connection se falls ka scale alag tarah se samajh aata hai. Hum ek jagah par rukkar paani ka ek dramatic moment dekhte hain, lekin river hills, settlements aur doosre waterways ko connect karti hui aage badhti rehti hai. Mallalli ki kahani sirf height ki nahi—ek aise journey ki hai jiska yeh khoobsurat hissa hai, final destination nahi.",
+          "oncamera": "Mallalli Falls ka paani Kumaradhara River se aata hai. Yeh river aage Netravati se milti hai aur phir Arabian Sea tak jaati hai. Matlab waterfall yahan khatam hota hua dikhta hai, lekin water ka actual safar abhi bahut lamba hai. Is view ko dekhte waqt yeh soch interesting lagti hai.",
+          "shots": [
+            {
+              "id": "coorgall_scene_19_mallalli_shot_01",
+              "done": false,
+              "name": "VO · Trail / steps from the marked safe route only",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_19_mallalli_shot_02",
+              "done": false,
+              "name": "VO · Falls at distance from an authorised viewing area",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_19_mallalli_shot_03",
+              "done": false,
+              "name": "VO · Waterfall sound, mist and forest ambience",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_19_mallalli_shot_07",
+              "done": false,
+              "name": "VO · Safe detail of rocks / water flow without crossing barriers",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_19_mallalli_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce Mallalli Falls and the river connection",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_19_mallalli_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Honest reaction to the actual water volume and trail conditions",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_19_mallalli_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Share one observation about scale from the safe viewpoint",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_19_mallalli_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Wrap only if weather and trail access remain safe",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_20_chelavara",
+          "title": "Chelavara Waterfalls",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Chelavara Waterfalls, Cheyyandane village, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: a stream-fed waterfall near Cheyyandane and Thadiyandamol that becomes dramatic because of its terrain. No prominent documented historical narrative was found, so focus on the stream, landscape and the importance of respecting the site.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: a stream-fed waterfall near Cheyyandane and Thadiyandamol that becomes dramatic because of its terrain. No prominent documented historical narrative was found, so focus on the stream, landscape and the importance of respecting the site.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Chelavara_Falls\n\nFACTUAL / FIELD NOTE: The site has serious safety risks and has been associated with fatal accidents. Never enter the pool, cross barriers or approach the edge for a shot. If access is unsafe, film only from the safe public area or skip it.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Chelavara Falls ka contrast hi iski kahani ka starting point hai. Kabhi-kabhi ek chhota watercourse bhi terrain ke saath milkar ek dramatic drop bana deta hai. Kaveri ki ek tributary se juda yeh waterfall Cheyyandane ke paas, Thadiyandamol ke landscape mein milta hai.\n\nPaani ka source chhota ho sakta hai, lekin jab woh rocks aur uneven terrain se guzarta hai, toh uska sound aur drop ka scale kaafi powerful lagta hai. Yahan nature ki story kisi royal past ya bade event mein nahi, paani, rock aur zameen ke relationship mein hai. Ek stream apna raasta follow karti hai, aur landscape us flow ko ek naya roop de deta hai.\n\nChelavara ki power door se bhi mehsoos hoti hai. Is tarah ke natural spots par local access aur safety guidance follow karna zaroori hai; landscape ko samajhne ke liye risky jagah tak jaana zaroori nahi.",
+          "oncamera": "Chelavara Falls ek chhote stream se banta hai, jo Kaveri system ka hissa hai. Mujhe interesting lagta hai ki ek relatively small watercourse, terrain ke saath milkar itna dramatic drop create karta hai. Yahan safety bahut important hai, toh hum sirf permitted safe viewing area se hi dekhenge.",
+          "shots": [
+            {
+              "id": "coorgall_scene_20_chelavara_shot_01",
+              "done": false,
+              "name": "VO · Approach greenery only from a legal, safe stopping point",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_20_chelavara_shot_02",
+              "done": false,
+              "name": "VO · Waterfall at distance from a designated, open viewing area",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_20_chelavara_shot_03",
+              "done": false,
+              "name": "VO · Natural sound and wet foliage details from a safe position",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_20_chelavara_shot_07",
+              "done": false,
+              "name": "VO · Safety sign / warning board if present and filming is allowed",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_20_chelavara_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · State that the shot will be from a safe viewing area only",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_20_chelavara_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Share your reaction without implying you entered the water",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_20_chelavara_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Explain why you are not going closer if water / ground looks unsafe",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_20_chelavara_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Leave from the authorised path and close the segment",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_21_iruppu",
+          "title": "Iruppu Falls",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Iruppu Falls, Kutta, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: distinguish the Ramayana-linked local legend from historical fact; the waterfall is also called Lakshmana Tirtha Falls and is connected with Rameshwara Temple and pilgrimage.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: distinguish the Ramayana-linked local legend from historical fact; the waterfall is also called Lakshmana Tirtha Falls and is connected with Rameshwara Temple and pilgrimage.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Irupu_Falls\n\nFACTUAL / FIELD NOTE: Follow forest access rules and stay on designated trails. Paths can be slippery; do not approach the cascade or enter the water during unsafe conditions.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Iruppu Falls ki pehchaan sirf iske paani se nahi, ek Ramayana se judi religious tradition se bhi banti hai. Is parampara mein Lakshmana Tirtha stream ki utpatti ko Ramayana ki kahani se joda jaata hai. Yaani yahan paani ke flow ke saath ek aisi story bhi judi hai jo generations se sunayi jaati rahi hai.\n\nYeh religious legend hai, documented historical event nahi. Lekin generations se sunayi jaane wali aisi kahaniyan batati hain ki log kisi landscape ko sirf uski physical shape se nahi, usse judi meaning se bhi pehchante hain. Iruppu aaj bhi pilgrimage se juda hai, aur paas ka Rameshwara Temple is connection ko aur mazboot karta hai.\n\nYahan ek cheez aankhon ke saamne hai—pahadon se girta paani. Doosri cheez woh sacred memory hai jo log apne saath lekar aate hain. Iruppu ki identity in dono ke beech banti hai: nature ka flow aur ek aisi legend jo samay ke saath is jagah se jud gayi.",
+          "oncamera": "Iruppu Falls ke saath Ramayana se judi ek popular legend hai. Kahani ke mutabik, Lakshmana ne Rama ke liye paani nikalne ko teer chalaya, aur usse Lakshmana Tirtha stream bani. Yeh religious legend hai, established history nahi—but isi tradition ki wajah se yeh waterfall pilgrimage ke liye bhi important hai.",
+          "shots": [
+            {
+              "id": "coorgall_scene_21_iruppu_shot_01",
+              "done": false,
+              "name": "VO · Trail / official entrance sign if open",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_21_iruppu_shot_02",
+              "done": false,
+              "name": "VO · Waterfall reveal from the authorised viewing point",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_21_iruppu_shot_03",
+              "done": false,
+              "name": "VO · Stream and forest ambience without leaving the marked path",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_21_iruppu_shot_07",
+              "done": false,
+              "name": "VO · Temple exterior only if visited and photography is permitted",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_21_iruppu_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Introduce the river and waterfall fact",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_21_iruppu_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Tell the Rama–Lakshmana account explicitly as a legend",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_21_iruppu_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Share your actual reaction to the water and forest setting",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_21_iruppu_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Wrap from the permitted trail / viewing zone",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorgall_scene_22_talakaveri",
+          "title": "Talakaveri (Talacauvery)",
+          "subtitle": "Destination script · Hinglish story-led VO + on-camera · standalone module; no day assignment.",
+          "location": "Talakaveri Temple, Brahmagiri Hills, Kodagu",
+          "duration": "",
+          "purpose": "Story spine: the traditional and sacred source of the Kaveri, marked by a tank and temple on the Brahmagiri hills; the Kaveri origin story is part of religious tradition, while the visible spring's flow is seasonal.",
+          "notes": "STORY SHAPE: Hook / historical or cultural context / what that history means today / return to your actual experience.\n\nHOW TO USE: Standalone destination module. Not assigned to a day. Record the on-camera script at the location or from a safe parked position. Record the voice-over later if that fits the edit. Use only the parts that match what you actually visited and filmed.\n\nRESEARCHED CONTEXT: Story spine: the traditional and sacred source of the Kaveri, marked by a tank and temple on the Brahmagiri hills; the Kaveri origin story is part of religious tradition, while the visible spring's flow is seasonal.\n\nSOURCES:\nWikipedia: https://en.wikipedia.org/wiki/Talakaveri\nWikipedia, Kaveri River: https://en.wikipedia.org/wiki/Kaveri\n\nFACTUAL / FIELD NOTE: Respect temple and religious-site rules. Tula Sankramana is an important annual pilgrimage period, but do not imply that the festival or a special spring event is happening during your visit unless confirmed.\n\nSTORYTELLING NOTE: Narration ka goal audience ko place ke andar ki kahani sunana hai. Script mein camera, shot capture, checklist ya 'main photos lene nahi aaya' jaise meta comments na padhein. Hook se shuru karein, researched history/legend ko natural Hinglish mein reveal karein, phir uska meaning aaj ke visible landscape se connect karein. Legend ko legend ke roop mein hi batayein. On-camera lines conversational aur personal rehni chahiye—unhe English mein na badlein.",
+          "voiceover": "Kaveri ko hum aam taur par ek badi river ke roop mein jaante hain—towns, bridges, farms aur landscapes se guzarti hui. Talakaveri mein usi river ko ek bilkul alag scale par dekha jaata hai: Brahmagiri hills mein woh sacred place jahan se Kaveri ke origin ko traditionally joda jaata hai. Yahan ka tank aur Kaveramma temple is belief ke centre mein hain.\n\nKaveri ke janm se judi ek religious legend bhi hai. Skanda Purana ki tradition mein Ganesha aur sage Agastya se judi ek origin story aati hai, jiske mutabik Kaveri prakat hoti hain. Yeh sacred story hai, scientific explanation nahi. Is tradition mein river ko sirf paani ka source nahi, ek divine presence ke roop mein samjha jaata hai.\n\nYahi Talakaveri ka meaning hai: neeche jaakar Kaveri ek badi river aur lakhon logon ki zindagi ka hissa ban jaati hai, lekin yahan usse faith aur origin ki jagah par yaad kiya jaata hai. Ek river ka safar lamba hota hai; uske source ko lekar insaanon ki kahaniyan bhi utni hi gehri ho sakti hain.",
+          "oncamera": "Talakaveri ko traditionally Kaveri ka source maana jaata hai. Yahan tank aur Kaveramma temple is sacred site ka centre hain. River ke origin ko lekar Ganesha aur sage Agastya ki ek religious legend bhi hai. Yahan geography aur faith, dono milkar Kaveri ki story ko shape karte hain.",
+          "shots": [
+            {
+              "id": "coorgall_scene_22_talakaveri_shot_01",
+              "done": false,
+              "name": "VO · Temple / approach establishing shot under local rules",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_22_talakaveri_shot_02",
+              "done": false,
+              "name": "VO · Tank / source-area view only where filming is permitted",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_22_talakaveri_shot_03",
+              "done": false,
+              "name": "VO · Brahmagiri hills and the actual cloud / visibility conditions",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_22_talakaveri_shot_07",
+              "done": false,
+              "name": "VO · Quiet ambience of bells, footsteps or wind only where recording is respectful",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorgall_scene_22_talakaveri_shot_04",
+              "done": false,
+              "name": "ON-CAMERA · Explain why Talakaveri is traditionally associated with the source of Kaveri",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_22_talakaveri_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Include the nuance that a permanent visible river flow is not always present",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_22_talakaveri_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Share a personal reflection on the place's belief and geography",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorgall_scene_22_talakaveri_shot_08",
+              "done": false,
+              "name": "ON-CAMERA · Respectful closing line before leaving the temple area",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

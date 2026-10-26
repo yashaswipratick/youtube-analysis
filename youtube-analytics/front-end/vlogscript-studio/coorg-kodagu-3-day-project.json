@@ -1,0 +1,1009 @@
+{
+  "format": "vlogscript-studio",
+  "version": 1,
+  "projects": [
+    {
+      "id": "coorg-kodagu-3-day-oct-2026",
+      "title": "Coorg / Kodagu — A Slow 3-Day Weekend",
+      "location": "Bengaluru → Virajpet → Madikeri → Bhagamandala & Talakaveri → Bengaluru",
+      "description": "YASH XPLORE · Corporate life. Weekend escapes. Bangalore to anywhere.\n\nTRIP DATES: Tuesday 20 October 2026 check-in; Thursday 22 October 2026 checkout and return to Bengaluru. Stay base from the itinerary: Amritara Ambatty Greens Resort near Virajpet.\n\nSTORY ARC: The escape → chasing the hills and waterfall → following the Kaveri story home. Warm, honest, cinematic and personal. This is a story-led vlog, not a tourist-brochure montage. Build the hook from actual footage; let natural sound breathe; include live reactions; keep a question open between chapters.\n\nROUTE REALITY: The attached planner has many stops in geographically different parts of Kodagu and several tightly spaced time slots. The main schedule prioritises a realistic arrival day, a Madikeri-area day, and the Bhagamandala–Talakaveri pair on checkout day. Do not combine all the original planner stops into these three days. The last drive home will be long; leave early and skip detours if needed. Two final scenes preserve the Kushalnagar cluster and waterfall alternatives as optional swaps only.\n\nWEATHER/SAFETY: Recent forecasts include rain risk in southern Karnataka through 22 October. Recheck district forecast, local road conditions, site opening/access, jeep arrangements and waterfall restrictions on 19 October and each morning. If there is heavy rain, lightning, poor visibility, slippery paths or a closure, skip the viewpoint/waterfall and use safe town/resort B-roll. Do not force a shot.\n\nCAMERA SETTINGS — DJI Osmo Action 5 Pro, Normal 10-bit, WB 5500K, Auto exposure, EV −0.3, RockSteady+. Landscape orientation throughout. 4K/30 for talking, wide scenery and history; 4K/60 for walking and moving B-roll; 4K/100 only for selected water/action details in sufficient light. Keep pans slow; capture 8–10 seconds per B-roll shot. Record natural sound for 10–15 seconds at waterfalls, viewpoints and river locations. Do not operate the camera while driving; use a secure mount or a passenger. Respect all temple, forest, viewpoint and resort filming rules.",
+      "scenes": [
+        {
+          "id": "coorg_scene_01",
+          "title": "Scene 01 — The Hook: Three Days in Coorg",
+          "subtitle": "Open with a promise, then hold back the full story",
+          "location": "Coorg — teaser montage from footage captured later",
+          "duration": "00:35",
+          "purpose": "Create a curiosity gap: city life, misty hills, water and the Kaveri story. Do not reveal every stop in the opening.",
+          "notes": "EDITING: Start with 3–5 fast visual flashes, then slow down. Only use footage actually captured on this trip. Record this VO later after you have the footage. Rain/mist may replace a clear panorama; keep the hook honest.",
+          "voiceover": "Har weekend Bengaluru se nikalne ka mann karta hai… lekin iss baar plan sirf famous places tick karna nahi hai. Teen din, ek car, aur Coorg—yaani Kodagu. Pehle din bas sheher se door nikalna hai. Doosre din dekhna hai ki hills aur waterfalls kitne kareeb aane dete hain. Aur aakhri din… Kaveri se judi ek aisi jagah tak jaana hai jahan trip ka matlab thoda badal sakta hai. Kya teen din ka break sach mein mind reset kar sakta hai? Chalo dekhte hain.",
+          "oncamera": "No spoken intro required. Let the montage and natural sound open the story. Add your channel title after the first few shots, not before the hook.",
+          "shots": [
+            {
+              "id": "coorg_scene_01_shot_01",
+              "done": false,
+              "name": "VO · Mist or cloud moving across a hill; use only if captured",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_01_shot_02",
+              "done": false,
+              "name": "VO · Close detail of coffee leaves or beans",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_01_shot_03",
+              "done": false,
+              "name": "VO · Car rolling on a safe, scenic stretch; secure mount/passenger only",
+              "angle": "POV",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_01_shot_04",
+              "done": false,
+              "name": "VO · Waterfall or flowing-water detail, if safely accessible",
+              "angle": "Wide",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_01_shot_05",
+              "done": false,
+              "name": "VO · A short shot of you looking towards the landscape",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_01_shot_06",
+              "done": false,
+              "name": "VO · A final Kaveri/Talakaveri teaser; do not use if you do not reach it",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_02",
+          "title": "Scene 02 — Tuesday: Leaving Bengaluru",
+          "subtitle": "On-camera setup · corporate life to weekend escape",
+          "location": "Bengaluru, before departure",
+          "duration": "00:45",
+          "purpose": "Make the audience feel the routine you are escaping and explain the trip’s realistic goal.",
+          "notes": "Record all car-interior talking shots while parked. Do not use a moving handheld camera. Mention the actual departure time and weather on the day; do not pre-record a false weather claim.",
+          "voiceover": "Tuesday hai, aur aaj office ke calendar ki jagah car ka route decide karega ki din kaisa jaayega. Main Coorg jaa raha hoon—teen din ke liye. Planner mein bahut saare spots save kiye hain, but iss baar ek rule rakha hai: jagah enjoy karni hai, sirf location count nahi badhana. Aaj Virajpet ke paas stay tak pahunchna hai. Uske baad dekhte hain Coorg ka pehla impression kya hota hai.",
+          "oncamera": "Camera ready, bags loaded, aur finally Bengaluru se break. Main yeh vlog perfect weather ke liye nahi bana raha—jo trip actually hogi, wahi dikhayenge. Agar rain plan badalta hai, toh woh bhi story ka part hai.",
+          "shots": [
+            {
+              "id": "coorg_scene_02_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · Car keys and packed camera bag detail",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_02_shot_02",
+              "done": false,
+              "name": "ON-CAMERA · Static talking intro in parked car",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_02_shot_03",
+              "done": false,
+              "name": "VO · Boot closing and luggage going into car",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_02_shot_04",
+              "done": false,
+              "name": "VO · Seatbelt click; camera already secured",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_02_shot_05",
+              "done": false,
+              "name": "VO · Engine start and dashboard/navigation insert while parked",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_02_shot_06",
+              "done": false,
+              "name": "VO · Pulling away from parking area, filmed safely",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_03",
+          "title": "Scene 03 — The Road Out",
+          "subtitle": "Let the drive breathe · Bengaluru to Virajpet",
+          "location": "Bengaluru–Mysuru corridor and onward to Virajpet",
+          "duration": "00:45",
+          "purpose": "Use the road to transition from busy city energy to a slower pace.",
+          "notes": "The exact route and traffic can change. Capture footage from legal stopping points or a securely mounted camera; no camera handling while driving. Do not promise a specific arrival time; leave buffer for traffic and rain.",
+          "voiceover": "City se nikalte hi trip ka pace dheere-dheere change hota hai. Pehle traffic, signals aur familiar roads… phir jaise-jaise distance badhta hai, conversations kam aur surroundings zyada notice hone lagte hain. Mujhe road trips ki ye baat pasand hai—destination abhi door hota hai, lekin break shuru ho chuka hota hai.",
+          "oncamera": "On-camera dialogue optional. If you stop safely for chai or a break, record a quick live update: kitna drive hua, road condition kaisi hai, aur abhi tak ka mood kya hai.",
+          "shots": [
+            {
+              "id": "coorg_scene_03_shot_01",
+              "done": false,
+              "name": "VO · City traffic receding in rear-view/mirror or mounted forward view",
+              "angle": "POV",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_03_shot_02",
+              "done": false,
+              "name": "VO · Road sign or route board from a safe stop",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_03_shot_03",
+              "done": false,
+              "name": "VO · Open road and changing landscape from fixed mount/passenger",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_03_shot_04",
+              "done": false,
+              "name": "VO · Hands holding a takeaway chai at a safe rest stop",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_03_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Short travel update at a safe parking/rest stop",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_03_shot_06",
+              "done": false,
+              "name": "VO · Ambient sound from a roadside pause",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_04",
+          "title": "Scene 04 — Check-in: First Impression of Coorg",
+          "subtitle": "Arrival · settle in before chasing attractions",
+          "location": "Amritara Ambatty Greens Resort, near Virajpet (as listed in your plan)",
+          "duration": "00:55",
+          "purpose": "Make arrival feel like a genuine moment, not a hotel advertisement.",
+          "notes": "Film only areas where filming is allowed. Show the actual room/view and actual check-in; do not stage service interactions or imply amenities you did not use. If arrival is late, skip the walk and prioritise rest.",
+          "voiceover": "Coorg pahunchne ke baad sabse pehle jo cheez important hai, woh hai thoda settle hona. Itna drive karke seedha agle spot ki taraf bhaagna easy hai, lekin phir trip sirf car aur parking ka sequence ban jaati hai. Aaj pehle stay ko samajhte hain, bags rakhte hain, aur agar light aur weather allow kare toh aas-paas thoda walk karenge.",
+          "oncamera": "Finally check-in ho gaya. Abhi main kisi viewpoint ko chase nahi kar raha. Pehle room settle, thoda fresh hona, phir nearby surroundings dekhunga. Kal ka main day early start hoga, toh aaj over-plan nahi karna.",
+          "shots": [
+            {
+              "id": "coorg_scene_04_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · Walk-in arrival update outside/at a permitted spot",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_04_shot_02",
+              "done": false,
+              "name": "VO · Signboard or exterior establishing shot, where permitted",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_04_shot_03",
+              "done": false,
+              "name": "VO · Luggage entering room; door opening",
+              "angle": "POV",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_04_shot_04",
+              "done": false,
+              "name": "VO · Room details that are actually present",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_04_shot_05",
+              "done": false,
+              "name": "VO · First look at the actual view/grounds",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_04_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Short first-impression review after settling in",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_05",
+          "title": "Scene 05 — First Evening: Slow Down",
+          "subtitle": "Coffee, greenery and the first quiet moment",
+          "location": "Resort grounds or nearby permitted plantation walk",
+          "duration": "00:40",
+          "purpose": "Create contrast with the busy road and establish the vlog’s personal tone.",
+          "notes": "Only describe a coffee plantation tour if you book and actually visit one. If there is no permitted estate walk or the weather is poor, record the grounds, rain, room window or a nearby safe path instead.",
+          "voiceover": "Har trip ka best moment zaroori nahi ki koi famous viewpoint ho. Kabhi-kabhi bas bag rakh ke bahar nikalna, thodi thandi hawa feel karna, ya bina kisi fixed plan ke surroundings dekhna bhi kaafi hota hai. Corporate life mein har cheez ka slot hota hai. Yahan main koshish karunga ki kuch moments schedule ke bina bhi rahen.",
+          "oncamera": "Aaj ka first evening simple rakhta hoon. Kal ka alarm jaldi lagega, toh aaj thoda walk, dinner aur rest. Coorg ka actual feel kya hai, woh main kal ke landscapes se zyada shayad in chhote moments mein samajh paunga.",
+          "shots": [
+            {
+              "id": "coorg_scene_05_shot_01",
+              "done": false,
+              "name": "VO · Green leaves with droplets or natural textures",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_05_shot_02",
+              "done": false,
+              "name": "VO · A slow walk along a permitted path",
+              "angle": "POV",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_05_shot_03",
+              "done": false,
+              "name": "VO · Shoes walking on the path; avoid slippery edges",
+              "angle": "Low angle",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_05_shot_04",
+              "done": false,
+              "name": "VO · Rain on leaves / roof, if it is actually raining",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_05_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Evening wrap-up and tomorrow’s plan",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_06",
+          "title": "Scene 06 — Wednesday: Mandalpatti, Chasing the View",
+          "subtitle": "Early start · accept what the weather gives you",
+          "location": "Mandalpatti viewpoint area, Madikeri side",
+          "duration": "01:05",
+          "purpose": "The day’s first visual payoff; show the journey to the viewpoint as well as the view.",
+          "notes": "Confirm current access, local jeep arrangements and road conditions before leaving. Do not take a private car onto restricted/unsafe terrain. Viewpoint visibility is weather-dependent; if rain, lightning or poor visibility makes access unsafe, skip it and use a safe roadside/estate alternative. Do not approach cliff edges.",
+          "voiceover": "Subah jaldi nikalne ka ek hi reason hai—pahadon ko unke mood mein dekhna. Mandalpatti ke liye plan hai ki local access aur weather confirm karke upar jaayein. Lekin yahan ek baat yaad rakhni hai: mountains koi fixed show nahi hain. Kabhi clouds khul jaate hain, kabhi sab kuch mist mein chhup jaata hai. Dono ko honestly capture karna hai.",
+          "oncamera": "Abhi hum Mandalpatti side aaye hain. Main expect kar raha hoon ki yahan se landscape ka ek strong view milega, but final decision weather ka hai. Agar clear hua toh amazing; agar mist raha, toh us moment ko bhi waise hi dikhayenge—kyunki real trip hamesha Instagram wali perfect conditions mein nahi hoti.",
+          "shots": [
+            {
+              "id": "coorg_scene_06_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · Arrival update before taking the local jeep/official access",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_06_shot_02",
+              "done": false,
+              "name": "VO · Jeep or permitted approach road from passenger position",
+              "angle": "POV",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_06_shot_03",
+              "done": false,
+              "name": "VO · Mud, stones or vegetation detail from safe ground",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_06_shot_04",
+              "done": false,
+              "name": "VO · Wide panorama only from a safe designated viewing area",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_06_shot_05",
+              "done": false,
+              "name": "VO · Cloud or mist movement if visible",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_06_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Honest live reaction: what can actually be seen today",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_06_shot_07",
+              "done": false,
+              "name": "VO · Footsteps on a safe path; never shoot near an edge",
+              "angle": "Low angle",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_07",
+          "title": "Scene 07 — Abbey Falls: Listen Before You Look",
+          "subtitle": "Waterfall chapter · sound-led sequence",
+          "location": "Abbey Falls, Madikeri",
+          "duration": "00:55",
+          "purpose": "Give viewers a sensory pause and preserve the waterfall’s natural sound.",
+          "notes": "Visit only if access is officially open and conditions are safe. Stay on designated paths/viewing areas; do not cross barriers or approach slippery water/rocks. Avoid drone-style fake shots. Let natural sound run without narration for 10–15 seconds.",
+          "voiceover": "Mandalpatti mein hum view dhoondh rahe the. Yahan approach thoda alag hai—pehle paani ki awaaz aati hai, phir waterfall saamne aata hai. Main is scene ko jaldi cut nahi karna chahta. Thoda natural sound, thoda slow observation… taaki video dekhte waqt aapko lage ki aap sirf location nahi dekh rahe, us jagah ka atmosphere feel kar rahe ho.",
+          "oncamera": "Ek cheez jo main travel videos mein kam karna chahta hoon, woh hai har jagah par continuously bolna. Kuch locations ko bas unki awaaz ke saath chhod dena chahiye. Yahan main thodi der camera side mein rakh ke sirf sound capture karunga.",
+          "shots": [
+            {
+              "id": "coorg_scene_07_shot_01",
+              "done": false,
+              "name": "VO · Footsteps on the designated approach path",
+              "angle": "POV",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_07_shot_02",
+              "done": false,
+              "name": "VO · First reveal of the waterfall from the official viewing point",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_07_shot_03",
+              "done": false,
+              "name": "VO · Water texture in sufficient light, from a safe position",
+              "angle": "Close-up",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_07_shot_04",
+              "done": false,
+              "name": "VO · Leaves/rocks around the viewpoint without crossing barriers",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_07_shot_05",
+              "done": false,
+              "name": "VO · 10–15 seconds uninterrupted natural waterfall audio",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_07_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Short reaction after listening to the falls",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_08",
+          "title": "Scene 08 — Madikeri Fort and the Town",
+          "subtitle": "A pause from landscapes · history inside the town",
+          "location": "Madikeri Fort and nearby town streets",
+          "duration": "00:55",
+          "purpose": "Change visual texture and add a cultural/historical layer to the travel story.",
+          "notes": "Verify site access and photography rules on arrival. Keep historical statements general unless checked against an on-site plaque or reliable source. Do not film people closely without permission.",
+          "voiceover": "Coorg ko sirf greenery aur coffee se describe karna easy hai. Lekin ek place ko samajhne ke liye uski history aur daily life bhi dekhni padti hai. Madikeri ke beech mein fort aur town ka atmosphere ek different side dikhata hai—hill station ke postcard se hatkar, ek lived-in place jahan logon ki everyday life chalti rehti hai.",
+          "oncamera": "Aaj ka day sirf views ke baare mein nahi hai. Madikeri mein main thoda slow walk karunga, fort ke details dekhunga aur bina jaldi kiye town ko observe karunga. Agar koi historical detail camera par bolunga, toh site par jo reliable information milegi usi ko use karunga.",
+          "shots": [
+            {
+              "id": "coorg_scene_08_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · Introduce the location from a permitted public spot",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_08_shot_02",
+              "done": false,
+              "name": "VO · Fort exterior establishing view",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_08_shot_03",
+              "done": false,
+              "name": "VO · Architectural texture, arch or wall detail where permitted",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_08_shot_04",
+              "done": false,
+              "name": "VO · Slow walking shot along a permitted path",
+              "angle": "POV",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_08_shot_05",
+              "done": false,
+              "name": "VO · Town street life from a respectful distance",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_08_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · One reflective line after exploring the fort/town",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_09",
+          "title": "Scene 09 — Raja’s Seat: Let the Day Breathe",
+          "subtitle": "Late-afternoon viewpoint · emotional mid-video payoff",
+          "location": "Raja’s Seat, Madikeri",
+          "duration": "00:55",
+          "purpose": "Finish Wednesday with a calmer landscape and set up Thursday’s Kaveri story.",
+          "notes": "Check actual opening/access times and sunset conditions. Do not promise a sunset or clear valley view; record the real conditions. Keep viewers away from edges and barriers.",
+          "voiceover": "Aaj subah se hum ek jagah se doosri jagah move kar rahe the. Raja’s Seat par main thoda rukna chahta hoon. Agar valley clear hai, toh uska wide shot. Agar clouds hain, toh clouds. Lekin iss point par trip ka pace thoda slow hona chahiye—taaki kal ke final day se pehle hum samajh sakein ki ab tak humne kya dekha.",
+          "oncamera": "Mujhe lagta hai travel vlog mein har scene ka purpose sirf beautiful footage dena nahi hota. Kabhi ek viewpoint aapko poore din ka recap karne ka time deta hai. Kal checkout ke baad hum Bhagamandala aur Talakaveri side jaayenge, aur trip ki story Kaveri ke saath close karne ki koshish karenge.",
+          "shots": [
+            {
+              "id": "coorg_scene_09_shot_01",
+              "done": false,
+              "name": "VO · Raja’s Seat exterior/entry sign if allowed",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_09_shot_02",
+              "done": false,
+              "name": "VO · Valley panorama from the designated viewing area",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_09_shot_03",
+              "done": false,
+              "name": "VO · People enjoying the viewpoint, filmed unobtrusively",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_09_shot_04",
+              "done": false,
+              "name": "VO · Your silhouette looking toward the valley",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_09_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Day-two reflection and tomorrow teaser",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_09_shot_06",
+              "done": false,
+              "name": "VO · A slow hold on the actual sky and landscape",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_10",
+          "title": "Scene 10 — Thursday: Checkout and One Last Drive",
+          "subtitle": "Pack up · make the final day feel intentional",
+          "location": "Resort near Virajpet, before checkout",
+          "duration": "00:40",
+          "purpose": "Transition from sightseeing to the return-home chapter.",
+          "notes": "Leave early if continuing to Bhagamandala and Talakaveri. The route is a long day once the onward drive to Bengaluru is included; skip additional detours rather than rushing. Check road/weather/access the same morning.",
+          "voiceover": "Thursday aa gaya hai, aur aaj checkout bhi hai aur Bengaluru wapas bhi jaana hai. Isliye aaj ka plan sab kuch fit karna nahi hai. Main Bhagamandala aur Talakaveri ko priority dunga, time aur road conditions dekh kar. Baaki stops ke liye next trip aa sakti hai—har saved pin ko ek hi trip mein finish karna zaroori nahi.",
+          "oncamera": "Bags pack ho gaye hain. Aaj thoda long drive hoga, so we’ll start early, keep the stops focused, aur agar weather ya road conditions theek nahi lage toh plan change karenge. Safety pehle, shots baad mein.",
+          "shots": [
+            {
+              "id": "coorg_scene_10_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · Morning departure update outside the stay",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_10_shot_02",
+              "done": false,
+              "name": "VO · Packing last items into the boot",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_10_shot_03",
+              "done": false,
+              "name": "VO · Final glance at the stay/greenery where filming is allowed",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_10_shot_04",
+              "done": false,
+              "name": "VO · Navigation set while parked; destination visible without personal data",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_10_shot_05",
+              "done": false,
+              "name": "VO · Car leaving the property, filmed safely",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_11",
+          "title": "Scene 11 — Bhagamandala: Where the Waters Meet",
+          "subtitle": "Respectful visit · the Kaveri story deepens",
+          "location": "Bhagamandala and Triveni Sangama",
+          "duration": "00:55",
+          "purpose": "Connect the physical journey to the cultural significance of the river.",
+          "notes": "Keep temple/confluence filming respectful and follow local signs and rules. Do not film worshippers closely without permission. River level, access and weather can change; do not enter water or cross barriers.",
+          "voiceover": "Coorg ki story mein Kaveri sirf ek scenic river nahi hai. Bhagamandala mein river se judi aastha aur local culture ka ek alag pehlu dikhta hai. Main yahan narration ko simple rakhunga—jo jagah ka actual atmosphere hai, usse dominate nahi karna. Thodi ambient sound, kuch wide shots, aur phir hum aage Talakaveri ki taraf badhenge.",
+          "oncamera": "Yahan aake mujhe trip ka theme thoda clear lag raha hai. Hum Bengaluru se break lene nikle the, landscapes dekhne aaye the; lekin ab journey ek river aur uske cultural meaning ke around aa rahi hai. Main site ki maryada follow karte hue hi footage record karunga.",
+          "shots": [
+            {
+              "id": "coorg_scene_11_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · Quiet introduction from a permitted public space",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_11_shot_02",
+              "done": false,
+              "name": "VO · Bhagamandala exterior/wayfinding sign where allowed",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_11_shot_03",
+              "done": false,
+              "name": "VO · Wide view of the confluence/river from designated area",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_11_shot_04",
+              "done": false,
+              "name": "VO · Water surface or flow detail from a safe bank",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_11_shot_05",
+              "done": false,
+              "name": "VO · Temple exterior details only where photography is permitted",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_11_shot_06",
+              "done": false,
+              "name": "VO · 10 seconds of ambient sound with no narration",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_12",
+          "title": "Scene 12 — Talakaveri: Following the River Upstream",
+          "subtitle": "Final destination · quieter emotional payoff",
+          "location": "Talakaveri / Talacauvery, Brahmagiri Hills",
+          "duration": "01:10",
+          "purpose": "Bring the story to a meaningful end before the long drive home.",
+          "notes": "Talakaveri is traditionally revered as the source of the Kaveri. Respect worship areas and site-specific rules. Mountain weather can change quickly; avoid exposed areas during lightning, heavy rain or strong winds. Do not promise a mountain panorama if mist blocks visibility.",
+          "voiceover": "Is trip ka last major stop hai Talakaveri—woh jagah jise parampara mein Kaveri ka source maana jaata hai. Teen din pehle hum Bengaluru ke traffic se nikal rahe the, aur ab hum us river ki kahani ke paas khade hain jiska naam Karnataka ke bahut saare landscapes ke saath juda hai. View clear ho ya mist mein ho, mere liye is stop ka meaning sirf photograph lene se zyada hai.",
+          "oncamera": "Yahan aake main ek cheez feel kar raha hoon: kabhi-kabhi trip ka best part checklist complete karna nahi hota. Kabhi jagah ke baare mein thoda samajhna, thoda chup rehna, aur phir ghar wapas nikalna hota hai. Ab yahan se Bengaluru ka long drive hai. Coorg ko poori tarah explore karna possible nahi tha—aur shayad isi wajah se next trip ka reason bhi mil gaya.",
+          "shots": [
+            {
+              "id": "coorg_scene_12_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · Introduce Talakaveri from a respectful, permitted location",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_12_shot_02",
+              "done": false,
+              "name": "VO · Talakaveri site establishing view",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_12_shot_03",
+              "done": false,
+              "name": "VO · Water/temple detail that is permitted to film",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_12_shot_04",
+              "done": false,
+              "name": "VO · Mountain landscape or mist as actually visible",
+              "angle": "Ultra-wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_12_shot_05",
+              "done": false,
+              "name": "VO · A quiet walking shot on a safe path",
+              "angle": "POV",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_12_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Reflective closing line from a safe, non-disruptive spot",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_12_shot_07",
+              "done": false,
+              "name": "VO · Final static shot before leaving; hold for 8 seconds",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_13",
+          "title": "Scene 13 — The Drive Home: What Coorg Left Behind",
+          "subtitle": "Closing reflection · invite a real comment",
+          "location": "Safe rest stop or parked car on return route to Bengaluru",
+          "duration": "00:45",
+          "purpose": "Close the narrative and encourage comments without a generic subscribe pitch.",
+          "notes": "Record the final talking shot only when parked. Capture actual road footage safely. If the drive is tiring or weather is poor, record the voice-over after reaching home instead.",
+          "voiceover": "Teen din mein Coorg complete nahi hota. Humne kuch hills dekhe, waterfall ki awaaz suni, Madikeri ko thoda walk kiya, aur Kaveri se judi jagahon tak pahunche. Lekin maine jaan-boojhkar kuch pins chhod diye—kyunki achhi trip ka matlab sab kuch race mein kar lena nahi. Kabhi-kabhi ek jagah ko time dena zyada yaad rehta hai.",
+          "oncamera": "Aap batao—agar aapke paas Coorg ke liye sirf teen din hote, toh aap kaunsi ek jagah choose karte: misty viewpoint, waterfall, coffee estate, ya Kaveri se judi jagah? Comments mein batao. Main next trip plan karte waqt aapke suggestions check karunga. Main hoon Yash, aur yeh tha @theyashxplore ka Coorg weekend. See you on the next escape.",
+          "shots": [
+            {
+              "id": "coorg_scene_13_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · Final thoughts from a parked car/rest stop or after reaching home",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_13_shot_02",
+              "done": false,
+              "name": "VO · Road disappearing into the distance from a safe mount/passenger",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_13_shot_03",
+              "done": false,
+              "name": "VO · A few 1-second callbacks to the strongest moments of the trip",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_13_shot_04",
+              "done": false,
+              "name": "VO · Car parked, luggage or camera packed away",
+              "angle": "Close-up",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_13_shot_05",
+              "done": false,
+              "name": "ON-CAMERA · Channel sign-off and comment question",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_14",
+          "title": "OPTIONAL SCENE — Kushalnagar Loop: Choose, Don’t Cram",
+          "subtitle": "Alternative stops from the original planner · use only if route/time is redesigned",
+          "location": "Dubare Elephant Camp / Harangi Reservoir / Nisargadhama / Hanging Bridge / Adventure Park / Greenway Coffee Island",
+          "duration": "00:35–01:30 depending on the actual stop",
+          "purpose": "Preserve the original planner’s east-side stops as an alternate route, not extra stops on top of the main schedule.",
+          "notes": "NOT PART OF THE MAIN 3-DAY RUN OF SHOW. Select only one or two stops if you deliberately redesign the route. Dubare had a restricted morning operating arrangement when it reopened in September 2026; verify current hours, booking/access and rules directly before departure. Harangi/river access, adventure activities and bridge access are conditional. Greenway Coffee Island requires direct confirmation of location, booking and tour time. Never plan a visit at night just to meet a saved time slot.",
+          "voiceover": "Coorg ke is side mein bhi kaafi options hain—Dubare, Harangi Reservoir, Nisargadhama, hanging bridge aur coffee plantation experience. Lekin iss trip mein main in sab ko force nahi kar raha. Agar aapka route Kushalnagar side se jaa raha ho aur time, opening hours aur weather allow kare, toh ek ya do stops select karo. Warna next trip ke liye save rakho.",
+          "oncamera": "Agar main yeh route choose karta hoon, toh yahan aake main actual stop ka experience bataunga—opening, access aur activity jo sach mein available hai. Planner mein jo time likha hai woh booking confirmation nahi hota, so main pehle confirm karke hi nikalunga.",
+          "shots": [
+            {
+              "id": "coorg_scene_14_shot_01",
+              "done": false,
+              "name": "VO · Dubare entrance / official sign only if actually visited",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_14_shot_02",
+              "done": false,
+              "name": "VO · Elephant camp from permitted visitor areas; no staged interaction",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_14_shot_03",
+              "done": false,
+              "name": "VO · Harangi Reservoir water and dam-side landscape from permitted area",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_14_shot_04",
+              "done": false,
+              "name": "VO · Nisargadhama forest path/river ambience if open",
+              "angle": "POV",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_14_shot_05",
+              "done": false,
+              "name": "VO · Hanging bridge or activity park only if open and used",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_14_shot_06",
+              "done": false,
+              "name": "VO · Coffee estate walk only with booking/permission",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            }
+          ]
+        },
+        {
+          "id": "coorg_scene_15",
+          "title": "OPTIONAL SCENE — Waterfall Swap: Pick One",
+          "subtitle": "Alternative to part of Wednesday, not a same-day waterfall marathon",
+          "location": "Mallalli Falls OR Chelavara Falls OR Iruppu Falls",
+          "duration": "00:45–01:15 depending on actual stop",
+          "purpose": "Keep the remaining waterfall ideas from the planner without pretending they all fit into one day.",
+          "notes": "NOT PART OF THE MAIN RUN OF SHOW. Choose at most one waterfall as a replacement if route and forecast make it practical. These falls lie in different parts of Kodagu, and access/steps may be slippery or restricted after rain. Check access locally, do not cross barriers, and do not approach the water. Edit the script to name only the waterfall actually visited.",
+          "voiceover": "Coorg mein waterfalls ka ek aur side explore karne ka mann tha, lekin teen alag waterfalls chase karne se better hai ek jagah ko time dena. Aaj hum [ACTUAL WATERFALL NAME] par hain. Yahan ka sound, water flow aur surroundings weather ke saath change hote hain—aur main wahi capture karna chahta hoon jo aaj yahan actually feel ho raha hai.",
+          "oncamera": "Agar weather aur access safe raha toh main yahan rukunga; warna is stop ko skip karna bhi bilkul fine hai. Trip ka footage tabhi worth hai jab wahan jaana safe ho. Main designated viewing area se hi shots loonga.",
+          "shots": [
+            {
+              "id": "coorg_scene_15_shot_01",
+              "done": false,
+              "name": "ON-CAMERA · State which waterfall you actually reached and current conditions",
+              "angle": "Medium",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            },
+            {
+              "id": "coorg_scene_15_shot_02",
+              "done": false,
+              "name": "VO · Entry/approach sign or route from an allowed spot",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_15_shot_03",
+              "done": false,
+              "name": "VO · Waterfall reveal from an official viewing area",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_15_shot_04",
+              "done": false,
+              "name": "VO · Water, leaves or sound details from safe ground",
+              "angle": "Close-up",
+              "fps": "4K / 60 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_15_shot_05",
+              "done": false,
+              "name": "VO · Uninterrupted water ambience",
+              "angle": "Wide",
+              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "voiceover"
+            },
+            {
+              "id": "coorg_scene_15_shot_06",
+              "done": false,
+              "name": "ON-CAMERA · Short honest reaction before leaving",
+              "angle": "Medium",              "fps": "4K / 30 FPS",
+              "orientation": "Landscape",
+              "scriptType": "oncamera"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
