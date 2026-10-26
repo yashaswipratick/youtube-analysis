@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.Customizer;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -37,6 +38,8 @@ public class SecurityConfig {
                         "/api/youtube-analytics/v1/oauth/success",
                         "/api/youtube-analytics/v1/oauth/start"
                 ).permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/youtube-analytics/v1/auth/youtube/connect").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/youtube-analytics/v1/auth/status").permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2Login(oauth2 -> oauth2.successHandler((request, response, authentication) -> {

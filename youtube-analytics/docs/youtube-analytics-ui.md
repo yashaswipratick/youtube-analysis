@@ -23,6 +23,8 @@ The two format-specific pages can be opened in separate tabs/windows:
 
 Each page filters the library and comparisons to the selected format. Duration is used as an approximation (180 seconds or less for Shorts), not a definitive Shorts-tab flag. Both pages load `front-end/config.js`, so changing `apiBaseUrl` changes the backend destination for all frontend pages.
 
+The separate beginner-friendly creator coaching experience is available at `http://localhost:3000/creator-coach.html` while the frontend server is running. It uses its own `creator-coach.html`, `creator-coach.css`, and `creator-coach.js` files, with dedicated navigation for My videos, My progress, Next video planner, My style, and Help. Links to it are available from the full workspace and both format-specific dashboards. The existing analytics pages are kept intact. This screen uses the `/api/youtube-analytics/v1` creator-coach API and displays only plain-language report fields; it does not expose OAuth tokens or raw AI responses.
+
 The dashboard uses plain HTML, CSS and JavaScript. It does not need a Node.js server or a third-party charting runtime. The API port uses `SERVER_PORT`; when changed, update `apiBaseUrl` and the Google authorized redirect URI. Configure UI return URL with `UI_BASE_URL` and allowed frontend origins with the comma-separated `CORS_ALLOWED_ORIGINS` setting.
 
 ## OpenAI credential and request diagnostics
@@ -76,3 +78,54 @@ The creator mode is served by `POST /creator-video-analysis`. It checks video ow
 - `service/businesslogic/AnalyticsWorkspaceBusinessLogic.java` contains deterministic, unit-testable transformations for upload consistency, within-set comparisons and keyword-opportunity labeling.
 - `service/businesslogic/AnalyticsWorkspaceService.java` orchestrates existing APIs/services and applies authorized-channel versus public-only access rules.
 - `controller/AnalyticsWorkspaceController.java` exposes the workspace-specific endpoints above.
+- `controller/CreatorCoachController.java` exposes the creator-coach endpoints listed below.
+- `service/creatorcoach/CreatorCoachService.java` orchestrates persisted profiles, manual inputs, transcript editing, deterministic analytics preprocessing, async jobs, report post-processing, progress, plans, reminders, and glossary entries.
+- `service/creatorcoach/CreatorCoachStore.java` stores creator-owned JSON records in the H2 database. Records are always scoped to the authenticated Google subject; the client never supplies an owner ID.
+- `service/creatorcoach/CreatorCoachQualityRules.java` contains deterministic curve-moment detection, evidence-quote checks, and confidence caps.
+- `resources/prompts/coach-v1.txt` is the static, versioned system prompt. Store prompt version/model/token counts/raw AI output in an internal report record, separate from UI-visible report JSON.
+
+## Creator coaching backend API
+
+The routes below share the prefix `/api/youtube-analytics/v1`. Private endpoints require the connected Google account. The owner scope is derived server-side from the OAuth identity.
+
+| Method / path | Purpose |
+| --- | --- |
+| `POST /auth/youtube/connect`, `GET /auth/status` | Begin or inspect YouTube connection; the status response says when reconnection is needed |
+| `GET/PUT /profile` | Read or save My Style: creator stage, style, languages, goals, must-keep elements, and output language |
+| `GET /videos` | Return up to 50 recent owned uploads with `TOO_NEW`, `NEEDS_YOUR_NUMBERS`, or `REPORT_READY` status |
+| `GET /videos/{id}/inputs` | Return known/missing inputs, owner Analytics, profile, saved transcript, and help text for Studio-only fields |
+| `PUT /videos/{id}/manual-metrics` | Save manual thumbnail impressions/click percentage, first-30-seconds/intro values, thumbnail description and optional notes |
+| `GET/PUT /videos/{id}/transcript` | Retrieve available captions or save creator-edited transcript text/segments, capped at 60,000 characters |
+| `POST /videos/{id}/analyses` | Queue one analysis and return `jobId`; returns status without creating a report when the video is under three days old or required inputs are missing |
+| `GET /analyses/{jobId}` | Poll `queued`, `reading`, `checking`, `done`, or `failed` status |
+| `GET /videos/{id}/report`, `GET /reports/{id}` | Return the latest or selected UI-ready report; raw OpenAI responses and the minute-by-minute curve are kept in internal storage |
+| `PUT /reports/{id}/fix-first`, `/checklist`, `/answers` | Persist completion state, next-video reminder flag, checklist ticks and creator answers |
+| `GET /progress` | Trend/habit history, outstanding reminders and directional before/after hints; reports “needs 3 videos” until enough history exists |
+| `GET/POST/PUT /plans`, `GET /plans/{id}`, `POST /plans/{id}/duplicate` | Save, retrieve, edit and duplicate the five-part video outline |
+| `POST /plans/{id}/title-check` | Compare title words with the outline and warn when key promises do not appear in the outline |
+| `GET /reports/{id}/export?format=pdf|text`, `GET /plans/{id}/export?format=text` | Download a one-page plain-language PDF report, copyable text checklist/report or five-part plan |
+| `GET /glossary` | Return plain definitions with examples from saved video data when available |
+| `DELETE /account/data` | Delete stored creator records and the persisted authorized-client entry for the account |
+
+### Storage and configuration
+
+The creator-coach records use an H2 file database under `./data/youtube-analytics/creator-coach-db` by default. Override with `CREATOR_DB_PATH`, `CREATOR_DB_USERNAME`, and `CREATOR_DB_PASSWORD`. Keep this directory private and back it up only in a protected location.
+
+OAuth access and refresh tokens are encrypted with AES-GCM in the server-side authorized-client table. Configure a stable, independent `YOUTUBE_TOKEN_ENCRYPTION_KEY` for deployments. If it is omitted, local development derives an encryption key from `GOOGLE_CLIENT_SECRET`; rotating that fallback secret can make existing stored tokens unreadable, requiring reconnect. Never put the key in the browser or logs. The original OAuth scope configuration should remain read-only and token values are never returned by creator endpoints.
+
+`CREATOR_COACH_DAILY_ANALYSIS_LIMIT` defaults to 10 starts per creator per India-local day. Set `CREATOR_COACH_INPUT_COST_PER_MILLION_USD` and `CREATOR_COACH_OUTPUT_COST_PER_MILLION_USD` to enable approximate cost logging from the actual token counts returned by the model. If the rates are left at zero, the report logs model/token usage but labels cost as not configured rather than inventing a charge.
+
+### Deterministic quality rules
+
+- A report is not created if the publication date is unavailable or the video is under three days old. The current catalog is limited to 50 recent uploads.
+- The small-sample flag is computed from owner Analytics views in the selected reporting window, not the public lifetime view counter. Missing views remain unknown, and small samples use neutral wording.
+- Audience drops/spikes and traffic-source shares are calculated in Java before the OpenAI call. The raw curve is stored internally and not included in public report JSON.
+- Segment boundaries from the model are clipped, sorted, overlap-adjusted and gap-filled in Java. Runtime shares and percent on the title promise are recomputed by the backend.
+- A quote survives only if whitespace-normalised transcript text contains it, it is at most 20 words, and its timestamp is within five seconds of its source cue. Invalid evidence is nulled with an explanatory note.
+- If there is no usable audience curve, “very sure” is capped at “fairly”. The backend makes one rewrite request when jargon or a protected-style conflict is detected; a final fallback sanitizes remaining jargon while preserving exact transcript quotes.
+- Matching in-flight requests are deduplicated by video, transcript, manual values, precomputed Analytics hash, profile and prompt version. Reports store the final input hash; internal records retain the raw response and usage fields.
+- Model calls use bounded retries with exponential backoff for HTTP 429/5xx responses. The output is constrained by a strict JSON schema and one schema-validation retry. The controller returns a job status rather than a long-running OpenAI response.
+
+The H2 record model deliberately keeps raw AI output and raw Analytics snapshots in an internal record type that is not exposed by the report endpoint. The UI receives only computed/report-safe fields. The creator can delete persisted creator data using `DELETE /account/data`.
+
+Known implementation limits: the current upload catalog is capped at 50 recent owned uploads; the title check is a deterministic word-overlap warning, not a performance prediction; the glossary uses available saved-report examples and returns no example when one cannot be grounded; the plan export is text, while report export supports PDF/text. The PDF is constrained to one page and may use a portable-character fallback when a Unicode font is unavailable on the server.

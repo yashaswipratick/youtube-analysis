@@ -203,6 +203,92 @@ class OpenAiAnalysisServiceTest {
         assertThat(result.path("segment_map").get(0).path("start").asText()).isEqualTo("00:00");
     }
 
+
+    @Test
+    void runsVersionedCreatorStoryPromptAndReturnsInternalUsageMetadata() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, Object> report = new java.util.LinkedHashMap<>();
+        report.put("transcript_ok", true);
+        report.put("early_data_note", "Too early to judge these numbers.");
+        report.put("plain_summary", "Keep your reflective opening and add one clear question.");
+        report.put("segments", java.util.List.of(Map.of(
+                "label", "Cinematic opening", "start_sec", 0, "end_sec", 20, "what_happens", "Reflective narration")));
+        Map<String, Object> title = new java.util.LinkedHashMap<>();
+        title.put("title_promise", "A quiet trip into the hills");
+        title.put("promise_segment_indexes", java.util.List.of(1));
+        title.put("first_delivered_at_sec", null);
+        title.put("explanation", "The transcript does not give enough timing evidence.");
+        title.put("how_sure", "fairly");
+        report.put("title_check", title);
+        Map<String, Object> first30 = new java.util.LinkedHashMap<>();
+        first30.put("speaks_to_camera_at_sec", null);
+        first30.put("has_clear_question_or_promise", true);
+        first30.put("matches_title", true);
+        first30.put("explanation", "The transcript contains an opening question; camera delivery cannot be confirmed.");
+        report.put("first_30_seconds", first30);
+        report.put("style_shifts", java.util.List.of());
+        report.put("keep_doing", java.util.List.of(Map.of(
+                "strength", "Reflective sensory narration", "quote", "Pahaadon par chhayi dhundh", "at_sec", 8)));
+        report.put("findings", java.util.List.of());
+        report.put("audience_explanations", java.util.List.of());
+        report.put("average_watch_explanation", null);
+        report.put("habits", Map.of(
+                "opened_with_clear_question", true,
+                "answered_title_promise_early", false,
+                "ended_with_clear_answer", false,
+                "asked_to_comment_or_subscribe", false,
+                "spoke_to_camera_within_30s", false));
+        report.put("previous_videos_text", null);
+        report.put("fix_first", Map.of(
+                "action", "Add one clear curiosity question early.",
+                "why", "It gives viewers a reason to follow the journey.",
+                "steps", java.util.List.of("Keep the cinematic opening.", "Add a natural question on camera."),
+                "how_sure", "fairly"));
+        report.put("recommendations", java.util.List.of(Map.of(
+                "action", "Try the question in the next upload.",
+                "reason", "The transcript leaves room for a clearer question.",
+                "tag", "try_and_see",
+                "test_steps", java.util.List.of("Use one early question."),
+                "success_signal", "Compare the first-30-seconds percentage on the next similar video.",
+                "how_sure", "fairly")));
+        report.put("next_video_checklist", java.util.List.of("Keep the reflective opening.", "Add one question.", "Deliver the title promise."));
+        report.put("questions_for_creator", java.util.List.of("Which moment was actually on camera?"));
+        report.put("cannot_tell_you", java.util.List.of("Music and B-roll quality cannot be judged from transcript text."));
+
+        Map<String, Object> openAiResponse = new java.util.LinkedHashMap<>();
+        openAiResponse.put("id", "resp-test-123");
+        openAiResponse.put("model", "test-coach-model");
+        openAiResponse.put("usage", Map.of("input_tokens", 1234, "output_tokens", 321));
+        openAiResponse.put("output_text", mapper.writeValueAsString(report));
+        String responseBody = mapper.writeValueAsString(openAiResponse);
+        AtomicReference<String> requestUrl = new AtomicReference<>();
+        ExchangeFunction exchange = request -> {
+            requestUrl.set(request.url().toString());
+            return Mono.just(ClientResponse.create(HttpStatus.OK)
+                    .header("Content-Type", MediaType.APPLICATION_JSON_VALUE)
+                    .body(responseBody)
+                    .build());
+        };
+        OpenAiConfig config = new OpenAiConfig("/tmp/openai-key", "https://api.openai.com/v1", "gpt-5.6-luna");
+        OpenAiApiKeyProvider keyProvider = new OpenAiApiKeyProvider(config) {
+            @Override public String getApiKey() { return "test-key"; }
+        };
+        OpenAiAnalysisService service = new OpenAiAnalysisService(
+                WebClient.builder().exchangeFunction(exchange), config, keyProvider, mapper);
+
+        Map<String, Object> result = service.analyzeCreatorStory(Map.of(
+                "output_language", "hinglish",
+                "creator_profile", Map.of("must_keep", java.util.List.of("cinematic opening")),
+                "transcript", "[00:08] Pahaadon par chhayi dhundh"));
+
+        assertThat(requestUrl.get()).isEqualTo("https://api.openai.com/v1/responses");
+        assertThat(result.get("promptVersion")).isEqualTo("coach-v1");
+        assertThat(result.get("model")).isEqualTo("test-coach-model");
+        assertThat(result.get("inputTokens")).isEqualTo(1234);
+        assertThat(result.get("outputTokens")).isEqualTo(321);
+        assertThat(result.get("rawResponse").toString()).contains("resp-test-123", "test-coach-model");
+    }
+
     @Test
     void validatesApiKeyAgainstModelsEndpointWithoutGeneratingContent() {
         AtomicReference<String> requestUrl = new AtomicReference<>();

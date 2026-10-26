@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#171a22">
+  <title>Creator Story Coach — YouTube Analytics</title>
+  <meta name="description" content="A beginner-friendly workspace to understand your travel videos, choose one improvement and track your progress.">
+  <link rel="stylesheet" href="/creator-coach.css">
+  <script src="/config.js"></script>
+  <script src="/creator-coach.js" defer></script>
+</head>
+<body>
+  <div class="cc-shell">
+    <aside class="cc-sidebar" id="cc-sidebar">
+      <a class="cc-brand" href="/creator-coach.html" aria-label="Creator Story Coach home">
+        <span class="cc-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 44 44"><rect x="1" y="1" width="42" height="42" rx="14" fill="currentColor" opacity=".15"/><path d="M12 25.5c5-1.5 6-10 11-10s6 12.5 10 12.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="25.5" r="3" fill="currentColor"/><circle cx="23" cy="15.5" r="3" fill="currentColor"/><circle cx="33" cy="28" r="3" fill="currentColor"/></svg>
+        </span>
+        <span><strong>Creator Story Coach</strong><small>YOUR TRAVEL VIDEO WORKSPACE</small></span>
+      </a>
+      <div class="cc-nav-caption">YOUR WORKSPACE</div>
+      <nav class="cc-nav" aria-label="Creator workspace navigation">
+        <button class="cc-nav-item active" data-page="videos"><span class="cc-nav-icon">▤</span><span>My videos</span></button>
+        <button class="cc-nav-item" data-page="progress"><span class="cc-nav-icon">↗</span><span>My progress</span></button>
+        <button class="cc-nav-item" data-page="planner"><span class="cc-nav-icon">✎</span><span>Next video planner</span></button>
+        <button class="cc-nav-item" data-page="style"><span class="cc-nav-icon">◎</span><span>My style</span></button>
+        <button class="cc-nav-item" data-page="help"><span class="cc-nav-icon">?</span><span>Help & word meanings</span></button>
+      </nav>
+      <div class="cc-sidebar-bottom">
+        <div class="cc-connected-card">
+          <span class="cc-status-dot" id="cc-auth-dot"></span>
+          <div><strong id="cc-auth-title">Checking YouTube connection</strong><p id="cc-auth-copy">Your private video numbers stay in your workspace.</p></div>
+        </div>
+        <a class="cc-studio-link" href="https://studio.youtube.com/" target="_blank" rel="noreferrer">Open YouTube Studio ↗</a>
+        <a class="cc-back-link" href="/index.html">← Back to analytics workspace</a>
+      </div>
+    </aside>
+    <main class="cc-main">
+      <header class="cc-topbar">
+        <button class="cc-menu" id="cc-menu" aria-label="Open navigation">☰</button>
+        <div class="cc-breadcrumb"><span>Creator workspace</span><span aria-hidden="true">/</span><strong id="cc-page-title">My videos</strong></div>
+        <div class="cc-top-actions">
+          <span class="cc-private"><span class="cc-private-dot"></span>Private to your account</span>
+          <button type="button" class="cc-theme-toggle" id="cc-theme-toggle" aria-label="Switch theme">☼ <span>Light mode</span></button>
+        </div>
+      </header>
+      <section id="cc-app" class="cc-content" aria-live="polite" aria-busy="true">
+        <div class="cc-skeleton-page">
+          <div class="cc-skeleton cc-skeleton-short"></div><div class="cc-skeleton cc-skeleton-title"></div>
+          <div class="cc-skeleton cc-skeleton-card"></div><div class="cc-skeleton cc-skeleton-card"></div>
+        </div>
+      </section>
+      <footer class="cc-footer"><span>One useful change at a time.</span><span>Your story stays yours. We learn patterns, not copy other creators.</span></footer>
+    </main>
+  </div>
+  <div class="cc-toast" id="cc-toast" role="status" aria-live="polite"></div>
+  <dialog class="cc-dialog" id="cc-dialog" aria-labelledby="cc-dialog-title">
+    <form method="dialog"><button class="cc-dialog-close" aria-label="Close">×</button></form>
+    <h2 id="cc-dialog-title">A little help</h2><div id="cc-dialog-content"></div>
+  </dialog>
+</body>
+</html>

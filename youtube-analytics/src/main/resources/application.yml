@@ -1,6 +1,15 @@
 spring:
   application:
     name: youtube-analytics
+  datasource:
+    url: jdbc:h2:file:${CREATOR_DB_PATH:./data/youtube-analytics/creator-coach-db};DB_CLOSE_ON_EXIT=FALSE
+    username: ${CREATOR_DB_USERNAME:sa}
+    password: ${CREATOR_DB_PASSWORD:}
+    driver-class-name: org.h2.Driver
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:creator-coach-schema.sql
 
   security:
     oauth2:
@@ -35,7 +44,13 @@ server:
 # Automatically open Google sign-in when running locally. Set OAUTH_AUTO_OPEN_BROWSER=false
 # for headless servers or environments where a browser should not be launched.
 app:
+  storage:
+    # Local H2 file database for creator-owned profiles, transcripts, reports and plans.
+    database-path: ${CREATOR_DB_PATH:./data/youtube-analytics/creator-coach-db}
   oauth:
+    # Stable, independent key for encrypted OAuth token storage. If blank, the local-development
+    # fallback derives a key from GOOGLE_CLIENT_SECRET. Set YOUTUBE_TOKEN_ENCRYPTION_KEY in deployments.
+    token-encryption-key: ${YOUTUBE_TOKEN_ENCRYPTION_KEY:}
     auto-open-browser: ${OAUTH_AUTO_OPEN_BROWSER:true}
   ui:
     # Used only when login was started from the separate UI. Direct OAuth URL visits
@@ -77,7 +92,7 @@ youtube:
 openai:
   # Local development only. Never commit the key file itself.
   # Payload logging includes full transcript/analytics content; disable for shared or production logs.
-  log-payloads: ${OPENAI_LOG_PAYLOADS:true}
+  log-payloads: ${OPENAI_LOG_PAYLOADS:false}
   validate-on-startup: ${OPENAI_VALIDATE_ON_STARTUP:true}
   api-key-file: ${OPENAI_API_KEY_FILE:/Users/yashaswipratick/Desktop/OPEN_API_KEY.txt}
   base-url: ${OPENAI_BASE_URL:https://api.openai.com/v1}
@@ -87,6 +102,11 @@ openai:
 # or set YTDLP_COMMAND to an executable path. The app never runs this through a shell.
 transcript:
   yt-dlp-command: ${YTDLP_COMMAND:yt-dlp}
+
+creator-coach:
+  daily-analysis-limit: ${CREATOR_COACH_DAILY_ANALYSIS_LIMIT:10}
+  input-cost-per-million-usd: ${CREATOR_COACH_INPUT_COST_PER_MILLION_USD:0}
+  output-cost-per-million-usd: ${CREATOR_COACH_OUTPUT_COST_PER_MILLION_USD:0}
 
 logging:
   level:
