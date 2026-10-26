@@ -10,6 +10,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2RefreshToken;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -27,6 +28,7 @@ import java.util.Set;
 
 /** Persists OAuth tokens encrypted with AES-GCM. Tokens never leave the server or appear in logs. */
 @Service
+@Profile("legacy-h2")
 public class EncryptedJdbcOAuth2AuthorizedClientService implements OAuth2AuthorizedClientService {
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int NONCE_BYTES = 12;

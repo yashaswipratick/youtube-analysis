@@ -12,6 +12,22 @@ mvn spring-boot:run
 
 Application APIs are rooted at `/api/youtube-analytics/v1`. Analytics endpoints are under `/analytics`, local YouTube Data API compatibility endpoints under `/youtube`, and OAuth helper endpoints under `/oauth`. OpenAPI documentation is available at `/swagger-ui/index.html` while the application is running.
 
+### Cassandra persistence
+
+The application uses the local Cassandra cluster for creator-owned records and encrypted OAuth tokens. On startup, it idempotently creates these tables in the `youtube_analytics` keyspace:
+
+- `creator_coach_record_by_id` — profiles, transcripts, reports, plans, checklist/action state and other creator records.
+- `creator_coach_record_ids_by_owner` — owner-scoped index used to remove a creator's records.
+- `oauth2_authorized_client` — access/refresh tokens encrypted with AES-GCM.
+- `cassandra_migration_marker` — one-time migration marker and migrated-row counts.
+
+**Cassandra requires keyspace names to use alphanumeric characters or underscores.** The application/repository name remains `youtube-analytics`, but the actual Cassandra keyspace is `youtube_analytics`; Cassandra rejects a hyphenated keyspace name even when quoted.
+
+Local defaults use `127.0.0.1:9042` and datacenter `datacenter1`. Override them with `CASSANDRA_CONTACT_POINT`, `CASSANDRA_PORT`, and `CASSANDRA_LOCAL_DATACENTER`. The DDL is also checked into `src/main/resources/cassandra-schema.cql`.
+
+On first startup, `CASSANDRA_MIGRATE_LEGACY_H2=true` (default) performs a **read-only** import from the previous local H2 file at `CREATOR_DB_PATH` (default `./data/youtube-analytics/creator-coach-db`). Creator records and already-encrypted OAuth tokens are copied to Cassandra; the original H2 file is not deleted. The `cassandra_migration_marker` table prevents automatic re-import. Set `CASSANDRA_MIGRATE_LEGACY_H2=false` to skip this migration. For stable token decryption across restarts/deployments, set `YOUTUBE_TOKEN_ENCRYPTION_KEY` and keep it private and unchanged.
+
+
 ### YouTube Studio analytics reports
 
 Analytics report endpoints are under `/api/youtube-analytics/v1/analytics`:

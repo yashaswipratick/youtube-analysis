@@ -7,7 +7,6 @@ import com.youtube.analytics.service.YouTubePublicApiService;
 import com.youtube.analytics.service.businesslogic.AnalyticsWorkspaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -64,7 +63,6 @@ public class CreatorCoachService {
     private final ObjectMapper mapper;
     private final Executor executor;
     private final OAuth2AuthorizedClientService authorizedClientService;
-    private final JdbcTemplate jdbc;
     private final int dailyAnalysisLimit;
     private final double inputCostPerMillionUsd;
     private final double outputCostPerMillionUsd;
@@ -73,13 +71,13 @@ public class CreatorCoachService {
                                YouTubePublicApiService publicApiService, OpenAiAnalysisService openAi,
                                ObjectMapper mapper,
                                @org.springframework.beans.factory.annotation.Qualifier("creatorCoachExecutor") Executor executor,
-                               OAuth2AuthorizedClientService authorizedClientService, JdbcTemplate jdbc,
+                               OAuth2AuthorizedClientService authorizedClientService,
                                @Value("${creator-coach.daily-analysis-limit:10}") int dailyAnalysisLimit,
                                @Value("${creator-coach.input-cost-per-million-usd:0}") double inputCostPerMillionUsd,
                                @Value("${creator-coach.output-cost-per-million-usd:0}") double outputCostPerMillionUsd) {
         this.store = store; this.workspaceService = workspaceService; this.publicApiService = publicApiService;
         this.openAi = openAi; this.mapper = mapper; this.executor = executor;
-        this.authorizedClientService = authorizedClientService; this.jdbc = jdbc;
+        this.authorizedClientService = authorizedClientService;
         this.dailyAnalysisLimit = Math.max(1, dailyAnalysisLimit);
         this.inputCostPerMillionUsd = Math.max(0, inputCostPerMillionUsd);
         this.outputCostPerMillionUsd = Math.max(0, outputCostPerMillionUsd);
@@ -690,8 +688,6 @@ public class CreatorCoachService {
         store.deleteAllForOwner(ownerId);
         try { authorizedClientService.removeAuthorizedClient("google", ownerId); }
         catch (RuntimeException ignored) { log.warn("Could not remove OAuth authorized client during creator data deletion."); }
-        try { jdbc.update("DELETE FROM oauth2_authorized_client WHERE principal_name=?", ownerId); }
-        catch (RuntimeException ignored) { log.warn("OAuth token row cleanup required for creator {}", safeOwner(ownerId)); }
     }
 
     private Map<String,Object> findLatestReport(String ownerId, String videoId) {

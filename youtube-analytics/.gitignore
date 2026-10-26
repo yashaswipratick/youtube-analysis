@@ -1,5 +1,10 @@
 target/
 data/youtube-analytics/reports/
+
+# Local database files may contain credentials or personal data
+*.mv.db
+*.trace.db
+*.lock.db
 *.class
 *.jar
 *.war

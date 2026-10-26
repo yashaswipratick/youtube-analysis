@@ -46,6 +46,13 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
+        <!-- DataStax Java driver for direct Cassandra access -->
+        <dependency>
+            <groupId>com.datastax.oss</groupId>
+            <artifactId>java-driver-core</artifactId>
+            <version>4.17.0</version>
+        </dependency>
+
         <!-- Durable local storage for creator profiles, transcript edits, reports and action tracking. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

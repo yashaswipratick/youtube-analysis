@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import com.datastax.oss.driver.api.core.CqlSession;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,7 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.security.oauth2.client.registration.google.client-id=test-client-id",
         "spring.security.oauth2.client.registration.google.client-secret=test-client-secret",
         "app.oauth.auto-open-browser=false",
-        "openai.validate-on-startup=false"
+        "openai.validate-on-startup=false",
+        "app.storage.migrate-legacy-h2=false"
 })
 class YoutubeAnalyticsApplicationTests {
 
@@ -30,6 +33,9 @@ class YoutubeAnalyticsApplicationTests {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private CqlSession cassandraSession;
 
     @Test
     void contextLoads() {
