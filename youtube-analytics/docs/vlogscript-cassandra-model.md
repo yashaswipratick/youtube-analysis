@@ -51,6 +51,7 @@ All endpoints are under `/api/youtube-analytics/v1/vlog-trips` and require an au
 | `PUT` | `/vlog-trips` | Merge/upsert a list of trips; omitted trips are not deleted |
 | `PUT` | `/vlog-trips/{tripId}` | Upsert one trip and synchronize its complete episode list |
 | `DELETE` | `/vlog-trips/{tripId}` | Delete one trip and all of its episodes |
+| `POST` | `/vlog-trips/storytelling-rewrite` | Preview an OpenAI storytelling rewrite for supplied voice-over sections; changes persist only after the Studio user applies the preview and the library syncs |
 
 The API derives `owner_id` from Google OAuth and ignores any browser-supplied owner identity. Sending a trip's complete episode array replaces that trip's episode list, so removing an episode in the Studio is persisted. Deleting a trip is an explicit delete request; it is not inferred from a missing trip in a bulk sync payload.
 

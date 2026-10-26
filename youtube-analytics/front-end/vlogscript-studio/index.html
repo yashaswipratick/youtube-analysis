@@ -197,7 +197,9 @@ html[data-theme="dark"] .scriptbook-editor .field input,html[data-theme="dark"] 
 .script-episode-card{display:flex;flex-direction:column;align-items:stretch;min-height:170px}.script-episode-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.script-episode-card h3{font-size:17px;margin:12px 0 4px;overflow-wrap:anywhere}.script-episode-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}.script-episode-card-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:16px;font-size:11px;color:var(--muted)}.script-episode-title-panel{margin-bottom:14px}.script-episode-destination-label{font-size:11px;letter-spacing:1.1px;text-transform:uppercase;font-weight:800;color:var(--blue);margin-bottom:10px}.script-episode-title-row{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}.script-episode-title-row .field{max-width:550px;flex:1}
 html[data-theme="dark"] .script-library-add-controls input{background:#111821;border-color:#3a465a;color:var(--ink)}html[data-theme="dark"] .script-destination-card,html[data-theme="dark"] .script-episode-card{background:#171e29;border-color:var(--line);color:var(--ink)}html[data-theme="dark"] .script-destination-card:hover,html[data-theme="dark"] .script-episode-card:hover{border-color:#718bda}html[data-theme="dark"] .script-library-card-icon{background:#222f4b;color:#9bb2ff}html[data-theme="dark"] .script-library-card-meta{border-color:var(--line)}html[data-theme="dark"] .script-episode-title-panel{background:#171e29;border-color:var(--line)}html[data-theme="dark"] #episodeTitleInput,html[data-theme="dark"] #scriptDestinationName{background:#111821;border-color:#3a465a;color:var(--ink)}
 @media(max-width:850px){.script-library-add{grid-template-columns:1fr}.script-library-add-controls{max-width:none}.script-destination-grid,.script-episode-grid{grid-template-columns:1fr}}@media(max-width:540px){.script-library-add-controls{flex-direction:column}.script-library-add-controls .btn{width:100%}.script-episode-title-row{display:block}.script-episode-title-row .scriptbook-status{display:inline-block;margin-top:10px}.script-destination-card,.script-episode-card{padding:15px}}
-</style><script src="../config.js"></script></head><body><div class="shell"><aside class="side"><div class="brand"><span class="mark">VS</span><span>VlogScript<div class="sub">STUDIO</div></span></div><div><div class="label">WORKSPACE</div><button class="nav active" id="homeNav">▦ &nbsp; My projects</button><button class="nav" id="shootNav">◉ &nbsp; Shooting checklist</button><button class="nav" id="episodeScriptNav">✎ &nbsp; Write your own script</button></div><div class="sidefoot"><strong>✦ Your work stays yours</strong>Scripts save in this browser and sync to your private Cassandra library when you sign in.</div><div class="sub">VLOGSCRIPT STUDIO · 1.0</div></aside><main><header class="top"><div class="crumb" id="crumb">Workspace / <b>My projects</b></div><div class="topright"><span class="saved" id="saveState">● Saved locally</span><button class="btn no-print" id="themeToggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">☾ Dark mode</button><button class="btn no-print" id="exportBtn">Export</button><button class="btn no-print" id="importBtn">Import</button><button class="btn no-print" id="printBtn">Print</button><input type="file" id="importFile" accept=".json,application/json" hidden></div></header><div class="content"><section id="dashboard"><div class="eyebrow">YOUR CREATOR WORKSPACE</div><h1 class="h1">Plan your next story.</h1><p class="intro">Every script module, every angle, every line — ready before you hit record.</p><div class="stats"><div class="stat"><span>Total projects</span><strong id="statProjects">0</strong></div><div class="stat"><span>Script modules</span><strong id="statScenes">0</strong></div><div class="stat"><span>Shots captured</span><strong id="statShots">0%</strong></div></div><div class="sectionhead"><h2>Your projects</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="dashboardEpisodeScript">✎ Write your own script</button><button class="btn primary" id="newProject">＋ New project</button></div></div><div id="projectGrid" class="projects"></div></section><section id="workspace" class="hidden"><div class="eyebrow">PROJECT WORKSPACE</div><div class="sectionhead" style="margin-top:4px"><div><h1 class="h1" id="projectHeading">Untitled vlog</h1><p class="intro" id="projectSummary">Script-based production plan</p></div><div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="backBtn">← Projects</button><button class="btn" id="episodeScriptWorkspaceBtn">✎ Write your own script</button><button class="btn primary" id="travelModeBtn">Travel Shoot Mode</button><button class="btn" id="readScriptsBtn">Read scripts</button><button class="btn danger" id="deleteProject">Delete project</button></div></div><div id="projectEditorView"><div class="stats"><div class="stat"><span>Script modules</span><strong id="sceneCount">0</strong></div><div class="stat"><span>Shots completed</span><strong id="shotCount">0 / 0</strong></div><div class="stat"><span>Overall progress</span><strong id="progressCount">0%</strong><div class="bar"><i id="progressBar" style="width:0%"></i></div></div></div><div class="panel fields"><div class="field"><label>Project title</label><input id="projectTitle" placeholder="e.g. A weekend in Coorg"></div><div class="field"><label>Location</label><input id="projectLocation" placeholder="Where are you filming?"></div><div class="field full"><label>Story / video summary</label><textarea id="projectDescription" rows="2" placeholder="What story do you want viewers to experience?"></textarea></div></div><div class="editor"><div class="panel scene-list"><div class="sectionhead" style="margin:3px 2px 10px"><h3>Script modules</h3><button class="btn small primary no-print" id="addScene">＋ Add</button></div><div id="sceneList"></div></div><div id="sceneResizer" class="scene-resizer no-print" role="separator" aria-label="Resize script modules panel" aria-orientation="vertical" tabindex="0" title="Drag to resize script modules panel"></div><div id="sceneDetail"></div></div></div>
+.voiceover-rewrite-status{font-size:12px;color:var(--muted);margin-top:7px}.voiceover-rewrite-preview{display:grid;gap:12px;margin:12px 0}.voiceover-rewrite-card{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--bg)}.voiceover-rewrite-card h3{font-size:13px;margin:0 0 8px}.voiceover-rewrite-card .rewrite-original{color:var(--muted);font-size:12px;white-space:pre-wrap;margin-bottom:10px}.voiceover-rewrite-card .rewrite-result{white-space:pre-wrap;line-height:1.8}.scriptbook-ai-status{font-size:12px;color:var(--muted);margin:0 0 10px;min-height:18px}.scriptbook-ai-status.error{color:#b42318}.scriptbook-ai-status.good{color:#16845b}
+.story-audit-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.story-audit-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}.story-audit-card{border:1px solid var(--line);border-radius:10px;padding:13px;background:var(--bg);min-width:0}.story-audit-card h3{font-size:13px;margin:0 0 7px}.story-audit-card p{font-size:12px;line-height:1.65;margin:5px 0;overflow-wrap:anywhere}.story-audit-card ul{margin:6px 0 0;padding-left:18px;font-size:12px;line-height:1.7}.story-audit-act-list,.story-audit-reviews{display:grid;gap:8px;margin:12px 0}.story-audit-item{border:1px solid var(--line);border-radius:10px;padding:12px}.story-audit-item h4{font-size:12px;margin:0 0 6px}.story-audit-item p{font-size:12px;line-height:1.65;margin:4px 0;overflow-wrap:anywhere}.story-audit-item summary{cursor:pointer;font-weight:750;font-size:12px}.story-audit-item .muted{color:var(--muted)}.story-audit-section-title{font-weight:750;color:var(--blue)}.story-audit-pill{display:inline-block;padding:3px 7px;border:1px solid var(--line);border-radius:20px;margin:2px 4px 2px 0;font-size:10px;color:var(--muted)}.story-audit-priority{font-weight:800;color:var(--blue)}.story-audit-stale{color:#a16207;font-size:12px}.story-audit-footer{border-top:1px solid var(--line);margin-top:14px;padding-top:10px;color:var(--muted);font-size:11px;line-height:1.6}
+@media(max-width:650px){.story-audit-grid{grid-template-columns:1fr}}html[data-theme="dark"] .story-audit-item{background:#151c27}html[data-theme="dark"] .story-audit-card{background:#121923} </style><script src="../config.js"></script></head><body><div class="shell"><aside class="side"><div class="brand"><span class="mark">VS</span><span>VlogScript<div class="sub">STUDIO</div></span></div><div><div class="label">WORKSPACE</div><button class="nav active" id="homeNav">▦ &nbsp; My projects</button><button class="nav" id="shootNav">◉ &nbsp; Shooting checklist</button><button class="nav" id="episodeScriptNav">✎ &nbsp; Write your own script</button></div><div class="sidefoot"><strong>✦ Your work stays yours</strong>Scripts save in this browser and sync to your private Cassandra library when you sign in.</div><div class="sub">VLOGSCRIPT STUDIO · 1.0</div></aside><main><header class="top"><div class="crumb" id="crumb">Workspace / <b>My projects</b></div><div class="topright"><span class="saved" id="saveState">● Saved locally</span><button class="btn no-print" id="themeToggle" type="button" aria-label="Switch to dark theme" aria-pressed="false">☾ Dark mode</button><button class="btn no-print" id="exportBtn">Export</button><button class="btn no-print" id="importBtn">Import</button><button class="btn no-print" id="printBtn">Print</button><input type="file" id="importFile" accept=".json,application/json" hidden></div></header><div class="content"><section id="dashboard"><div class="eyebrow">YOUR CREATOR WORKSPACE</div><h1 class="h1">Plan your next story.</h1><p class="intro">Every script module, every angle, every line — ready before you hit record.</p><div class="stats"><div class="stat"><span>Total projects</span><strong id="statProjects">0</strong></div><div class="stat"><span>Script modules</span><strong id="statScenes">0</strong></div><div class="stat"><span>Shots captured</span><strong id="statShots">0%</strong></div></div><div class="sectionhead"><h2>Your projects</h2><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="dashboardEpisodeScript">✎ Write your own script</button><button class="btn primary" id="newProject">＋ New project</button></div></div><div id="projectGrid" class="projects"></div></section><section id="workspace" class="hidden"><div class="eyebrow">PROJECT WORKSPACE</div><div class="sectionhead" style="margin-top:4px"><div><h1 class="h1" id="projectHeading">Untitled vlog</h1><p class="intro" id="projectSummary">Script-based production plan</p></div><div class="no-print" style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="backBtn">← Projects</button><button class="btn" id="episodeScriptWorkspaceBtn">✎ Write your own script</button><button class="btn primary" id="travelModeBtn">Travel Shoot Mode</button><button class="btn" id="readScriptsBtn">Read scripts</button><button class="btn danger" id="deleteProject">Delete project</button></div></div><div id="projectEditorView"><div class="stats"><div class="stat"><span>Script modules</span><strong id="sceneCount">0</strong></div><div class="stat"><span>Shots completed</span><strong id="shotCount">0 / 0</strong></div><div class="stat"><span>Overall progress</span><strong id="progressCount">0%</strong><div class="bar"><i id="progressBar" style="width:0%"></i></div></div></div><div class="panel fields"><div class="field"><label>Project title</label><input id="projectTitle" placeholder="e.g. A weekend in Coorg"></div><div class="field"><label>Location</label><input id="projectLocation" placeholder="Where are you filming?"></div><div class="field full"><label>Story / video summary</label><textarea id="projectDescription" rows="2" placeholder="What story do you want viewers to experience?"></textarea></div></div><div class="editor"><div class="panel scene-list"><div class="sectionhead" style="margin:3px 2px 10px"><h3>Script modules</h3><button class="btn small primary no-print" id="addScene">＋ Add</button></div><div id="sceneList"></div></div><div id="sceneResizer" class="scene-resizer no-print" role="separator" aria-label="Resize script modules panel" aria-orientation="vertical" tabindex="0" title="Drag to resize script modules panel"></div><div id="sceneDetail"></div></div></div>
 <div id="scriptReaderView" class="script-reader hidden">
  <aside class="reader-scene-sidebar">
   <div class="reader-sidebar-head"><h2>Script modules</h2><span class="pill" id="readerSceneCount">0 modules</span></div>
@@ -309,12 +311,13 @@ html[data-theme="dark"] .script-library-add-controls input{background:#111821;bo
   <div class="sectionhead"><h2>Episodes</h2><span class="pill" id="scriptEpisodeCount">0 episodes</span></div><div id="scriptEpisodeCards" class="script-episode-grid"></div>
  </div>
  <div id="scriptEpisodeEditor" class="hidden">
-  <div class="scriptbook-header"><div><div class="eyebrow" id="episodeEditorBreadcrumb">DESTINATION · EPISODE</div><h1 class="h1">Write your own script</h1><p class="intro">Break the episode into story beats. Your script and notes save in this browser as you write.</p></div><div class="scriptbook-actions"><button class="btn" id="episodeBackToEpisodesBtn">← Episodes</button><button class="btn" id="episodeBackToDestinationsBtn">All destinations</button><button class="btn" id="episodeDownloadBtn">Download .txt</button><button class="btn danger" id="deleteCurrentScriptEpisodeBtn">Delete episode</button><button class="btn primary" id="episodeAddSectionBtn">＋ Add section</button></div></div>
+  <div class="scriptbook-header"><div><div class="eyebrow" id="episodeEditorBreadcrumb">DESTINATION · EPISODE</div><h1 class="h1">Write your own script</h1><p class="intro">Break the episode into story beats. Your script and notes save in this browser as you write.</p></div><div class="scriptbook-actions"><button class="btn" id="episodeBackToEpisodesBtn">← Episodes</button><button class="btn" id="episodeBackToDestinationsBtn">All destinations</button><button class="btn" id="episodeDownloadBtn">Download .txt</button><button class="btn" id="storyAuditBtn" type="button">🧭 AI story audit</button><button class="btn primary" id="rewriteEpisodeVoiceoversBtn" type="button">✨ AI storytelling rewrite</button><button class="btn danger" id="deleteCurrentScriptEpisodeBtn">Delete episode</button><span id="voiceoverRewriteStatus" class="scriptbook-ai-status" aria-live="polite"></span><button class="btn primary" id="episodeAddSectionBtn">＋ Add section</button></div></div>
   <div class="panel script-episode-title-panel"><div class="script-episode-destination-label" id="episodeDestinationLabel">Coorg</div><div class="script-episode-title-row"><div class="field"><label for="episodeTitleInput">Episode name</label><input id="episodeTitleInput" type="text" maxlength="120" placeholder="Episode 1"></div><span class="scriptbook-status good" id="episodeScriptStatus">● Saved locally</span></div></div>
+  <section id="storyAuditPanel" class="panel hidden" aria-live="polite"><div class="story-audit-toolbar"><div><div class="eyebrow">YASH XPLORE · STORY FORMAT v2.3</div><h2 style="margin:3px 0">Episode story audit</h2><p class="hint" style="margin-bottom:0">Diagnose the whole episode before rewriting. Results are advisory and never change your script automatically.</p></div><span class="pill" id="storyAuditModel">AI audit</span></div><p id="storyAuditStatus" class="scriptbook-ai-status" aria-live="polite"></p><p id="storyAuditSnapshotStatus" class="story-audit-stale hidden"></p><div id="storyAuditResults"></div><div class="story-audit-footer">Retention notes are hypotheses, not measured drop-offs. Use YouTube Studio audience-retention data to evaluate edits after publication; script analysis alone cannot prove what viewers did.</div></section>
   <div class="scriptbook-layout"><aside class="panel scriptbook-rail"><div class="scriptbook-rail-title"><h2>Episode outline</h2><span class="pill" id="episodeSectionCount">0 sections</span></div><p class="hint">Select a section to write or revise it. Add as many script beats as your story needs.</p><div class="scriptbook-sections" id="episodeSectionNav"></div></aside>
    <main class="panel scriptbook-editor"><div class="scriptbook-editor-head"><div><div class="eyebrow" id="episodeSectionNumber">SECTION 01</div><h2 id="episodeSectionHeading">Intro / Opening</h2></div><span class="pill" id="episodeSectionWordBadge">0 words</span></div><p class="scriptbook-help">Write in your natural voice. Treat this as a working draft, not a script you must memorise. Use the notes field for camera angles, B-roll, research reminders and delivery tips.</p>
     <div class="scriptbook-field-grid"><div class="field"><label for="episodeSectionTitle">Section heading</label><input id="episodeSectionTitle" type="text" placeholder="e.g. First impression"></div><div class="field"><label for="episodeSectionType">Script format / scene</label><input id="episodeSectionType" type="text" placeholder="e.g. On-camera, voice-over"></div><div class="field full"><label for="episodeSectionTiming">Timing / trigger</label><input id="episodeSectionTiming" type="text" placeholder="e.g. After safely parking · optional"></div></div>
-    <div class="field"><label for="episodeSectionText">Your script</label><textarea id="episodeSectionText" spellcheck="true" placeholder="Write or paste your script here…"></textarea></div><div class="field" style="margin-top:14px"><label for="episodeSectionNotes">Shot ideas, delivery tips and reminders</label><textarea id="episodeSectionNotes" class="notes-area" rows="4" placeholder="Camera angles, B-roll, delivery notes, things to verify…"></textarea></div>
+    <div class="field"><label for="episodeSectionText">Your script</label><textarea id="episodeSectionText" spellcheck="true" placeholder="Write or paste your script here…"></textarea></div><div id="voiceoverRewritePanel" class="panel hidden" aria-live="polite"><div class="scriptbook-editor-head"><div><div class="eyebrow">OPENAI · STORYTELLING PREVIEW</div><h2>Listen to the story, not the paragraph</h2></div><span class="pill" id="voiceoverRewriteCount">0 rewrites</span></div><p class="hint">Review the rewritten voice-overs. Nothing is changed or saved until you apply this preview. On-camera scripts are excluded.</p><div id="voiceoverRewritePreview" class="voiceover-rewrite-preview"></div><div class="scriptbook-actions"><button type="button" class="btn primary" id="applyVoiceoverRewritesBtn">Use rewritten scripts</button><button type="button" class="btn" id="discardVoiceoverRewritesBtn">Discard preview</button></div></div><div class="field" style="margin-top:14px"><label for="episodeSectionNotes">Shot ideas, delivery tips and reminders</label><textarea id="episodeSectionNotes" class="notes-area" rows="4" placeholder="Camera angles, B-roll, delivery notes, things to verify…"></textarea></div>
     <div class="scriptbook-foot"><span class="scriptbook-status" id="episodeSectionMetrics">0 words · 0 characters</span><div class="scriptbook-nav-controls"><button class="btn" id="episodePrevSectionBtn">← Previous</button><button class="btn primary" id="episodeNextSectionBtn">Next section →</button><button class="btn scriptbook-delete scriptbook-danger" id="episodeDeleteSectionBtn">Delete section</button></div></div>
    </main>
   </div>
@@ -433,7 +436,7 @@ const EPISODE1_SCRIPT_DEFAULTS = [
 const SCRIPT_LIBRARY_KEY='vlogscript-script-library-v1';
 const SCRIPT_DELETED_TRIPS_KEY='vlogscript-deleted-trip-ids-v1';
 const EPISODE1_SCRIPT_KEY='vlogscript-episode1-draft-v1';
-let scriptLibrary=null,scriptLibraryView='destinations',activeScriptDestinationId=null,activeScriptEpisodeId=null,activeEpisodeSectionId='intro';
+let scriptLibrary=null,scriptLibraryView='destinations',activeScriptDestinationId=null,activeScriptEpisodeId=null,activeEpisodeSectionId='intro',pendingVoiceoverRewrite=null,pendingStoryAudit=null,storyAuditInFlight=false;
 function cloneData(value){return JSON.parse(JSON.stringify(value))}
 function normalizeScriptTrip(value){
  const trip={...(value||{})};
@@ -510,15 +513,18 @@ async function syncScriptLibraryNow(options={}){
   if(activeDestination&&!activeDestination.episodes.some(episode=>episode.id===activeScriptEpisodeId))activeScriptEpisodeId=activeDestination.episodes[0]?.id||null;
   localStorage.setItem(SCRIPT_LIBRARY_KEY,JSON.stringify({version:2,destinations:scriptLibrary}));
   if(toPush.length){
+   console.info('[VlogScript Sync] Uploading locally changed trips to Cassandra', {tripCount:toPush.length,episodeCount:toPush.reduce((n,trip)=>n+(trip.episodes||[]).length,0)});
    const saveResponse=await fetch(VLOG_TRIPS_API+'/vlog-trips',{method:'PUT',credentials:'include',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({trips:toPush})});
    if(!saveResponse.ok)throw new Error('Local changes could not be written to Cassandra.');
    const savedPayload=await saveResponse.json();
+   console.info('[VlogScript Sync] Cassandra accepted local trip changes', {httpStatus:saveResponse.status,tripCount:Array.isArray(savedPayload.trips)?savedPayload.trips.length:toPush.length});
    if(Array.isArray(savedPayload.trips)){
     scriptLibrary=mergeScriptTrips(scriptLibrary,savedPayload.trips);
     localStorage.setItem(SCRIPT_LIBRARY_KEY,JSON.stringify({version:2,destinations:scriptLibrary}));
    }
   }
   scriptSyncReady=true;
+  console.info('[VlogScript Sync] Sync complete', {tripCount:scriptLibrary.length,authenticated:scriptAuthenticated});
   setScriptSyncStatus('● Synced '+scriptLibrary.length+' trip'+(scriptLibrary.length===1?'':'s')+' with Cassandra',true);
   if(options.refreshUi&&$('episodeScriptPage')&&!$('episodeScriptPage').classList.contains('hidden'))renderEpisodeScriptPage();
  }catch(error){
@@ -589,8 +595,234 @@ function renderScriptLibraryHome(){const lib=loadScriptLibrary();$('scriptDestin
 function renderScriptDestination(){const destination=currentScriptDestination();if(!destination){scriptLibraryView='destinations';renderScriptLibraryHome();$('scriptLibraryHome').classList.remove('hidden');$('scriptDestinationView').classList.add('hidden');$('scriptEpisodeEditor').classList.add('hidden');return}$('scriptDestinationHeading').textContent=(destination.tripLabel||destination.name||'Untitled trip')+' · '+(destination.name||'Untitled destination');$('scriptDestinationName').value=destination.name||'';$('scriptTripLabelEdit').value=destination.tripLabel||'';$('scriptTripDateEdit').value=destination.startDate||'';$('scriptTripTypeEdit').value=destination.tripType||'Road trip';const episodes=destination.episodes||[];$('scriptEpisodeCount').textContent=episodes.length+' episode'+(episodes.length===1?'':'s');const grid=$('scriptEpisodeCards');if(!episodes.length){grid.innerHTML='<div class="script-library-empty"><strong>No episodes yet</strong><p>Start with Episode 1, then add another episode whenever you need it.</p><button class="btn primary" id="scriptEmptyAddEpisode">＋ Add your first episode</button></div>';const btn=$('scriptEmptyAddEpisode');if(btn)btn.onclick=addScriptEpisode;return}grid.innerHTML=episodes.map((e,i)=>{const sections=e.sections||[],words=sections.reduce((n,s)=>n+((s.script||'').trim()?(s.script||'').trim().split(/\s+/).length:0),0);return '<button type="button" class="script-episode-card" data-open-episode="'+esc(e.id)+'"><span class="script-episode-card-head"><span class="pill">EPISODE '+String(i+1).padStart(2,'0')+'</span><span class="pill">'+sections.length+' sections</span></span><h3>'+esc(e.title||('Episode '+(i+1)))+'</h3><p>'+(sections.length?'Continue editing your script, story beats and shooting notes.':'Blank script — add your first section.')+'</p><span class="script-episode-card-foot"><span>'+words+' words drafted</span><span>Write episode →</span></span></button>'}).join('');grid.querySelectorAll('[data-open-episode]').forEach(b=>b.onclick=()=>openScriptEpisode(destination.id,b.dataset.openEpisode))}
 function renderEpisodeNav(){const d=getEpisodeDraft();$('episodeSectionCount').textContent=d.length+' sections';$('episodeSectionNav').innerHTML=d.map((s,i)=>'<button type="button" class="scriptbook-section-btn '+(s.id===activeEpisodeSectionId?'active':'')+'" data-episode-section="'+esc(s.id)+'"><span class="scriptbook-index">'+String(i+1).padStart(2,'0')+'</span><span><span class="scriptbook-section-title">'+esc(s.title||'Untitled section')+'</span><span class="scriptbook-section-type">'+esc(s.type||'Script section')+'</span></span></button>').join('');$('episodeSectionNav').querySelectorAll('[data-episode-section]').forEach(b=>b.onclick=()=>{activeEpisodeSectionId=b.dataset.episodeSection;renderEpisodeEditor()})}
 function updateEpisodeMetrics(){const s=currentEpisodeSection();if(!s){$('episodeSectionMetrics').textContent='0 words · 0 characters';$('episodeSectionWordBadge').textContent='0 words';return}const text=String(s.script||''),words=text.trim()?text.trim().split(/\s+/).length:0;$('episodeSectionMetrics').textContent=words+' words · '+text.length+' characters';$('episodeSectionWordBadge').textContent=words+' words'}
-function saveEpisodeDraft(){const status=$('episodeScriptStatus');try{saveScriptLibrary();if(status){status.textContent='● Saved locally';status.classList.add('good')}}catch(e){if(status){status.textContent='Browser storage unavailable';status.classList.remove('good')}}updateEpisodeMetrics()}
-function renderEpisodeEditor(){const destination=currentScriptDestination(),episode=currentScriptEpisode();if(!destination||!episode){scriptLibraryView='episodes';renderScriptDestination();$('scriptLibraryHome').classList.add('hidden');$('scriptDestinationView').classList.remove('hidden');$('scriptEpisodeEditor').classList.add('hidden');return}if(!Array.isArray(episode.sections))episode.sections=[];if(!episode.sections.length)episode.sections.push(createDefaultEpisodeSection());if(!episode.sections.some(s=>s.id===activeEpisodeSectionId))activeEpisodeSectionId=episode.sections[0].id;const i=episode.sections.findIndex(s=>s.id===activeEpisodeSectionId),section=currentEpisodeSection();$('episodeEditorBreadcrumb').textContent=(destination.name||'Destination')+' / '+(episode.title||'Episode');$('episodeDestinationLabel').textContent=destination.name||'Destination';$('episodeTitleInput').value=episode.title||'';$('episodeSectionNumber').textContent='SECTION '+String(i+1).padStart(2,'0');$('episodeSectionHeading').textContent=section.title||'Untitled section';$('episodeSectionTitle').value=section.title||'';$('episodeSectionType').value=section.type||'';$('episodeSectionTiming').value=section.timing||'';$('episodeSectionText').value=section.script||'';$('episodeSectionNotes').value=section.notes||'';$('episodePrevSectionBtn').disabled=i<=0;$('episodeNextSectionBtn').disabled=i>=episode.sections.length-1;$('episodeDeleteSectionBtn').disabled=episode.sections.length<=1;$('episodeScriptStatus').textContent='● Saved locally';$('episodeScriptStatus').classList.add('good');renderEpisodeNav();updateEpisodeMetrics()}
+function saveEpisodeDraft(){const status=$('episodeScriptStatus');try{saveScriptLibrary();if(status){status.textContent='● Saved locally';status.classList.add('good')}}catch(e){if(status){status.textContent='Browser storage unavailable';status.classList.remove('good')}}updateEpisodeMetrics();updateStoryAuditSnapshotStatus()}
+function isVoiceOverSectionType(type){const value=String(type||'').trim().toLowerCase();return value.includes('voice-over')||value.includes('voice over')||value.includes('voiceover')||/^vo(?:\\s|$)/.test(value)}
+function setVoiceoverRewriteStatus(message,state=''){
+ const el=$('voiceoverRewriteStatus');if(!el)return;
+ el.textContent=message;el.classList.toggle('error',state==='error');el.classList.toggle('good',state==='good');
+}
+function renderVoiceoverRewritePreview(){
+ const panel=$('voiceoverRewritePanel'),container=$('voiceoverRewritePreview');
+ if(!pendingVoiceoverRewrite||!panel||!container)return;
+ const current=currentScriptEpisode();
+ if(!current||current.id!==pendingVoiceoverRewrite.episodeId||currentScriptDestination()?.id!==pendingVoiceoverRewrite.destinationId){
+  panel.classList.add('hidden');return;
+ }
+ $('voiceoverRewriteCount').textContent=pendingVoiceoverRewrite.sections.length+' rewrites';
+ container.innerHTML=pendingVoiceoverRewrite.sections.map(item=>{
+  const section=current.sections.find(s=>s.id===item.id);
+  return '<article class="voiceover-rewrite-card"><h3>'+esc(section?.title||'Voice-over section')+'</h3><div class="rewrite-original"><strong>Original</strong>\n'+esc(section?.script||'')+'</div><div class="rewrite-result"><strong>Storytelling rewrite</strong>\n'+esc(item.rewrittenScript)+'</div><p class="rewrite-changes"><strong>What AI changed:</strong> '+esc(item.changesMade||'Rephrased for spoken delivery.')+'</p></article>';
+ }).join('');
+ panel.classList.remove('hidden');
+}
+function storyAuditFingerprint(sections){
+ return JSON.stringify((sections||[]).map(section=>({
+  id:String(section.id||''),title:String(section.title||''),type:String(section.type||''),
+  timing:String(section.timing||''),notes:String(section.notes||''),script:String(section.script||'')
+ })));
+}
+function currentStoryAuditFingerprint(){return storyAuditFingerprint(currentScriptEpisode()?.sections||[])}
+function storyAuditSectionTitle(id){
+ const section=(currentScriptEpisode()?.sections||[]).find(item=>item.id===id);
+ return section?.title||id||'No section assigned';
+}
+function storyAuditSectionNames(ids){
+ if(!Array.isArray(ids)||!ids.length)return '<span class="muted">No sections assigned</span>';
+ return ids.map(id=>'<span class="story-audit-pill">'+esc(storyAuditSectionTitle(id))+'</span>').join('');
+}
+function storyAuditList(items,emptyMessage){
+ if(!Array.isArray(items)||!items.length)return '<p class="muted">'+esc(emptyMessage)+'</p>';
+ return '<ul>'+items.map(item=>'<li>'+esc(item)+'</li>').join('')+'</ul>';
+}
+function updateStoryAuditSnapshotStatus(){
+ if(!pendingStoryAudit)return;
+ const status=$('storyAuditSnapshotStatus');
+ if(!status)return;
+ const stale=pendingStoryAudit.fingerprint!==currentStoryAuditFingerprint();
+ status.classList.toggle('hidden',!stale);
+ status.textContent=stale?'This audit was run on an earlier draft. Re-run the audit after your edits before relying on its recommendations.':'';
+ if($('storyAuditBtn'))$('storyAuditBtn').textContent=stale?'↻ Re-audit story':'🧭 AI story audit';
+}
+function renderStoryAuditPreview(){
+ const panel=$('storyAuditPanel'),container=$('storyAuditResults'),pending=pendingStoryAudit;
+ if(!panel||!container||!pending)return;
+ const current=currentScriptEpisode();
+ if(!current||current.id!==pending.episodeId||currentScriptDestination()?.id!==pending.destinationId){
+  panel.classList.add('hidden');return;
+ }
+ const audit=pending.audit||{},compass=audit.storyCompass||{},delivery=audit.firstDelivery||{},payoff=audit.payoffAndEnding||{};
+ const sectionNames=(ids)=>storyAuditSectionNames(ids);
+ const acts=Array.isArray(audit.acts)?audit.acts:[];
+ const reviews=Array.isArray(audit.sectionReviews)?audit.sectionReviews:[];
+ const priorities=Array.isArray(audit.priorityEdits)?audit.priorityEdits:[];
+ const issues=Array.isArray(audit.continuityIssues)?audit.continuityIssues:[];
+ const flags=Array.isArray(audit.factCheckFlags)?audit.factCheckFlags:[];
+ const box=(title,body)=>'<article class="story-audit-card"><h3>'+esc(title)+'</h3>'+body+'</article>';
+ const textLine=(label,value)=>value?'<p><strong>'+esc(label)+':</strong> '+esc(value)+'</p>':'';
+ const compassHtml=box('Story Compass',
+  textLine('Episode promise',compass.episodePromise)+textLine('Primary story engine',compass.primaryStoryEngine)+
+  textLine('Central question',compass.centralQuestion)+textLine('Creator’s stake',compass.creatorStake)+
+  '<p><strong>Evidence anchors</strong></p>'+storyAuditList(compass.evidenceAnchors,'The audit could not name specific evidence anchors.'));
+ const deliveryHtml=box('Opening promise → first delivery',
+  '<p><strong>First delivery:</strong> '+esc(delivery.sectionId?storyAuditSectionTitle(delivery.sectionId):'No clear first delivery identified')+'</p>'+
+  textLine('What it delivers',delivery.whatItDelivers)+textLine('Possible delay',delivery.delayRisk));
+ const payoffHtml=box('Payoff and ending',
+  '<p><strong>Payoff section:</strong> '+esc(payoff.sectionId?storyAuditSectionTitle(payoff.sectionId):'No clear payoff identified')+'</p>'+
+  textLine('Diagnosis',payoff.diagnosis)+textLine('Recommended action',payoff.action));
+ const laneHtml=box('VO / on-camera / natural sound',
+  storyAuditList(audit.laneOverlapNotes,'No specific voice-lane overlap was flagged.'));
+ const actsHtml='<h3 style="margin:18px 0 8px">Five-act map</h3><div class="story-audit-act-list">'+acts.map((act,i)=>
+  '<article class="story-audit-item"><h4>'+(i+1)+'. '+esc(act.act||'Act')+'</h4><div>'+sectionNames(act.sectionIds)+'</div><p>'+esc(act.diagnosis||'')+'</p></article>'
+ ).join('')+'</div>';
+ const prioritiesHtml='<h3 style="margin:18px 0 8px">Recommended edits (highest impact first)</h3><div class="story-audit-act-list">'+(priorities.length?priorities.slice().sort((a,b)=>(Number(a.priority)||99)-(Number(b.priority)||99)).map(item=>
+  '<article class="story-audit-item"><h4><span class="story-audit-priority">P'+esc(item.priority??'?')+'</span> · '+esc(item.action||'Editorial action')+'</h4><div>'+sectionNames(item.sectionIds)+'</div>'+
+  textLine('Why it may help',item.expectedBenefit)+textLine('What to measure',item.testSignal)+'</article>'
+ ).join(''):'<p class="hint">No prioritized changes were returned.</p>')+'</div>';
+ const issuesHtml='<h3 style="margin:18px 0 8px">Transitions and side quests</h3><div class="story-audit-act-list">'+(issues.length?issues.map(item=>
+  '<article class="story-audit-item"><div>'+sectionNames(item.sectionIds)+'</div>'+textLine('Issue',item.issue)+textLine('Possible fix',item.fix)+'</article>'
+ ).join(''):'<p class="hint">No specific continuity issues were flagged.</p>')+'</div>';
+ const reviewHtml='<h3 style="margin:18px 0 8px">Section-by-section review</h3><div class="story-audit-reviews">'+reviews.map(item=>
+  '<details class="story-audit-item"><summary>'+esc(storyAuditSectionTitle(item.id))+' <span class="muted">· '+esc(item.narrativeRole||'Section')+'</span></summary>'+
+  textLine('What works',item.strength)+textLine('Risk',item.risk)+textLine('Suggested action',item.suggestedAction)+'</details>'
+ ).join('')+'</div>';
+ const flagsHtml='<h3 style="margin:18px 0 8px">Claims to verify</h3><div class="story-audit-act-list">'+(flags.length?flags.map(item=>
+  '<article class="story-audit-item"><h4>'+esc(item.claim||'Claim to verify')+'</h4><div>'+sectionNames(item.sectionId?[item.sectionId]:[])+'</div><p>'+esc(item.whyVerify||'')+'</p></article>'
+ ).join(''):'<p class="hint">No fact-check flags were returned. Still verify historical, cultural, safety, and scientific claims independently before publishing.</p>')+'</div>';
+ container.innerHTML='<div class="story-audit-grid">'+compassHtml+deliveryHtml+payoffHtml+laneHtml+'</div>'+actsHtml+prioritiesHtml+issuesHtml+reviewHtml+flagsHtml+
+  '<div class="story-audit-grid">'+box('Retention experiments',storyAuditList(audit.retentionHypotheses,'No retention hypotheses were returned.'))+
+  box('Confidence and limitations',storyAuditList(audit.confidenceNotes,'Treat this as a draft-level editorial read; confirm against footage and analytics.'))+'</div>';
+ $('storyAuditModel').textContent=(pending.model||'OpenAI')+' · v'+(pending.storyFormatVersion||'2.3');
+ panel.classList.remove('hidden');
+ updateStoryAuditSnapshotStatus();
+}
+async function requestStoryAudit(){
+ const destination=currentScriptDestination(),episode=currentScriptEpisode();
+ if(!destination||!episode)return;
+ if(!scriptAuthenticated){$('storyAuditPanel').classList.remove('hidden');$('storyAuditStatus').textContent='No AI call happened. Sign in with Google using “Sign in to sync”, return here, then run the audit again. Your scripts are unchanged.';$('storyAuditStatus').classList.add('error');return}
+ const sections=(episode.sections||[]).map(section=>({
+  id:section.id,title:section.title||'',type:section.type||'',timing:section.timing||'',
+  notes:section.notes||'',script:section.script||''
+ }));
+ if(!sections.length){setVoiceoverRewriteStatus('This episode has no sections to audit.','error');return}
+ if(sections.length>60){setVoiceoverRewriteStatus('This episode has more than 60 sections. Audit a smaller chapter at a time.','error');return}
+ const button=$('storyAuditBtn'),oldLabel=button.textContent;
+ const fingerprint=storyAuditFingerprint(sections),requestStartedAt=Date.now();
+ button.disabled=true;button.textContent='Auditing…';storyAuditInFlight=true;
+ $('storyAuditPanel').classList.remove('hidden');
+ $('storyAuditResults').innerHTML='';
+ $('storyAuditSnapshotStatus').classList.add('hidden');
+ $('storyAuditStatus').textContent='Reading the whole episode for its story promise, first delivery, act structure, repetition, continuity, factual risks, and ending.';
+ $('storyAuditStatus').classList.remove('error','good');
+ console.info('[VlogScript AI] Story audit started',{destination:destination.name,episode:episode.title,sectionCount:sections.length});
+ try{
+  const response=await fetch(VLOG_TRIPS_API+'/vlog-trips/storytelling-audit',{
+   method:'POST',credentials:'include',
+   headers:{'Content-Type':'application/json',Accept:'application/json'},
+   body:JSON.stringify({destinationName:destination.name||'',episodeTitle:episode.title||'',sections})
+  });
+  if(!response.ok){
+   if(response.status===401)throw new Error('Sign in with Google first. Your scripts will remain unchanged.');
+   const problem=await response.json().catch(()=>({}));
+   throw new Error(problem.message||problem.error||'The story audit failed. Check the backend/API configuration and retry.');
+  }
+  const payload=await response.json(),audit=payload.audit;
+  if(!audit||!Array.isArray(audit.acts)||audit.acts.length!==5||
+     !Array.isArray(audit.sectionReviews)||audit.sectionReviews.length!==sections.length){
+   throw new Error('The audit response was incomplete. No script was changed.');
+  }
+  const expected=sections.map(section=>section.id);
+  if(audit.sectionReviews.some((review,i)=>review?.id!==expected[i])){
+   throw new Error('The audit did not return exactly one review per section in the original order. No script was changed.');
+  }
+  pendingStoryAudit={destinationId:destination.id,episodeId:episode.id,requestId:payload.requestId||null,
+   model:payload.model||'openai',storyFormatVersion:payload.storyFormatVersion||'2.3',fingerprint,audit};
+  renderStoryAuditPreview();
+  $('storyAuditStatus').textContent='Audit ready. Review the prioritized edits, compare them to the actual footage, then revise only the sections that benefit. Nothing was changed automatically.';
+  $('storyAuditStatus').classList.add('good');
+  console.info('[VlogScript AI] Story audit ready',{requestId:payload.requestId||'not-returned',elapsedMs:Date.now()-requestStartedAt,sections:sections.length});
+ }catch(error){
+  console.error('[VlogScript AI] Story audit failed',{elapsedMs:Date.now()-requestStartedAt,error:error.message||String(error)});
+  $('storyAuditStatus').textContent=error.message||'Story audit failed. Your original scripts are unchanged.';
+  $('storyAuditStatus').classList.add('error');
+ }finally{
+  storyAuditInFlight=false;button.disabled=false;
+  if(pendingStoryAudit&&pendingStoryAudit.destinationId===destination.id&&pendingStoryAudit.episodeId===episode.id){
+   button.textContent=pendingStoryAudit.fingerprint===currentStoryAuditFingerprint()?'🧭 AI story audit':'↻ Re-audit story';
+  }else button.textContent=oldLabel;
+ }
+}
+async function requestVoiceoverRewrite(){
+ const destination=currentScriptDestination(),episode=currentScriptEpisode();
+ if(!destination||!episode)return;
+ if(!scriptAuthenticated){console.warn('[VlogScript AI] No OpenAI request sent: Studio is not authenticated.');setVoiceoverRewriteStatus('No AI call happened. Sign in with Google using “Sign in to sync”, return here, then run the rewrite again. Your scripts are unchanged.','error');return}
+ const sections=(episode.sections||[]).filter(section=>isVoiceOverSectionType(section.type)&&String(section.script||'').trim());
+ if(!sections.length){setVoiceoverRewriteStatus('This episode has no non-empty voice-over sections to rewrite.','error');return}
+ if(sections.length>20){setVoiceoverRewriteStatus('This episode has more than 20 voice-over sections. Split the rewrite into smaller groups first.','error');return}
+ const button=$('rewriteEpisodeVoiceoversBtn'),oldLabel=button.textContent;
+ const requestStartedAt=Date.now();
+ const requestChars=sections.reduce((sum,section)=>sum+String(section.script||'').length,0);
+ console.info('[VlogScript AI] Rewrite request started', {destination:destination.name,episode:episode.title,sectionCount:sections.length,sourceCharacters:requestChars,onCameraSectionsExcluded:true,apiBase:VLOG_TRIPS_API});
+ button.disabled=true;button.textContent='Rewriting…';
+ setVoiceoverRewriteStatus('Sending '+sections.length+' voice-over sections to the backend. Watch the backend console for VOICEOVER_STORY_REWRITE_START and OPENAI_VOICEOVER_REQUEST_SENDING.');
+ try{
+  const response=await fetch(VLOG_TRIPS_API+'/vlog-trips/storytelling-rewrite',{
+   method:'POST',credentials:'include',
+   headers:{'Content-Type':'application/json',Accept:'application/json'},
+   body:JSON.stringify({
+    destinationName:destination.name||'',
+    episodeTitle:episode.title||'',
+    sections:sections.map(section=>({id:section.id,title:section.title||'',type:section.type||'',timing:section.timing||'',notes:section.notes||'',script:section.script||''})),
+    fullEpisodeContext:(episode.sections||[]).map(section=>({id:section.id,title:section.title||'',type:section.type||'',timing:section.timing||'',notes:section.notes||'',script:section.script||''}))
+   })
+  });
+  if(!response.ok){
+   if(response.status===401)throw new Error('Sign in with Google first. Your scripts will remain unchanged.');
+   const problem=await response.json().catch(()=>({}));
+   throw new Error(problem.message||problem.error||'OpenAI could not rewrite these scripts. Check the backend/API configuration and retry.');
+  }
+  const payload=await response.json();
+  console.info('[VlogScript AI] HTTP response received', {requestId:payload.requestId||'not-returned',model:payload.model||'not-returned',httpStatus:response.status,elapsedMs:Date.now()-requestStartedAt,responseSectionCount:Array.isArray(payload.sections)?payload.sections.length:0});
+  if(!Array.isArray(payload.sections)||payload.sections.length!==sections.length)throw new Error('The rewrite response did not include every requested section. Nothing was changed.');
+  const expected=new Set(sections.map(section=>section.id));
+  const seen=new Set();
+  const rewritten=payload.sections.map(item=>{
+   if(!item||!expected.has(item.id)||seen.has(item.id)||typeof item.rewrittenScript!=='string'||!item.rewrittenScript.trim())throw new Error('OpenAI returned an incomplete or invalid rewrite. Nothing was changed.');
+   seen.add(item.id);return{id:item.id,rewrittenScript:item.rewrittenScript.trim(),changesMade:String(item.changesMade||'').trim()};
+  });
+  if(seen.size!==expected.size)throw new Error('One or more sections were missing from the rewrite. Nothing was changed.');
+  if(rewritten.some(item=>!item.changesMade))throw new Error('OpenAI did not explain the storytelling changes. Nothing was changed.');
+  pendingVoiceoverRewrite={destinationId:destination.id,episodeId:episode.id,requestId:payload.requestId||null,model:payload.model||'openai',sections:rewritten};
+  console.info('[VlogScript AI] Rewrite output ready for review', {requestId:payload.requestId||'not-returned',model:payload.model||'openai',sectionCount:rewritten.length,sections:rewritten.map(item=>({id:item.id,changesMade:item.changesMade,originalCharacters:String(sections.find(source=>source.id===item.id)?.script||'').length,rewrittenCharacters:item.rewrittenScript.length}))});
+  renderVoiceoverRewritePreview();
+  setVoiceoverRewriteStatus('OpenAI call succeeded ('+(payload.requestId||'request ID unavailable')+'). Review the “What AI changed” explanation for each section, then choose “Use rewritten scripts”. Nothing is saved until you apply it.');
+ }catch(error){
+  console.error('[VlogScript AI] Rewrite failed; original scripts were not changed', {elapsedMs:Date.now()-requestStartedAt,error:error.message||String(error)});
+  setVoiceoverRewriteStatus(error.message||'Storytelling rewrite failed. Your existing scripts are unchanged.','error');
+ }finally{
+  button.disabled=false;button.textContent=oldLabel;
+ }
+}
+function normalizeRewriteText(value){return String(value||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ')}
+function applyVoiceoverRewrites(){
+ if(!pendingVoiceoverRewrite)return;
+ const destination=currentScriptDestination(),episode=currentScriptEpisode();
+ if(!destination||!episode||destination.id!==pendingVoiceoverRewrite.destinationId||episode.id!==pendingVoiceoverRewrite.episodeId){
+  setVoiceoverRewriteStatus('The active episode changed. Open the original episode and run the rewrite again.','error');return;
+ }
+ const byId=new Map(pendingVoiceoverRewrite.sections.map(item=>[item.id,item.rewrittenScript]));
+ for(const section of episode.sections||[]){
+  if(byId.has(section.id)&&isVoiceOverSectionType(section.type))section.script=byId.get(section.id);
+ }
+ const count=byId.size,requestId=pendingVoiceoverRewrite.requestId||'unknown';
+ pendingVoiceoverRewrite=null;
+ $('voiceoverRewritePanel').classList.add('hidden');
+ saveEpisodeDraft();
+ renderEpisodeEditor();
+ console.info('[VlogScript AI] Rewritten scripts applied and saved locally', {requestId,episode:episode.title,sectionCount:count,cassandraSyncQueued:scriptSyncReady});
+ setVoiceoverRewriteStatus(count+' voice-over scripts applied and saved locally. Request '+requestId+'. Cassandra sync '+(scriptSyncReady?'is queued; check the Cassandra sync status below.':'will run after backend sign-in is connected.'),'good');
+}
+function discardVoiceoverRewrite(){pendingVoiceoverRewrite=null;$('voiceoverRewritePanel').classList.add('hidden');setVoiceoverRewriteStatus('Preview discarded. Your original scripts were kept.')}
+function renderEpisodeEditor(){const destination=currentScriptDestination(),episode=currentScriptEpisode();if(!destination||!episode){scriptLibraryView='episodes';renderScriptDestination();$('scriptLibraryHome').classList.add('hidden');$('scriptDestinationView').classList.remove('hidden');$('scriptEpisodeEditor').classList.add('hidden');return}if(!Array.isArray(episode.sections))episode.sections=[];if(pendingVoiceoverRewrite&&(pendingVoiceoverRewrite.episodeId!==episode.id||pendingVoiceoverRewrite.destinationId!==destination.id)){pendingVoiceoverRewrite=null;$('voiceoverRewritePanel').classList.add('hidden')}if(pendingStoryAudit&&(pendingStoryAudit.episodeId!==episode.id||pendingStoryAudit.destinationId!==destination.id)){pendingStoryAudit=null;$('storyAuditPanel').classList.add('hidden');$('storyAuditBtn').textContent='🧭 AI story audit'}if(!episode.sections.length)episode.sections.push(createDefaultEpisodeSection());$('rewriteEpisodeVoiceoversBtn').disabled=!episode.sections.some(s=>isVoiceOverSectionType(s.type)&&String(s.script||'').trim());if(!episode.sections.some(s=>s.id===activeEpisodeSectionId))activeEpisodeSectionId=episode.sections[0].id;const i=episode.sections.findIndex(s=>s.id===activeEpisodeSectionId),section=currentEpisodeSection();$('episodeEditorBreadcrumb').textContent=(destination.name||'Destination')+' / '+(episode.title||'Episode');$('episodeDestinationLabel').textContent=destination.name||'Destination';$('episodeTitleInput').value=episode.title||'';$('episodeSectionNumber').textContent='SECTION '+String(i+1).padStart(2,'0');$('episodeSectionHeading').textContent=section.title||'Untitled section';$('episodeSectionTitle').value=section.title||'';$('episodeSectionType').value=section.type||'';$('episodeSectionTiming').value=section.timing||'';$('episodeSectionText').value=section.script||'';$('episodeSectionNotes').value=section.notes||'';$('episodePrevSectionBtn').disabled=i<=0;$('episodeNextSectionBtn').disabled=i>=episode.sections.length-1;$('episodeDeleteSectionBtn').disabled=episode.sections.length<=1;$('episodeScriptStatus').textContent='● Saved locally';$('episodeScriptStatus').classList.add('good');renderEpisodeNav();updateEpisodeMetrics()}
 function renderEpisodeScriptPage(){$('scriptLibraryHome').classList.toggle('hidden',scriptLibraryView!=='destinations');$('scriptDestinationView').classList.toggle('hidden',scriptLibraryView!=='episodes');$('scriptEpisodeEditor').classList.toggle('hidden',scriptLibraryView!=='editor');if(scriptLibraryView==='destinations')renderScriptLibraryHome();else if(scriptLibraryView==='episodes')renderScriptDestination();else renderEpisodeEditor()}
 function addEpisodeSection(){const episode=currentScriptEpisode();if(!episode)return;const s={id:'section-'+uid(),title:'New script section',type:'Script / draft',timing:'',script:'',notes:''};episode.sections.push(s);activeEpisodeSectionId=s.id;saveEpisodeDraft();renderEpisodeEditor();$('episodeSectionTitle').focus()}
 function removeEpisodeSection(){const episode=currentScriptEpisode(),section=currentEpisodeSection();if(!episode||!section)return;if(episode.sections.length<=1){alert('Keep at least one script section in each episode.');return}if(!confirm('Delete “'+(section.title||'Untitled section')+'” from this episode?'))return;const i=episode.sections.findIndex(s=>s.id===section.id);episode.sections.splice(i,1);activeEpisodeSectionId=episode.sections[Math.min(i,episode.sections.length-1)].id;saveEpisodeDraft();renderEpisodeEditor()}
@@ -1107,7 +1339,7 @@ $('addScriptDestinationBtn').onclick=createScriptDestination;$('scriptDestinatio
 $('scriptBackToDestinationsBtn').onclick=showScriptDestinations;$('addScriptEpisodeBtn').onclick=addScriptEpisode;$('episodeBackToEpisodesBtn').onclick=()=>{scriptLibraryView='episodes';show('episode-script')};$('episodeBackToDestinationsBtn').onclick=showScriptDestinations;$('deleteCurrentScriptEpisodeBtn').onclick=deleteCurrentScriptEpisode;
 $('scriptDestinationName').addEventListener('input',e=>{const d=currentScriptDestination();if(!d)return;d.name=e.target.value;$('scriptDestinationHeading').textContent=(d.tripLabel||d.name||'Untitled trip')+' · '+(d.name||'Untitled destination');$('episodeDestinationLabel').textContent=d.name||'Destination';$('episodeEditorBreadcrumb').textContent=(d.name||'Destination')+' / '+(currentScriptEpisode()?.title||'Episode');saveScriptLibrary()});[['scriptTripLabelEdit','tripLabel'],['scriptTripDateEdit','startDate'],['scriptTripTypeEdit','tripType']].forEach(([id,key])=>$(id).addEventListener('change',e=>{const d=currentScriptDestination();if(!d)return;d[key]=e.target.value;$('scriptDestinationHeading').textContent=(d.tripLabel||d.name||'Untitled trip')+' · '+(d.name||'Untitled destination');saveScriptLibrary()}));
 $('episodeTitleInput').addEventListener('input',e=>{const episode=currentScriptEpisode(),destination=currentScriptDestination();if(!episode)return;episode.title=e.target.value;$('episodeEditorBreadcrumb').textContent=(destination?.name||'Destination')+' / '+(episode.title||'Episode');saveEpisodeDraft()});
-$('episodeAddSectionBtn').onclick=addEpisodeSection;$('episodeDeleteSectionBtn').onclick=removeEpisodeSection;$('episodePrevSectionBtn').onclick=()=>moveEpisodeSection(-1);$('episodeNextSectionBtn').onclick=()=>moveEpisodeSection(1);$('episodeDownloadBtn').onclick=downloadEpisodeScript;
+$('episodeAddSectionBtn').onclick=addEpisodeSection;$('episodeDeleteSectionBtn').onclick=removeEpisodeSection;$('episodePrevSectionBtn').onclick=()=>moveEpisodeSection(-1);$('episodeNextSectionBtn').onclick=()=>moveEpisodeSection(1);$('episodeDownloadBtn').onclick=downloadEpisodeScript;$('storyAuditBtn').onclick=requestStoryAudit;$('rewriteEpisodeVoiceoversBtn').onclick=requestVoiceoverRewrite;$('applyVoiceoverRewritesBtn').onclick=applyVoiceoverRewrites;$('discardVoiceoverRewritesBtn').onclick=discardVoiceoverRewrite;
 [['episodeSectionTitle','title'],['episodeSectionType','type'],['episodeSectionTiming','timing'],['episodeSectionText','script'],['episodeSectionNotes','notes']].forEach(([id,key])=>$(id).addEventListener('input',e=>{const section=currentEpisodeSection();if(!section)return;section[key]=e.target.value;if(key==='title'){$('episodeSectionHeading').textContent=section.title||'Untitled section';renderEpisodeNav()}saveEpisodeDraft()}));
 $('shootNav').onclick=()=>{if(!cur()){if(projects.length)open(projects[0].id);else create()}show('shoot');let s=cur()?.scenes.find(s=>s.shots.some(x=>!x.done));if(s){activeScene=s.id;sceneList();sceneEditor()}};$('themeToggle').onclick=()=>{const dark=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=dark?'dark':'light';$('themeToggle').textContent=dark?'☀ Light mode':'☾ Dark mode';$('themeToggle').setAttribute('aria-label',dark?'Switch to light theme':'Switch to dark theme');$('themeToggle').setAttribute('aria-pressed',String(dark));try{localStorage.setItem('vlogscript-theme',dark?'dark':'light')}catch(e){}};$('themeToggle').textContent=document.documentElement.dataset.theme==='dark'?'☀ Light mode':'☾ Dark mode';$('themeToggle').setAttribute('aria-label',document.documentElement.dataset.theme==='dark'?'Switch to light theme':'Switch to dark theme');$('themeToggle').setAttribute('aria-pressed',String(document.documentElement.dataset.theme==='dark'));$('printBtn').onclick=()=>window.print();$('exportBtn').onclick=()=>{let b=new Blob([JSON.stringify({format:'vlogscript-studio',version:1,projects},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='vlogscript-studio-backup.json';a.click();URL.revokeObjectURL(a.href)};$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{try{let d=JSON.parse(await e.target.files[0].text()),a=Array.isArray(d)?d:d.projects;if(!Array.isArray(a))throw Error();if(confirm('Import '+a.length+' project(s)? Existing projects will be kept.')){projects=[...a,...projects];save();show('home')}}catch(e){alert('Could not import this JSON file. Choose a VlogScript Studio export.')}e.target.value=''};async function bootstrap(){
  try{
