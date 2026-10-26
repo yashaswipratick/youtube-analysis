@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,7 +24,8 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            @Value("${app.ui.base-url:http://localhost:3000}") String uiBaseUrl) throws Exception {
+            @Value("${app.ui.base-url:http://localhost:3000}") String uiBaseUrl,
+            OAuth2AuthorizedClientRepository authorizedClientRepository) throws Exception {
         http
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
@@ -42,7 +44,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/youtube-analytics/v1/auth/status").permitAll()
                 .anyRequest().authenticated()
             )
-            .oauth2Login(oauth2 -> oauth2.successHandler((request, response, authentication) -> {
+            .oauth2Login(oauth2 -> oauth2
+                .authorizedClientRepository(authorizedClientRepository)
+                .successHandler((request, response, authentication) -> {
                 var session = request.getSession(false);
                 if (session != null && Boolean.TRUE.equals(
                         session.getAttribute(OAuthController.RETURN_TO_UI_SESSION_ATTRIBUTE))) {

@@ -80,7 +80,7 @@ The creator mode is served by `POST /creator-video-analysis`. It checks video ow
 - `controller/AnalyticsWorkspaceController.java` exposes the workspace-specific endpoints above.
 - `controller/CreatorCoachController.java` exposes the creator-coach endpoints listed below.
 - `service/creatorcoach/CreatorCoachService.java` orchestrates persisted profiles, manual inputs, transcript editing, deterministic analytics preprocessing, async jobs, report post-processing, progress, plans, reminders, and glossary entries.
-- `service/creatorcoach/CreatorCoachStore.java` stores creator-owned JSON records in the H2 database. Records are always scoped to the authenticated Google subject; the client never supplies an owner ID.
+- `service/creatorcoach/CreatorCoachStore.java` stores creator-owned JSON records in the Cassandra keyspace `youtube_analytics`. Records are always scoped to the authenticated Google subject; the client never supplies an owner ID.
 - `service/creatorcoach/CreatorCoachQualityRules.java` contains deterministic curve-moment detection, evidence-quote checks, and confidence caps.
 - `resources/prompts/coach-v1.txt` is the static, versioned system prompt. Store prompt version/model/token counts/raw AI output in an internal report record, separate from UI-visible report JSON.
 
@@ -109,9 +109,9 @@ The routes below share the prefix `/api/youtube-analytics/v1`. Private endpoints
 
 ### Storage and configuration
 
-The creator-coach records use an H2 file database under `./data/youtube-analytics/creator-coach-db` by default. Override with `CREATOR_DB_PATH`, `CREATOR_DB_USERNAME`, and `CREATOR_DB_PASSWORD`. Keep this directory private and back it up only in a protected location.
+All creator-coach records and OAuth authorized clients are stored in the local Cassandra keyspace `youtube_analytics`. Local defaults use Cassandra at `127.0.0.1:9042` with datacenter `datacenter1`. Override with `CASSANDRA_CONTACT_POINT`, `CASSANDRA_PORT`, and `CASSANDRA_LOCAL_DATACENTER`.
 
-OAuth access and refresh tokens are encrypted with AES-GCM in the server-side authorized-client table. Configure a stable, independent `YOUTUBE_TOKEN_ENCRYPTION_KEY` for deployments. If it is omitted, local development derives an encryption key from `GOOGLE_CLIENT_SECRET`; rotating that fallback secret can make existing stored tokens unreadable, requiring reconnect. Never put the key in the browser or logs. The original OAuth scope configuration should remain read-only and token values are never returned by creator endpoints.
+The `oauth2_authorized_client` table is the only durable OAuth-token store. Token rows are cleared at application startup and graceful shutdown, so Google authorization is required for each application run. Token values are never returned by creator endpoints.
 
 `CREATOR_COACH_DAILY_ANALYSIS_LIMIT` defaults to 10 starts per creator per India-local day. Set `CREATOR_COACH_INPUT_COST_PER_MILLION_USD` and `CREATOR_COACH_OUTPUT_COST_PER_MILLION_USD` to enable approximate cost logging from the actual token counts returned by the model. If the rates are left at zero, the report logs model/token usage but labels cost as not configured rather than inventing a charge.
 
@@ -126,6 +126,6 @@ OAuth access and refresh tokens are encrypted with AES-GCM in the server-side au
 - Matching in-flight requests are deduplicated by video, transcript, manual values, precomputed Analytics hash, profile and prompt version. Reports store the final input hash; internal records retain the raw response and usage fields.
 - Model calls use bounded retries with exponential backoff for HTTP 429/5xx responses. The output is constrained by a strict JSON schema and one schema-validation retry. The controller returns a job status rather than a long-running OpenAI response.
 
-The H2 record model deliberately keeps raw AI output and raw Analytics snapshots in an internal record type that is not exposed by the report endpoint. The UI receives only computed/report-safe fields. The creator can delete persisted creator data using `DELETE /account/data`.
+The internal Cassandra record model deliberately keeps raw AI output and raw Analytics snapshots in an internal record type that is not exposed by the report endpoint. The UI receives only computed/report-safe fields. The creator can delete persisted creator data using `DELETE /account/data`.
 
 Known implementation limits: the current upload catalog is capped at 50 recent owned uploads; the title check is a deterministic word-overlap warning, not a performance prediction; the glossary uses available saved-report examples and returns no example when one cannot be grounded; the plan export is text, while report export supports PDF/text. The PDF is constrained to one page and may use a portable-character fallback when a Unicode font is unavailable on the server.

@@ -14,18 +14,17 @@ Application APIs are rooted at `/api/youtube-analytics/v1`. Analytics endpoints 
 
 ### Cassandra persistence
 
-The application uses the local Cassandra cluster for creator-owned records and encrypted OAuth tokens. On startup, it idempotently creates these tables in the `youtube_analytics` keyspace:
+The application uses local Cassandra as the **only database** for creator-owned records and OAuth authorized clients. OAuth access and refresh token values are stored in the `oauth2_authorized_client` table, without an HTTP-session authorized-client cache. No separate token-encryption key or client-secret-derived token key is configured, so protect access to the local Cassandra service and its disk files.
 
 - `creator_coach_record_by_id` — profiles, transcripts, reports, plans, checklist/action state and other creator records.
 - `creator_coach_record_ids_by_owner` — owner-scoped index used to remove a creator's records.
-- `oauth2_authorized_client` — access/refresh tokens encrypted with AES-GCM.
-- `cassandra_migration_marker` — one-time migration marker and migrated-row counts.
+- `oauth2_authorized_client` — the sole durable token store.
 
 **Cassandra requires keyspace names to use alphanumeric characters or underscores.** The application/repository name remains `youtube-analytics`, but the actual Cassandra keyspace is `youtube_analytics`; Cassandra rejects a hyphenated keyspace name even when quoted.
 
-Local defaults use `127.0.0.1:9042` and datacenter `datacenter1`. Override them with `CASSANDRA_CONTACT_POINT`, `CASSANDRA_PORT`, and `CASSANDRA_LOCAL_DATACENTER`. The DDL is also checked into `src/main/resources/cassandra-schema.cql`.
+Local defaults use `127.0.0.1:9042` and datacenter `datacenter1`. Override them with `CASSANDRA_CONTACT_POINT`, `CASSANDRA_PORT`, and `CASSANDRA_LOCAL_DATACENTER`. The DDL is checked into `src/main/resources/cassandra-schema.cql`.
 
-On first startup, `CASSANDRA_MIGRATE_LEGACY_H2=true` (default) performs a **read-only** import from the previous local H2 file at `CREATOR_DB_PATH` (default `./data/youtube-analytics/creator-coach-db`). Creator records and already-encrypted OAuth tokens are copied to Cassandra; the original H2 file is not deleted. The `cassandra_migration_marker` table prevents automatic re-import. Set `CASSANDRA_MIGRATE_LEGACY_H2=false` to skip this migration. For stable token decryption across restarts/deployments, set `YOUTUBE_TOKEN_ENCRYPTION_KEY` and keep it private and unchanged.
+The application clears the Cassandra OAuth token table before accepting requests on startup and again during graceful shutdown. A new Google authorization is therefore required for each application run. Both OAuth login and the API token manager use the Cassandra-only authorized-client repository. Tokens still exist transiently in request-processing memory while Spring Security makes an authenticated Google API request; no separate in-memory token cache is maintained.
 
 
 ### YouTube Studio analytics reports

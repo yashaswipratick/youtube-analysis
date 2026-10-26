@@ -1,14 +1,6 @@
 spring:
   application:
     name: youtube-analytics
-  # Unused H2 datasource is kept in-memory for legacy compatibility tests only.
-  # Live application records and OAuth tokens are stored in Cassandra.
-  datasource:
-    url: jdbc:h2:mem:legacy-unused;DB_CLOSE_DELAY=-1
-    username: ${CREATOR_DB_USERNAME:sa}
-    password: ${CREATOR_DB_PASSWORD:}
-    driver-class-name: org.h2.Driver
-
   security:
     oauth2:
       client:
@@ -42,18 +34,13 @@ server:
 # Automatically open Google sign-in when running locally. Set OAUTH_AUTO_OPEN_BROWSER=false
 # for headless servers or environments where a browser should not be launched.
 app:
-  storage:
-    # Read-only source used to migrate existing rows from the previous H2 file at first startup.
-    database-path: ${CREATOR_DB_PATH:./data/youtube-analytics/creator-coach-db}
-    migrate-legacy-h2: ${CASSANDRA_MIGRATE_LEGACY_H2:true}
   cassandra:
     contact-point: ${CASSANDRA_CONTACT_POINT:127.0.0.1}
     port: ${CASSANDRA_PORT:9042}
     local-datacenter: ${CASSANDRA_LOCAL_DATACENTER:datacenter1}
   oauth:
-    # Stable, independent key for encrypted OAuth token storage. If blank, the local-development
-    # fallback derives a key from GOOGLE_CLIENT_SECRET. Set YOUTUBE_TOKEN_ENCRYPTION_KEY in deployments.
-    token-encryption-key: ${YOUTUBE_TOKEN_ENCRYPTION_KEY:}
+    # OAuth tokens are stored only in local Cassandra and cleared at startup/shutdown.
+    # No application-level token-encryption key or alternate token store is used.
     auto-open-browser: ${OAUTH_AUTO_OPEN_BROWSER:true}
   ui:
     # Used only when login was started from the separate UI. Direct OAuth URL visits
